@@ -1,0 +1,13 @@
+/vendor/
+/Model/Base/
+/Model/Map/
+/Model/Event/
+/node_modules/
+/composer.lock
+/package-lock.json
+/.phpunit.cache/
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/.idea/
+/.vscode/
+.DS_Store
