@@ -48,6 +48,12 @@ final readonly class EntryRepository
         return $deleted;
     }
 
+    /** Keeps the evidence of the choices but cuts the link with a customer account that no longer exists. */
+    public function detachCustomer(int $customerId): int
+    {
+        return ConsentEntryQuery::create()->filterByCustomerId($customerId)->update(['CustomerId' => null]);
+    }
+
     /** @return list<ConsentEntry> */
     public function forConsentId(string $consentId): array
     {

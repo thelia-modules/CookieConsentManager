@@ -63,6 +63,10 @@
         <index name="idx_ccm_consent_entry_recorded_at">
             <index-column name="recorded_at"/>
         </index>
+        <index name="idx_ccm_consent_entry_action_recorded_at">
+            <index-column name="action"/>
+            <index-column name="recorded_at"/>
+        </index>
     </table>
 
     <table name="ccm_daily_stat" phpName="DailyStat" namespace="CookieConsentManager\Model">

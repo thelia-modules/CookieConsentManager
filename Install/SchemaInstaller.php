@@ -18,9 +18,22 @@ final readonly class SchemaInstaller
         return new self($moduleDirectory);
     }
 
+    // Indexes added after the first release: CREATE TABLE IF NOT EXISTS leaves an existing table untouched.
+    private const LATER_INDEXES = [
+        ['ccm_consent_entry', 'idx_ccm_consent_entry_action_recorded_at', '`action`, `recorded_at`'],
+    ];
+
     public function apply(?ConnectionInterface $con = null): void
     {
+        $con ??= Propel::getWriteConnection('TheliaMain');
         $this->execute($this->moduleDirectory.'/Config/TheliaMain.sql', $con);
+
+        foreach (self::LATER_INDEXES as [$table, $index, $columns]) {
+            $exists = $con->query(\sprintf("SHOW INDEX FROM `%s` WHERE Key_name = '%s'", $table, $index))->fetch();
+            if (false === $exists) {
+                $con->exec(\sprintf('ALTER TABLE `%s` ADD INDEX `%s` (%s)', $table, $index, $columns));
+            }
+        }
     }
 
     public function applyUpdates(string $currentVersion, ?ConnectionInterface $con = null): void

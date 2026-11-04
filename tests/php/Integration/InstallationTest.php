@@ -48,6 +48,23 @@ final class InstallationTest extends CcmTestCase
         self::assertSame(1, ConsentEntryQuery::create()->filterByConsentId(self::ID)->count());
     }
 
+    public function testAnExistingInstallGetsTheRegistryFilterIndexAndReplayingKeepsOneCopy(): void
+    {
+        $con = Propel::getWriteConnection('TheliaMain');
+        $name = 'idx_ccm_consent_entry_action_recorded_at';
+        $columns = static fn (): array => array_column($con->query("SHOW INDEX FROM ccm_consent_entry WHERE Key_name = '".$name."'")->fetchAll(\PDO::FETCH_ASSOC), 'Column_name');
+
+        if ([] !== $columns()) {
+            $con->exec('ALTER TABLE ccm_consent_entry DROP INDEX '.$name);
+        }
+
+        $installer = SchemaInstaller::forModule(\dirname(__DIR__, 3));
+        $installer->apply();
+        $installer->apply();
+
+        self::assertSame(['action', 'recorded_at'], $columns());
+    }
+
     public function testAScriptThatWouldDropOrTruncateIsRefusedBeforeAnyStatementRuns(): void
     {
         $file = tempnam(sys_get_temp_dir(), 'ccm-sql');

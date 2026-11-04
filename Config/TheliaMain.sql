@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS `ccm_consent_entry`
     `customer_id` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `idx_ccm_consent_entry_consent_id` (`consent_id`),
-    INDEX `idx_ccm_consent_entry_recorded_at` (`recorded_at`)
+    INDEX `idx_ccm_consent_entry_recorded_at` (`recorded_at`),
+    INDEX `idx_ccm_consent_entry_action_recorded_at` (`action`, `recorded_at`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `ccm_daily_stat`
