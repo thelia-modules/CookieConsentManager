@@ -1,0 +1,26 @@
+# Analyses the module against the shop it is installed in (the core and the generated Propel models).
+# From the shop root, with CCM_SITE_ROOT set to it:
+#   CCM_SITE_ROOT=$PWD vendor/bin/phpstan analyse -c local/modules/CookieConsentManager/phpstan.neon.dist --memory-limit=1G
+parameters:
+    level: 6
+    paths:
+        - .
+    excludePaths:
+        analyse:
+            - node_modules (?)
+            - tools (?)
+            - assets (?)
+            - Resources (?)
+    bootstrapFiles:
+        - tests/php/phpstan-bootstrap.php
+    scanFiles:
+        - %env.CCM_SITE_ROOT%/vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
+    scanDirectories:
+        - %env.CCM_SITE_ROOT%/var/propel/dev/model
+    tmpDir: .phpstan.cache
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # The documents handled here are JSON of the fixed ccm-config/1 schema (Config/schema/):
+        # an array<string, mixed> annotation on every signature would only repeat it.
+        -
+            identifier: missingType.iterableValue
