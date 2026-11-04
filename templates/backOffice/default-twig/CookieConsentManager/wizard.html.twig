@@ -72,7 +72,7 @@
                 {{ ccm.issues(issues, '') }}
                 {% if can.create %}
                     <form method="post" action="{{ path('ccm_admin_wizard_save') }}">
-                        {{ ccm.csrf() }}<input type="hidden" name="step" value="4"><input type="hidden" name="step_action" value="publish">
+                        {{ ccm.csrf() }}<input type="hidden" name="step" value="4">
                         <button class="btn btn-success" type="submit" data-testid="ccm-wizard-publish"><i class="bi bi-cloud-upload" aria-hidden="true"></i> {{ 'Publish'|trans }}</button>
                     </form>
                 {% else %}

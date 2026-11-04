@@ -77,11 +77,12 @@ final class DashboardController extends AbstractScreenController
     #[Route('/wizard', name: 'wizard_save', methods: ['POST'])]
     public function saveWizard(Request $request): Response
     {
-        if (null !== $denied = $this->guardWrite($request, 'publish' === $request->request->get('step_action') ? AccessManager::CREATE : AccessManager::UPDATE)) {
+        $step = max(1, min(4, (int) $request->request->get('step', 1)));
+        // Step 4 publishes: the right comes from the step, never from a field the browser sends.
+        if (null !== $denied = $this->guardWrite($request, 4 === $step ? AccessManager::CREATE : AccessManager::UPDATE)) {
             return $denied;
         }
 
-        $step = max(1, min(4, (int) $request->request->get('step', 1)));
         $draft = $this->drafts->load();
 
         if (1 === $step) {
