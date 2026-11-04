@@ -9,7 +9,25 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /** Shows the Markdown guides of the module in the back-office: everything is escaped first, only a few constructs are rendered. */
 final class GuideRenderer
 {
-    public const GUIDES = ['administrateur' => 'fr/guide-administrateur.md', 'integrateur' => 'fr/guide-integrateur.md'];
+    /** Guide => language => file. The key stays the French one: it is the `guide` parameter of the help screen. */
+    public const GUIDES = [
+        'administrateur' => ['fr' => 'fr/guide-administrateur.md', 'en' => 'administrator-guide.md'],
+        'integrateur' => ['fr' => 'fr/guide-integrateur.md', 'en' => 'integrator-guide.md'],
+    ];
+
+    /** Guide files that the help screen serves, by file name: a link to one of them becomes a link to the screen. */
+    private const GUIDE_FILES = [
+        'administrator-guide.md' => 'administrateur',
+        'guide-administrateur.md' => 'administrateur',
+        'integrator-guide.md' => 'integrateur',
+        'guide-integrateur.md' => 'integrateur',
+    ];
+
+    /** Anchors that the dashboard links to: topic => language => heading slug. */
+    private const ANCHORS = [
+        'template-override' => ['fr' => 'surcharger-un-gabarit-pas-a-pas', 'en' => 'overriding-a-template'],
+        'theme-fonts' => ['fr' => 'polices-du-theme', 'en' => 'theme-fonts'],
+    ];
 
     public function __construct(
         #[Autowire(value: __DIR__.'/../docs')]
@@ -17,9 +35,20 @@ final class GuideRenderer
     ) {
     }
 
-    public function render(string $guide): ?string
+    /** French for a French back-office, English for every other language. */
+    public static function language(string $locale): string
     {
-        $file = isset(self::GUIDES[$guide]) ? $this->directory.'/'.self::GUIDES[$guide] : null;
+        return 'fr' === strtolower(substr($locale, 0, 2)) ? 'fr' : 'en';
+    }
+
+    public static function anchor(string $topic, string $locale): string
+    {
+        return self::ANCHORS[$topic][self::language($locale)];
+    }
+
+    public function render(string $guide, string $locale = 'en'): ?string
+    {
+        $file = isset(self::GUIDES[$guide]) ? $this->directory.'/'.self::GUIDES[$guide][self::language($locale)] : null;
         if (null === $file || !is_file($file)) {
             return null;
         }
@@ -153,7 +182,13 @@ final class GuideRenderer
         $text = preg_replace('/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $text) ?? $text;
         $text = preg_replace_callback('/\[([^\]]+)\]\(([^)\s]+)\)/', static function (array $match): string {
             $url = html_entity_decode($match[2], \ENT_QUOTES);
-            if (1 !== preg_match('~^(https?://|#|[\w./-]+\.md(#[\w-]*)?$)~i', $url)) {
+            if (1 === preg_match('~^(?:[\w./-]*/)?([\w.-]+\.md)(#[\w-]*)?$~i', $url, $file)) {
+                // The other Markdown files are not served by the back-office: only the guides have a page.
+                $guide = self::GUIDE_FILES[$file[1]] ?? null;
+
+                return null === $guide ? $match[1] : '<a href="?guide='.$guide.htmlspecialchars($file[2] ?? '', \ENT_QUOTES).'">'.$match[1].'</a>';
+            }
+            if (1 !== preg_match('~^(https?://|#)~i', $url)) {
                 return $match[1];
             }
 

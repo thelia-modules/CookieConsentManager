@@ -37,7 +37,7 @@ final class HelpController extends AbstractScreenController
 
         $guide = (string) $request->query->get('guide', 'administrateur');
         $guide = isset(GuideRenderer::GUIDES[$guide]) ? $guide : 'administrateur';
-        $html = $this->guides->render($guide);
+        $html = $this->guides->render($guide, $request->getLocale());
 
         return $this->view('help', 'dashboard', ['guide' => $guide, 'guides' => array_keys(GuideRenderer::GUIDES), 'html' => $html], null === $html ? 404 : 200);
     }

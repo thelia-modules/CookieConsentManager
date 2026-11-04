@@ -34,4 +34,41 @@ final class GuideRendererTest extends TestCase
         self::assertNull((new GuideRenderer('/nonexistent'))->render('administrateur'));
         self::assertNull((new GuideRenderer(__DIR__))->render('../etc/passwd'));
     }
+
+    private static function guides(): GuideRenderer
+    {
+        return new GuideRenderer(\dirname(__DIR__, 3).'/docs');
+    }
+
+    public function testTheLanguageOfTheGuideFollowsTheLocale(): void
+    {
+        self::assertSame('fr', GuideRenderer::language('fr_FR'));
+        self::assertSame('fr', GuideRenderer::language('fr'));
+        self::assertSame('en', GuideRenderer::language('en_US'));
+        self::assertSame('en', GuideRenderer::language('de_DE'));
+
+        self::assertStringContainsString('Guide administrateur', (string) self::guides()->render('administrateur', 'fr_FR'));
+        self::assertStringContainsString('Administrator guide', (string) self::guides()->render('administrateur', 'en_US'));
+        self::assertStringContainsString('Integrator guide', (string) self::guides()->render('integrateur', 'es_ES'));
+    }
+
+    public function testEveryAnchorTheDashboardLinksToExistsInBothLanguages(): void
+    {
+        foreach (['template-override' => 'integrateur', 'theme-fonts' => 'administrateur'] as $topic => $guide) {
+            foreach (['fr', 'en'] as $locale) {
+                self::assertStringContainsString('id="'.GuideRenderer::anchor($topic, $locale).'"', (string) self::guides()->render($guide, $locale), $topic.' in '.$locale);
+            }
+        }
+    }
+
+    public function testALinkToAnotherGuideStaysInTheHelpScreenAndOtherFilesAreNotLinked(): void
+    {
+        $html = (new GuideRenderer(__DIR__))->convert('See the [integrator guide](integrator-guide.md#overriding-a-template), the [FR guide](guide-administrateur.md), [decision 004](decisions/004-audience-measurement-allowlist.md) and the [README](../README.md#deploying).');
+
+        self::assertStringContainsString('<a href="?guide=integrateur#overriding-a-template">integrator guide</a>', $html);
+        self::assertStringContainsString('<a href="?guide=administrateur">FR guide</a>', $html);
+        self::assertStringContainsString('decision 004', $html);
+        self::assertStringContainsString('the README', $html);
+        self::assertSame(2, substr_count($html, '<a '), 'a file that the back-office does not serve gets no dead link');
+    }
 }
