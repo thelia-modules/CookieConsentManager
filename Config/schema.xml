@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="TheliaMain"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../vendor/thelia/propel/resources/xsd/database.xsd">
+
+    <table name="ccm_draft_setting" phpName="DraftSetting" namespace="CookieConsentManager\Model">
+        <column name="id" primaryKey="true" required="true" type="INTEGER"/>
+        <column name="settings" required="true" type="CLOB"/>
+        <column name="base_version" type="INTEGER"/>
+        <column name="updated_by" size="255" type="VARCHAR"/>
+        <behavior name="timestampable"/>
+    </table>
+
+    <table name="ccm_service_config" phpName="ServiceConfig" namespace="CookieConsentManager\Model">
+        <column name="service_key" primaryKey="true" required="true" size="64" type="VARCHAR"/>
+        <column name="origin" required="true" size="16" type="VARCHAR"/>
+        <column name="kind" required="true" size="16" type="VARCHAR"/>
+        <column name="purpose" required="true" size="64" type="VARCHAR"/>
+        <column defaultValue="0" name="enabled" required="true" type="INTEGER"/>
+        <column defaultValue="0" name="proposed" required="true" type="INTEGER"/>
+        <column defaultValue="0" name="strictly_necessary" required="true" type="INTEGER"/>
+        <column name="parameters" type="CLOB"/>
+        <column name="details" type="CLOB"/>
+        <behavior name="timestampable"/>
+    </table>
+
+    <table name="ccm_version" phpName="Version" namespace="CookieConsentManager\Model">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER"/>
+        <column name="version" required="true" type="INTEGER"/>
+        <column name="snapshot" required="true" type="CLOB"/>
+        <column name="config_hash" required="true" size="64" type="CHAR"/>
+        <column name="js_hash" required="true" size="64" type="CHAR"/>
+        <column name="served_hash" required="true" size="12" type="CHAR"/>
+        <column name="module_version" required="true" size="32" type="VARCHAR"/>
+        <column name="author" size="255" type="VARCHAR"/>
+        <column defaultValue="0" name="substantial" required="true" type="INTEGER"/>
+        <column name="comment" size="255" type="VARCHAR"/>
+        <column name="created_at" required="true" type="TIMESTAMP"/>
+        <unique name="ccm_version_unique">
+            <unique-column name="version"/>
+        </unique>
+    </table>
+
+    <table name="ccm_consent_entry" phpName="ConsentEntry" namespace="CookieConsentManager\Model">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="BIGINT"/>
+        <column name="consent_id" required="true" size="36" type="CHAR"/>
+        <column name="recorded_at" required="true" type="TIMESTAMP"/>
+        <column name="action" required="true" size="32" type="VARCHAR"/>
+        <column name="source" required="true" size="16" type="VARCHAR"/>
+        <column name="version" required="true" type="INTEGER"/>
+        <column name="version_hash" required="true" size="12" type="CHAR"/>
+        <column name="locale" required="true" size="10" type="VARCHAR"/>
+        <column name="path" required="true" size="255" type="VARCHAR"/>
+        <column name="browser" size="64" type="VARCHAR"/>
+        <column name="purposes_json" required="true" type="LONGVARCHAR"/>
+        <column name="services_json" required="true" type="LONGVARCHAR"/>
+        <column name="exempt_json" type="LONGVARCHAR"/>
+        <column name="ip_truncated" size="45" type="VARCHAR"/>
+        <column name="customer_id" type="INTEGER"/>
+        <index name="idx_ccm_consent_entry_consent_id">
+            <index-column name="consent_id"/>
+        </index>
+        <index name="idx_ccm_consent_entry_recorded_at">
+            <index-column name="recorded_at"/>
+        </index>
+    </table>
+
+    <table name="ccm_daily_stat" phpName="DailyStat" namespace="CookieConsentManager\Model">
+        <column name="day" primaryKey="true" required="true" type="DATE"/>
+        <column name="metric" primaryKey="true" required="true" size="80" type="VARCHAR"/>
+        <column defaultValue="0" name="total" required="true" type="INTEGER"/>
+    </table>
+</database>

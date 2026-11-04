@@ -1,0 +1,252 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cookie-consent-manager.openstudio.fr/schema/ccm-config-1.schema.json",
+  "title": "CookieConsentManager configuration export, schema ccm-config/1",
+  "description": "Every key the export writes and the import reads. Keys marked x-environment depend on the site (identifiers, URLs, regions): an import makes the admin confirm them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema"],
+  "properties": {
+    "schema": { "const": "ccm-config/1" },
+    "exported_at": { "type": "string" },
+    "module_version": { "type": "string" },
+    "source_version": { "type": ["integer", "null"] },
+    "environment": { "type": "array", "items": { "type": "string" } },
+    "general": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "description": "Kept for compatibility: ignored by the module (the banner is controlled by publishing)." },
+        "layout": { "enum": ["bar", "modal"] },
+        "close_button": { "type": "boolean" },
+        "floating_button": { "type": "boolean" },
+        "reload_on_script_withdraw": { "type": "boolean" },
+        "block_embedded_iframes": { "type": "boolean" },
+        "experimental_services": { "type": "boolean" },
+        "renewal_months": { "type": "integer", "minimum": 1, "maximum": 13 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": { "type": ["string", "null"], "x-environment": true },
+        "page_title": { "type": ["string", "null"] },
+        "urls": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string" },
+            "body": { "type": "string" },
+            "accept": { "type": "string" },
+            "reject": { "type": "string" },
+            "customize": { "type": "string" },
+            "close": { "type": "string" },
+            "allow": { "type": "string" },
+            "preferences": { "type": "string" },
+            "free_text": { "type": "string" }
+          }
+        }
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "colors": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "primary": { "$ref": "#/definitions/color" },
+            "surface": { "$ref": "#/definitions/color" },
+            "text": { "$ref": "#/definitions/color" }
+          }
+        }
+      }
+    },
+    "purposes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+          "order": { "type": "integer" },
+          "consent_mode": { "type": "array", "items": { "enum": ["ad_storage", "ad_user_data", "ad_personalization", "analytics_storage", "functionality_storage", "personalization_storage", "security_storage"] } },
+          "label": { "$ref": "#/definitions/localizedText" },
+          "description": { "$ref": "#/definitions/localizedText" }
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "purpose", "enabled"],
+            "properties": {
+              "key": { "$ref": "#/definitions/serviceKey" },
+              "verified": { "type": "boolean" },
+              "purpose": { "type": "string" },
+              "enabled": { "type": "boolean" },
+              "parameters": { "type": "object", "additionalProperties": { "type": "string" }, "x-environment": true },
+              "controller": { "type": "string" },
+              "cookie_durations": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "custom", "kind", "purpose", "enabled"],
+            "properties": {
+              "key": { "$ref": "#/definitions/serviceKey" },
+              "custom": { "const": true },
+              "kind": { "enum": ["script", "custom", "declarative"] },
+              "purpose": { "type": "string" },
+              "enabled": { "type": "boolean" },
+              "name": { "type": "string" },
+              "controller": { "type": "string" },
+              "policy_url": { "type": "string" },
+              "cookies": { "$ref": "#/definitions/cookies" },
+              "script_url": { "type": "string" },
+              "code": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "module", "kind", "purpose", "enabled"],
+            "properties": {
+              "key": { "$ref": "#/definitions/serviceKey" },
+              "module": { "const": true },
+              "proposed": { "type": "boolean" },
+              "kind": { "enum": ["script", "custom", "declarative"] },
+              "purpose": { "type": "string" },
+              "enabled": { "type": "boolean" },
+              "name": { "type": "string" },
+              "controller": { "type": "string" },
+              "policy_url": { "type": "string" },
+              "cookies": { "$ref": "#/definitions/cookies" },
+              "script_url": { "type": "string" },
+              "code": { "type": "string" },
+              "strictly_necessary": { "type": "boolean" },
+              "justification": { "type": "string" }
+            }
+          }
+        ]
+      }
+    },
+    "consent_mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "mode": { "enum": ["basic", "advanced"] },
+        "ads_data_redaction": { "type": "boolean" },
+        "url_passthrough": { "type": "boolean" },
+        "wait_for_update_ms": { "type": "integer", "minimum": 0 },
+        "regions": {
+          "type": "array",
+          "x-environment": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["iso"],
+            "properties": {
+              "iso": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$" } },
+              "default": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "ad_storage": { "$ref": "#/definitions/signalState" },
+                  "ad_user_data": { "$ref": "#/definitions/signalState" },
+                  "ad_personalization": { "$ref": "#/definitions/signalState" },
+                  "analytics_storage": { "$ref": "#/definitions/signalState" },
+                  "functionality_storage": { "$ref": "#/definitions/signalState" },
+                  "personalization_storage": { "$ref": "#/definitions/signalState" },
+                  "security_storage": { "$ref": "#/definitions/signalState" }
+                }
+              }
+            }
+          }
+        },
+        "uet": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "enabled": { "type": "boolean" } }
+        }
+      }
+    },
+    "exempt_measurement": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["service"],
+        "properties": {
+          "service": { "$ref": "#/definitions/serviceKey" },
+          "conditions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "audience_measurement_only": { "type": "boolean" },
+              "no_cross_site_tracking": { "type": "boolean" },
+              "no_third_party_sharing": { "type": "boolean" },
+              "limited_retention": { "type": "boolean" },
+              "opposition_offered": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "presets": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Preset (code of Resources/presets) attached to each language of the shop.",
+      "patternProperties": { "^[a-z]{2}$": { "type": "string", "pattern": "^[a-z]{2}-[A-Z]{2}$" } }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "retention_months": { "type": "integer", "minimum": 1, "maximum": 60 },
+        "ip_mode": { "enum": ["none", "truncated"] },
+        "link_customer": { "type": "boolean" }
+      }
+    }
+  },
+  "definitions": {
+    "serviceKey": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+    "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "signalState": { "enum": ["granted", "denied"] },
+    "localizedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": { "^[a-z]{2}$": { "type": "string" } }
+    },
+    "cookies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "domain": { "type": "string" },
+          "duration_days": { "type": "integer", "minimum": 0 },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}
