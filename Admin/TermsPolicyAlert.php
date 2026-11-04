@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CookieConsentManager\Admin;
 
 use CookieConsentManager\Front\TemplateContext;
-use CookieConsentManager\Validation\DraftValidator;
+use CookieConsentManager\Validation\FrenchPresetLanguages;
 use CookieConsentManager\Validation\TermsPageUrl;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -18,7 +18,7 @@ final readonly class TermsPolicyAlert
     private const DOMAIN = 'cookieconsentmanager.bo.default-twig';
 
     public function __construct(
-        private DraftValidator $validator,
+        private FrenchPresetLanguages $frenchLanguages,
         private ActiveLanguages $languages,
         private TranslatorInterface $translator,
     ) {
@@ -31,7 +31,7 @@ final readonly class TermsPolicyAlert
      */
     public function collect(array $draft): array
     {
-        $refused = $this->validator->languagesUnderFrenchPreset($draft);
+        $refused = $this->frenchLanguages->of($draft);
         $alerts = [];
         foreach ($this->languages->codes() as $language) {
             $url = trim(TemplateContext::policyUrl($draft['policy'], $language));

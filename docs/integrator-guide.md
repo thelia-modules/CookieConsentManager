@@ -274,6 +274,30 @@ final class Payzen extends BaseModule
 - Required attributes: `key` (unique), `name`, `controller`, `purpose`, `policy_url`. `strictly_necessary` (default `false`) is the only way to use `purpose: essential` and requires `justification` (shown in the back-office with a permanent alert). A missing `script` makes a declarative service: it is listed at the second level and its state is pushed to the `dataLayer`. A `key` already in the catalogue is refused with an alert. `controller` and `policy_url` are read by the panel and the placeholder. Each cookie can carry `duration_days` (0 for a session cookie), shown as "name (duration)". A service declared by a module is never eligible for the consent exemption.
 - A compiler pass collects the tags and writes nothing to the database at compile time. The service enters the draft as "proposed" at `php Thelia module:refresh`, at `php Thelia ccm:services:sync` or when the back-office opens, inactive until an administrator enables it and publishes. It appears under "Services proposed by other modules".
 
+## Adding alerts and validation rules from another module
+
+The dashboard alerts and the draft validation are built from tagged services, so a module can add its own without changing this one. In a module whose services are autoconfigured (the default in Thelia 3), implement an interface and the service is picked up:
+
+```php
+final class MyAlerts implements \CookieConsentManager\Admin\AlertProvider\AlertProvider
+{
+    public static function priority(): int
+    {
+        return 50; // higher runs first; the built-in providers use 100 to 1000
+    }
+
+    public function alerts(array $draft): array
+    {
+        return [new \CookieConsentManager\Admin\Alert(\CookieConsentManager\Admin\Alert::WARNING, 'my_alert', 'Message', 'ccm_admin_services')];
+    }
+}
+```
+
+- `AlertProvider` (tag `ccm.alert_provider`) returns the alerts of the normalized draft. The dashboard sorts all alerts by severity (danger, warning, info) and keeps the order of the providers inside a severity. Use a stable `code`: it is the identifier of the alert in the page.
+- `SectionValidator` (tag `ccm.section_validator`) returns the `ValidationIssue` list of one part of the draft (`validate(array $draft): array`). An issue of severity `error` blocks the save and the publication; a `warning` does not. Built-in sections run at priorities 1000 to 600.
+- `priority()` is read when the tag carries no `priority` attribute. To set it from the service definition, tag the service yourself: `->tag('ccm.alert_provider', ['priority' => 50])`.
+- Messages are your own: translate them in your module. The module does not extract them.
+
 ## Content Security Policy
 
 What the module emits and what to allow:

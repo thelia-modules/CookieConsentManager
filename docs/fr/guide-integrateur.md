@@ -90,6 +90,15 @@ Dans le tag, `controller` et `policy_url` sont lus par le panneau et par l'espac
 
 Pour tester : `php Thelia module:refresh` puis, au back-office, « Finalités et services » : la ligne apparaît sous « Services proposés par d'autres modules », inactive et absente de la configuration publiée tant qu'un administrateur ne l'a pas activée et publiée. En console : `php Thelia ccm:services:sync`.
 
+## 5 bis. Ajouter des alertes et des règles de validation depuis un module
+
+Les alertes du tableau de bord et la validation du brouillon sont construites à partir de services tagués : un module tiers y ajoute les siennes sans modifier celui-ci. Dans un module dont les services sont autoconfigurés (le cas par défaut de Thelia 3), implémenter une interface suffit.
+
+- `CookieConsentManager\Admin\AlertProvider\AlertProvider` (tag `ccm.alert_provider`) : `alerts(array $draft): array` renvoie des `Alert` à partir du brouillon normalisé. Le tableau de bord trie par gravité (danger, avertissement, info) et garde l'ordre des fournisseurs à gravité égale. Le `code` d'une alerte doit rester stable. Exemple complet dans `docs/integrator-guide.md` (section « Adding alerts and validation rules from another module »).
+- `CookieConsentManager\Validation\SectionValidator` (tag `ccm.section_validator`) : `validate(array $draft): array` renvoie des `ValidationIssue` pour une partie du brouillon. Une issue de gravité `error` bloque l'enregistrement et la publication ; un `warning` ne bloque pas.
+- `priority()` (statique) donne l'ordre, le plus haut d'abord ; les fournisseurs et sections du module vont de 100 à 1000. Un attribut `priority` posé sur le tag l'emporte.
+- Les messages sont ceux du module tiers : à traduire chez lui.
+
 ## 6. Politique de sécurité de contenu (CSP)
 
 Ce que le module émet, à autoriser :

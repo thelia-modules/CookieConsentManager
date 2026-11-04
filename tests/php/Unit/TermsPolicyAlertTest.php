@@ -9,7 +9,7 @@ use CookieConsentManager\Admin\Alert;
 use CookieConsentManager\Admin\TermsPolicyAlert;
 use CookieConsentManager\Draft\DraftNormalizer;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
-use CookieConsentManager\Tests\Support\Wiring;
+use CookieConsentManager\Validation\FrenchPresetLanguages;
 use PHPUnit\Framework\TestCase;
 
 final class TermsPolicyAlertTest extends TestCase
@@ -28,7 +28,7 @@ final class TermsPolicyAlertTest extends TestCase
                 return ['fr', 'en'];
             }
         };
-        $alerts = (new TermsPolicyAlert((new Wiring())->validator, $languages, new CatalogueTranslator()))->collect((new DraftNormalizer())->normalize($draft));
+        $alerts = (new TermsPolicyAlert(new FrenchPresetLanguages($languages), $languages, new CatalogueTranslator()))->collect((new DraftNormalizer())->normalize($draft));
         foreach ($alerts as $alert) {
             self::assertSame(Alert::DANGER, $alert->severity);
         }

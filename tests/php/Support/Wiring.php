@@ -6,8 +6,10 @@ namespace CookieConsentManager\Tests\Support;
 
 use CookieConsentManager\Admin\ActiveLanguages;
 use CookieConsentManager\Catalogue\CatalogueReader;
+use CookieConsentManager\Catalogue\CookieDurations;
 use CookieConsentManager\Draft\DraftNormalizer;
 use CookieConsentManager\Draft\DraftRepository;
+use CookieConsentManager\Draft\ServiceControllers;
 use CookieConsentManager\Front\AssembledScriptHasher;
 use CookieConsentManager\Front\FrontUrls;
 use CookieConsentManager\Front\ServedScriptAssembler;
@@ -28,6 +30,13 @@ use CookieConsentManager\Transfer\ConfigSchemaValidator;
 use CookieConsentManager\Transfer\PolicyUrlResolver;
 use CookieConsentManager\Validation\ConflictingModuleDetector;
 use CookieConsentManager\Validation\DraftValidator;
+use CookieConsentManager\Validation\EnvironmentSection;
+use CookieConsentManager\Validation\ExemptionSection;
+use CookieConsentManager\Validation\FrenchPresetLanguages;
+use CookieConsentManager\Validation\GeneralSection;
+use CookieConsentManager\Validation\IssueFactory;
+use CookieConsentManager\Validation\PresetSection;
+use CookieConsentManager\Validation\ServicesSection;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -82,7 +91,7 @@ final class Wiring
                 return 'en';
             }
         };
-        $this->validator = new DraftValidator($this->catalogue, $modules, $translator, null, new class extends ActiveLanguages {
+        $languages = new class extends ActiveLanguages {
             public function mainCode(): string
             {
                 return 'fr';
@@ -92,7 +101,22 @@ final class Wiring
             {
                 return ['fr', 'en'];
             }
-        });
+        };
+        $issues = new IssueFactory($translator);
+        $this->validator = new DraftValidator([
+            new GeneralSection($issues),
+            new ServicesSection($this->catalogue, $modules, $issues),
+            new ExemptionSection($this->catalogue, $issues),
+            new PresetSection(
+                $this->catalogue,
+                new ServiceControllers($moduleDirectory.'/Resources/catalogue/controllers.json'),
+                $languages,
+                new CookieDurations($moduleDirectory.'/Resources/catalogue/cookie-durations.json'),
+                new FrenchPresetLanguages($languages),
+                $issues,
+            ),
+            new EnvironmentSection($issues),
+        ]);
         $this->versions = new VersionRepository();
         $moduleVersion = new ModuleVersion($moduleDirectory.'/Config/module.xml');
         $this->assembler = new SnapshotAssembler($this->catalogue, $moduleVersion, new NoOverriddenTemplates());
