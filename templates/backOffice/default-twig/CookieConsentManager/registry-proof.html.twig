@@ -21,7 +21,6 @@
                 <dt class="col-sm-3">{{ 'Page'|trans }}</dt><dd class="col-sm-9">{{ entry.path }}</dd>
                 <dt class="col-sm-3">{{ 'Browser'|trans }}</dt><dd class="col-sm-9">{{ entry.browser }}</dd>
                 {% if entry.ip_truncated %}<dt class="col-sm-3">{{ 'Truncated IP'|trans }}</dt><dd class="col-sm-9">{{ entry.ip_truncated }}</dd>{% endif %}
-                {% if entry.customer_id %}<dt class="col-sm-3">{{ 'Customer'|trans }}</dt><dd class="col-sm-9">{{ entry.customer_id }}</dd>{% endif %}
             </dl>
             <h3 class="h6">{{ 'Choices recorded'|trans }}</h3>
             <div class="row small mb-3">

@@ -17,7 +17,6 @@ final readonly class ConsentRecorder
         private VersionRepository $versions,
         private EntryRepository $entries,
         private DailyStatRepository $stats,
-        private CustomerIdResolver $customers,
         private EventDispatcherInterface $dispatcher,
     ) {
     }
@@ -64,8 +63,7 @@ final readonly class ConsentRecorder
                 ->setPurposesJson($this->json($payload->purposes))
                 ->setServicesJson($this->json($payload->services))
                 ->setExemptJson($this->json($payload->exempt))
-                ->setIpTruncated('truncated' === $options['ip_mode'] ? IpTruncator::truncate($request->getClientIp()) : null)
-                ->setCustomerId($options['link_customer'] ? $this->customers->resolve($request) : null);
+                ->setIpTruncated('truncated' === $options['ip_mode'] ? IpTruncator::truncate($request->getClientIp()) : null);
             $entry->save($con);
 
             if ($first) {

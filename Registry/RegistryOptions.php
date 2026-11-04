@@ -17,7 +17,7 @@ final readonly class RegistryOptions
     ) {
     }
 
-    /** @return array{retention_months: int, ip_mode: string, link_customer: bool} */
+    /** @return array{retention_months: int, ip_mode: string} */
     public function current(): array
     {
         $latest = $this->versions->latest();

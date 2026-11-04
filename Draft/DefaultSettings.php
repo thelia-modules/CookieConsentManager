@@ -53,7 +53,7 @@ final class DefaultSettings
                 'uet' => ['enabled' => false],
             ],
             'exempt_measurement' => [],
-            'registry' => ['retention_months' => 60, 'ip_mode' => 'none', 'link_customer' => false],
+            'registry' => ['retention_months' => 60, 'ip_mode' => 'none'],
             'presets' => [],
             'services' => [],
         ];

@@ -68,9 +68,8 @@
                         <label class="form-label" for="reg_retention">{{ 'Retention (months)'|trans }} {{ ccm.hint('Default 5 years: validity of the choice plus a reasonable control delay. No legal duration is set.'|trans) }}</label>
                         <input class="form-control mb-1" type="number" min="1" max="60" id="reg_retention" name="registry[retention_months]" value="{{ draft.registry.retention_months }}">
                         <div class="form-text mb-2" data-testid="ccm-retention-in-force">{{ 'In force (published version): %months% months. The purge and the export follow it; a change applies from the next publication. Maximum 60 months.'|trans({'%months%': in_force.retention_months}) }}</div>
-                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="reg_ip" name="registry[ip_truncated]" value="1" {{ draft.registry.ip_mode == 'truncated' ? 'checked' : '' }}><label class="form-check-label" for="reg_ip">{{ 'Store the truncated IP (/24 for IPv4, /48 for IPv6)'|trans }}</label></div>
-                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" role="switch" id="reg_customer" name="registry[link_customer]" value="1" {{ draft.registry.link_customer ? 'checked' : '' }}><label class="form-check-label" for="reg_customer">{{ 'Link the Thelia customer identifier'|trans }}</label></div>
-                        <p class="small text-secondary">{{ 'Both options condition the proof and must be announced in your privacy policy. They apply from the next publication.'|trans }}</p>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" role="switch" id="reg_ip" name="registry[ip_truncated]" value="1" {{ draft.registry.ip_mode == 'truncated' ? 'checked' : '' }}><label class="form-check-label" for="reg_ip">{{ 'Store the truncated IP (/24 for IPv4, /48 for IPv6)'|trans }}</label></div>
+                        <p class="small text-secondary">{{ 'This option conditions the proof and must be announced in your privacy policy. It applies from the next publication.'|trans }}</p>
                         {% if can.update %}<button class="btn btn-primary" type="submit" data-testid="ccm-registry-options-save">{{ 'Save in the draft'|trans }}</button>{% endif %}
                     </form>
                     <hr>
@@ -98,9 +97,9 @@
                         <li>{{ 'Type its first characters in the search above.'|trans }}</li>
                         <li>{{ 'Open the proof sheet: entry, the version the visitor saw and the hashes. Print it from the browser.'|trans }}</li>
                     </ol>
-                    <p class="small text-secondary">{{ 'Without the identifier, the search relies on the truncated IP or the customer identifier options.'|trans }}</p>
+                    <p class="small text-secondary">{{ 'Without the identifier, the search relies on the truncated IP option.'|trans }}</p>
                     <h3 class="h6">{{ 'Sample text for your privacy policy'|trans }}</h3>
-                    <blockquote class="small border-start ps-3 text-secondary mb-0" data-testid="ccm-policy-sample">{{ 'To prove the consent you give, we keep a record of your choices: a random identifier, the date, your choices, the banner version, the language, the page, your browser family and, if enabled, a truncated IP address or your customer identifier. These data are kept for %months% months and are used only as proof of consent.'|trans({'%months%': in_force.retention_months}) }}</blockquote>
+                    <blockquote class="small border-start ps-3 text-secondary mb-0" data-testid="ccm-policy-sample">{{ 'To prove the consent you give, we keep a record of your choices: a random identifier, the date, your choices, the banner version, the language, the page, your browser family and, if enabled, a truncated IP address. These data are kept for %months% months and are used only as proof of consent.'|trans({'%months%': in_force.retention_months}) }}</blockquote>
                 </div>
             </div>
         </div>

@@ -84,7 +84,6 @@ return [
     'To be able to prove your choice, we keep a record of it (date, choice made, version of the texts shown, language, page, browser family) for %duration%.' => 'To be able to prove your choice, we keep a record of it (date, choice made, version of the texts shown, language, page, browser family) for %duration%.',
     'The record does not contain your IP address.' => 'The record does not contain your IP address.',
     'The record contains your IP address, truncated.' => 'The record contains your IP address, truncated.',
-    'The record is linked to your customer account.' => 'The record is linked to your customer account.',
     'Your rights' => 'Your rights',
     'You have the right to access, rectify and erase your data and to object to its processing. To exercise them, contact the publisher of this site. You can also lodge a complaint with your data protection authority.' => 'You have the right to access, rectify and erase your data and to object to its processing. To exercise them, contact the publisher of this site. You can also lodge a complaint with your data protection authority.',
 ];

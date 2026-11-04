@@ -341,7 +341,6 @@ final readonly class DraftSectionEditor
         $registry = (array) ($input['registry'] ?? []);
         $draft['registry']['retention_months'] = (int) ($registry['retention_months'] ?? $draft['registry']['retention_months']);
         $draft['registry']['ip_mode'] = isset($registry['ip_truncated']) ? 'truncated' : 'none';
-        $draft['registry']['link_customer'] = isset($registry['link_customer']);
 
         return $draft;
     }

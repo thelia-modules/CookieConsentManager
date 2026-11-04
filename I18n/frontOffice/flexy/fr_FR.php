@@ -84,7 +84,6 @@ return [
     'To be able to prove your choice, we keep a record of it (date, choice made, version of the texts shown, language, page, browser family) for %duration%.' => 'Pour pouvoir prouver votre choix, nous en conservons une trace (date, choix effectué, version des textes affichés, langue, page, famille de navigateur) pendant %duration%.',
     'The record does not contain your IP address.' => 'Cette trace ne contient pas votre adresse IP.',
     'The record contains your IP address, truncated.' => 'Cette trace contient votre adresse IP, tronquée.',
-    'The record is linked to your customer account.' => 'Cette trace est liée à votre compte client.',
     'Your rights' => 'Vos droits',
     'You have the right to access, rectify and erase your data and to object to its processing. To exercise them, contact the publisher of this site. You can also lodge a complaint with your data protection authority.' => 'Vous avez le droit d\'accéder à vos données, de les rectifier, de les effacer et de vous opposer à leur traitement. Pour exercer ces droits, contactez l\'éditeur de ce site. Vous pouvez aussi introduire une réclamation auprès de votre autorité de protection des données.',
 ];

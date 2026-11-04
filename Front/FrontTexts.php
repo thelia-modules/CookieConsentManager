@@ -87,7 +87,6 @@ final readonly class FrontTexts
         'policy_proof' => 'To be able to prove your choice, we keep a record of it (date, choice made, version of the texts shown, language, page, browser family) for %duration%.',
         'policy_proof_no_ip' => 'The record does not contain your IP address.',
         'policy_proof_ip' => 'The record contains your IP address, truncated.',
-        'policy_proof_customer' => 'The record is linked to your customer account.',
         'policy_rights_title' => 'Your rights',
         'policy_rights' => 'You have the right to access, rectify and erase your data and to object to its processing. To exercise them, contact the publisher of this site. You can also lodge a complaint with your data protection authority.',
     ];

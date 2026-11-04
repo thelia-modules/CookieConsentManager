@@ -84,7 +84,6 @@ return [
     'To be able to prove your choice, we keep a record of it (date, choice made, version of the texts shown, language, page, browser family) for %duration%.' => 'Om uw keuze te kunnen aantonen, bewaren we er een registratie van (datum, gemaakte keuze, versie van de getoonde teksten, taal, pagina, browserfamilie) gedurende %duration%.',
     'The record does not contain your IP address.' => 'De registratie bevat uw IP-adres niet.',
     'The record contains your IP address, truncated.' => 'De registratie bevat uw IP-adres, ingekort.',
-    'The record is linked to your customer account.' => 'De registratie is gekoppeld aan uw klantaccount.',
     'Your rights' => 'Uw rechten',
     'You have the right to access, rectify and erase your data and to object to its processing. To exercise them, contact the publisher of this site. You can also lodge a complaint with your data protection authority.' => 'U hebt het recht op toegang tot, rectificatie en wissing van uw gegevens en om bezwaar te maken tegen de verwerking ervan. Neem hiervoor contact op met de uitgever van deze website. U kunt ook een klacht indienen bij uw gegevensbeschermingsautoriteit.',
 ];

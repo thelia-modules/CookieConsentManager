@@ -67,9 +67,6 @@ final readonly class PolicyPageTemplate
 
         $html[] = '<h2>'.self::e($words['policy_proof_title']).'</h2>';
         $proof = [str_replace('%duration%', CookieDuration::months((int) $config['registry']['retention_months'], $labels), $words['policy_proof']), 'none' === $config['registry']['ip_mode'] ? $words['policy_proof_no_ip'] : $words['policy_proof_ip']];
-        if ($config['registry']['link_customer']) {
-            $proof[] = $words['policy_proof_customer'];
-        }
         $html[] = '<p>'.self::e(implode(' ', $proof)).'</p>';
 
         $html[] = '<h2>'.self::e($words['policy_rights_title']).'</h2>';

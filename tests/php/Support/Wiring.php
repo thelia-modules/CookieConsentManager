@@ -20,7 +20,6 @@ use CookieConsentManager\Publication\VersionRepository;
 use CookieConsentManager\Publication\VersionRestorer;
 use CookieConsentManager\Registry\ConsentPayloadValidator;
 use CookieConsentManager\Registry\ConsentRecorder;
-use CookieConsentManager\Registry\CustomerIdResolver;
 use CookieConsentManager\Registry\DailyStatRepository;
 use CookieConsentManager\Registry\EntryRepository;
 use CookieConsentManager\Transfer\ConfigExporter;
@@ -129,6 +128,6 @@ final class Wiring
         $this->payloadValidator = new ConsentPayloadValidator($this->versions);
         $this->entries = new EntryRepository();
         $this->dispatcher = new EventDispatcher();
-        $this->recorder = new ConsentRecorder($this->versions, $this->entries, new DailyStatRepository(), new CustomerIdResolver(), $this->dispatcher);
+        $this->recorder = new ConsentRecorder($this->versions, $this->entries, new DailyStatRepository(), $this->dispatcher);
     }
 }

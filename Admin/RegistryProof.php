@@ -35,7 +35,6 @@ final readonly class RegistryProof
                 'services' => (array) json_decode($entry->getServicesJson(), true),
                 'exempt' => (array) json_decode((string) $entry->getExemptJson(), true),
                 'ip_truncated' => $entry->getIpTruncated(),
-                'customer_id' => $entry->getCustomerId(),
             ],
             'version' => null === $version ? null : [
                 'number' => $version->getVersion(),

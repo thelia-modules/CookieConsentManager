@@ -35,7 +35,6 @@ final readonly class FieldLabeler
         'consent_mode.uet.enabled' => 'Microsoft Advertising (UET) signal',
         'registry.retention_months' => 'Registry retention (months)',
         'registry.ip_mode' => 'IP option',
-        'registry.link_customer' => 'Link to the customer account',
     ];
 
     private const TEXTS = [

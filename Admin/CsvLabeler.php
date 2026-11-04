@@ -26,7 +26,6 @@ final readonly class CsvLabeler
         'purposes_json' => 'Purposes',
         'services_json' => 'Services',
         'ip_truncated' => 'Truncated IP address',
-        'customer_id' => 'Customer',
     ];
 
     public function __construct(
