@@ -1,0 +1,304 @@
+{
+  "config": {
+    "appearance": {
+      "colors": {
+        "primary": "#1a56db",
+        "surface": "#ffffff",
+        "text": "#111827"
+      }
+    },
+    "consent_mode": {
+      "ads_data_redaction": false,
+      "enabled": true,
+      "mode": "basic",
+      "regions": [],
+      "uet": {
+        "enabled": false
+      },
+      "url_passthrough": false,
+      "wait_for_update_ms": 500
+    },
+    "exempt_measurement": [
+      {
+        "conditions": {
+          "audience_measurement_only": true,
+          "limited_retention": true,
+          "no_cross_site_tracking": true,
+          "no_third_party_sharing": true,
+          "opposition_offered": true
+        },
+        "service": "matomo"
+      }
+    ],
+    "general": {
+      "block_embedded_iframes": true,
+      "close_button": false,
+      "enabled": true,
+      "experimental_services": false,
+      "floating_button": false,
+      "layout": "bar",
+      "reload_on_script_withdraw": true,
+      "renewal_months": 6
+    },
+    "policy": {
+      "page_title": "Privacy policy",
+      "url": "/privacy-policy"
+    },
+    "purposes": [
+      {
+        "code": "analytics",
+        "consent_mode": [
+          "analytics_storage"
+        ],
+        "description": {
+          "en": "Measure site traffic to improve the site.",
+          "fr": "Mesurer la fréquentation du site pour l'améliorer."
+        },
+        "label": {
+          "en": "Audience measurement",
+          "fr": "Mesure d'audience"
+        },
+        "order": 1
+      },
+      {
+        "code": "ads",
+        "consent_mode": [
+          "ad_storage",
+          "ad_user_data",
+          "ad_personalization"
+        ],
+        "description": {
+          "en": "Serve and measure personalised advertising.",
+          "fr": "Diffuser et mesurer des publicités personnalisées."
+        },
+        "label": {
+          "en": "Advertising",
+          "fr": "Publicité"
+        },
+        "order": 2
+      },
+      {
+        "code": "social",
+        "consent_mode": [],
+        "description": {
+          "en": "Share content and interact with social networks.",
+          "fr": "Partager des contenus et interagir avec les réseaux sociaux."
+        },
+        "label": {
+          "en": "Social networks",
+          "fr": "Réseaux sociaux"
+        },
+        "order": 3
+      },
+      {
+        "code": "media",
+        "consent_mode": [],
+        "description": {
+          "en": "Display videos, maps and content hosted by third parties.",
+          "fr": "Afficher des vidéos, cartes et contenus hébergés par des tiers."
+        },
+        "label": {
+          "en": "Third-party content",
+          "fr": "Contenus tiers"
+        },
+        "order": 4
+      },
+      {
+        "code": "support",
+        "consent_mode": [],
+        "description": {
+          "en": "Talk to support (chat).",
+          "fr": "Dialoguer avec le support (chat)."
+        },
+        "label": {
+          "en": "Customer support",
+          "fr": "Support client"
+        },
+        "order": 5
+      },
+      {
+        "code": "personalization",
+        "consent_mode": [
+          "functionality_storage",
+          "personalization_storage"
+        ],
+        "description": {
+          "en": "Remember your preferences and personalise content.",
+          "fr": "Mémoriser vos préférences et personnaliser le contenu."
+        },
+        "label": {
+          "en": "Preferences and personalisation",
+          "fr": "Préférences et personnalisation"
+        },
+        "order": 6
+      }
+    ],
+    "registry": {
+      "ip_mode": "none",
+      "link_customer": false,
+      "retention_months": 60
+    },
+    "services": [
+      {
+        "enabled": true,
+        "key": "facebookpixel",
+        "parameters": {
+          "facebookpixelId": "123456789"
+        },
+        "purpose": "ads"
+      },
+      {
+        "enabled": true,
+        "key": "gtag",
+        "parameters": {
+          "gtagUa": "G-TEST12345"
+        },
+        "purpose": "analytics"
+      },
+      {
+        "enabled": true,
+        "key": "matomo",
+        "parameters": {
+          "matomoHost": "https://stats.example.com/",
+          "matomoId": "3"
+        },
+        "purpose": "analytics"
+      },
+      {
+        "enabled": true,
+        "key": "youtube",
+        "parameters": [],
+        "purpose": "media"
+      }
+    ],
+    "texts": {
+      "en": {
+        "accept": "Accept all",
+        "allow": "Allow",
+        "body": "We use trackers to measure audience, personalise your experience and serve third-party content. You can accept, refuse or choose in detail, and change your mind at any time.",
+        "close": "Continue without accepting",
+        "customize": "Customize",
+        "free_text": "",
+        "preferences": "Manage my cookies",
+        "reject": "Reject all",
+        "title": "Your cookie choices"
+      },
+      "fr": {
+        "accept": "Tout accepter",
+        "allow": "Autoriser",
+        "body": "Nous utilisons des traceurs pour mesurer l'audience, personnaliser votre expérience et diffuser du contenu tiers. Vous pouvez accepter, refuser ou choisir finement, et changer d'avis à tout moment.",
+        "close": "Continuer sans accepter",
+        "customize": "Personnaliser",
+        "free_text": "",
+        "preferences": "Gérer mes cookies",
+        "reject": "Tout refuser",
+        "title": "Vos choix sur les cookies"
+      }
+    }
+  },
+  "module_version": "1.0.0",
+  "schema": "ccm-snapshot/1",
+  "services_resolved": [
+    {
+      "controller": "Meta Pixel",
+      "cookies": [
+        "_fbp",
+        "_fbc",
+        "fr",
+        "datr",
+        "sb",
+        "wd",
+        "reg_ext_ref",
+        "reg_fb_gate",
+        "reg_fb_ref",
+        "x-src"
+      ],
+      "domains": [
+        "connect.facebook.net",
+        "www.facebook.com"
+      ],
+      "google_tag": false,
+      "key": "facebookpixel",
+      "kind": "script",
+      "name": "Meta Pixel",
+      "policy_url": "https://www.facebook.com/policy.php",
+      "purpose": "ads",
+      "storage": [],
+      "user": {
+        "facebookpixelId": "123456789"
+      }
+    },
+    {
+      "controller": "Google Analytics 4",
+      "cookies": [
+        "_ga",
+        "_ga_*",
+        "_gid",
+        "_gat",
+        "_gat_gtag_*",
+        "_gcl_au",
+        "__utma",
+        "__utmb",
+        "__utmc",
+        "__utmt",
+        "__utmz"
+      ],
+      "domains": [
+        "www.googletagmanager.com",
+        "www.google-analytics.com",
+        "region1.google-analytics.com"
+      ],
+      "google_tag": true,
+      "key": "gtag",
+      "kind": "script",
+      "name": "Google Analytics 4",
+      "policy_url": "https://policies.google.com/privacy",
+      "purpose": "analytics",
+      "storage": [],
+      "user": {
+        "gtagUa": "G-TEST12345"
+      }
+    },
+    {
+      "controller": "Matomo",
+      "cookies": [
+        "_pk_*",
+        "piwik_ignore"
+      ],
+      "domains": [],
+      "google_tag": false,
+      "key": "matomo",
+      "kind": "script",
+      "name": "Matomo",
+      "policy_url": "https://matomo.org/faq/general/faq_146/",
+      "purpose": "analytics",
+      "storage": [],
+      "user": {
+        "matomoHost": "https://stats.example.com/",
+        "matomoId": "3"
+      }
+    },
+    {
+      "controller": "YouTube",
+      "cookies": [
+        "VISITOR_INFO1_LIVE",
+        "YSC",
+        "PREF"
+      ],
+      "domains": [
+        "www.youtube.com",
+        "www.youtube-nocookie.com",
+        "i.ytimg.com"
+      ],
+      "google_tag": false,
+      "key": "youtube",
+      "kind": "media",
+      "name": "YouTube",
+      "policy_url": "https://policies.google.com/privacy",
+      "purpose": "media",
+      "storage": [],
+      "user": []
+    }
+  ],
+  "templates": []
+}

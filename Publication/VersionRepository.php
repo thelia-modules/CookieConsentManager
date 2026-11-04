@@ -9,6 +9,10 @@ use CookieConsentManager\Model\VersionQuery;
 
 final readonly class VersionRepository
 {
+    public function __construct(private SnapshotNormalizer $normalizer = new SnapshotNormalizer())
+    {
+    }
+
     public function latest(): ?Version
     {
         return VersionQuery::create()->orderByVersion('DESC')->findOne();
@@ -48,6 +52,6 @@ final readonly class VersionRepository
     /** @return array<string, mixed> */
     public function snapshot(Version $version): array
     {
-        return (array) json_decode($version->getSnapshot(), true, 512, \JSON_THROW_ON_ERROR);
+        return $this->normalizer->normalize((array) json_decode($version->getSnapshot(), true, 512, \JSON_THROW_ON_ERROR));
     }
 }
