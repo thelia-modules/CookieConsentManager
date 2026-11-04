@@ -43,7 +43,7 @@ Resolution rules:
 - `hasConsent(service)` is `s[service] === 1`. `hasPurposeConsent(purpose)` is `p[purpose] === 1`: a partial purpose is not granted.
 - The banner is shown again when an active published service is missing from `s` and its purpose is `1`. A purpose at `0` or `2` never triggers it.
 - "Accept all" sets every purpose and active service to `1`. "Reject all" and "continue without accepting" set everything to `0`.
-- A choice is stale when `t` plus the renewal delay has passed, or when `ver` is lower than the last substantial version. Until the visitor answers again, no non-exempt service runs and no Consent Mode `granted` update is sent (see [decision 005](decisions/005-stale-consent-suspension.md)).
+- A choice is stale when `t` plus the renewal delay has passed, when `t` is missing or not a whole number, or when `ver` is lower than the last substantial version. Until the visitor answers again, no non-exempt service runs and no Consent Mode `granted` update is sent (see [decision 005](decisions/005-stale-consent-suspension.md)).
 - In live mode the script writes a new choice at once with `pd: 1`, then posts it. The cookie that the server sets in its answer replaces it. The script writes the cookie only for a new choice.
 - In preview mode the cookie is named `ccm_preview` and nothing is posted.
 

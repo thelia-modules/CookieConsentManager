@@ -39,8 +39,8 @@
   }
   var p = (j && j.p) || {}, s = (j && j.s) || {}, show = !j;
   if (j) {
-    // An expired or outdated choice is no consent: Consent Mode stays at its default until the visitor answers.
-    var stale = (j.t || 0) + c.repromptDays * 86400 <= Date.now() / 1e3 || (c.substantialVersion > 0 && (j.ver || 0) < c.substantialVersion);
+    // An expired, undated or outdated choice is no consent: Consent Mode stays at its default until the visitor answers.
+    var stale = typeof j.t !== 'number' || j.t % 1 !== 0 || j.t + c.repromptDays * 86400 <= Date.now() / 1e3 || (c.substantialVersion > 0 && (j.ver || 0) < c.substantialVersion);
     show = stale || S.some(function (o) { return s[o.key] === undefined && p[o.purpose] === 1; });
     if (stale) { p = {}; s = {}; }
     if (g.enabled && !stale) {
