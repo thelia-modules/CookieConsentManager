@@ -1,0 +1,25 @@
+tarteaucitron.services.amazon = {
+    "key": "amazon",
+    "type": "ads",
+    "name": "Amazon",
+    "uri": "https://www.amazon.com/gp/help/customer/display.html/?ie=UTF8&nodeId=201909010",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['amazon_product'], function (x) {
+            var frame_title = tarteaucitron.getElemAttr(x, "title") || 'Amazon iframe',
+                amazonId = tarteaucitron.getElemAttr(x, "amazonid"),
+                productId = tarteaucitron.getElemAttr(x, "productid"),
+                url = '//ws-eu.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&OneJS=1&Operation=GetAdHtml&MarketPlace=' + tarteaucitron.getLanguage().toUpperCase() + '&source=ss&ref=ss_til&ad_type=product_link&tracking_id=' + amazonId + '&marketplace=amazon&region=' + tarteaucitron.getLanguage().toUpperCase() + '&placement=' + productId + '&asins=' + productId + '&show_border=true&link_opens_in_new_window=true',
+                iframe = '<iframe title="' + frame_title + '" style="width:120px;height:240px;" src="' + url + '"></iframe>';
+
+            return iframe;
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'amazon';
+        tarteaucitron.fallback(['amazon_product'], tarteaucitron.engage(id));
+    }
+};

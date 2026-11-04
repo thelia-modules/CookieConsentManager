@@ -1,0 +1,28 @@
+tarteaucitron.services.twitch = {
+    "key": "twitch",
+    "type": "video",
+    "name": "Twitch",
+    "needConsent": true,
+    "cookies": [],
+    "uri": "https://www.twitch.tv/p/en/legal/privacy-notice",
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['twitch_player'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'Twitch iframe',
+                id = tarteaucitron.getElemAttr(x, 'videoID'),
+                parent = tarteaucitron.getElemAttr(x, 'parent'),
+                width = tarteaucitron.getElemAttr(x, 'width'),
+                height = tarteaucitron.getElemAttr(x, 'height');
+            var embedURL = "https://player.twitch.tv/?video=" + id + "&parent=" + parent;
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return "<iframe title=\"" + frame_title + "\" style=\"" + styleAttr + "\" src=\"" + embedURL + "\"></iframe>";
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = "twitch";
+        tarteaucitron.fallback(["twitch_player"], tarteaucitron.engage(id));
+    }
+};

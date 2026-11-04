@@ -1,0 +1,49 @@
+tarteaucitron.services.dailymotion = {
+    "key": "dailymotion",
+    "type": "video",
+    "name": "Dailymotion",
+    "uri": "https://www.dailymotion.com/legal/privacy",
+    "needConsent": true,
+    "cookies": ['ts', 'dmvk', 'hist', 'v1st', 's_vi'],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['dailymotion_player'], function (x) {
+            var frame_title = tarteaucitron.getElemAttr(x, "title") || 'Dailymotion iframe',
+                video_id = tarteaucitron.getElemAttr(x, "videoID"),
+                video_width = tarteaucitron.getElemAttr(x, "width"),
+                video_height = tarteaucitron.getElemAttr(x, "height"),
+                styleAttr = "",
+                video_frame,
+                embed_type = tarteaucitron.getElemAttr(x, "embedType"),
+                allowfullscreen = tarteaucitron.getElemAttr(x, "allowfullscreen"),
+                showinfo = tarteaucitron.getElemAttr(x, "showinfo"),
+                autoplay = tarteaucitron.getElemAttr(x, "autoplay"),
+                api = tarteaucitron.getElemAttr(x, "api"),
+                params = 'info=' + showinfo + '&autoPlay=' + autoplay + '&api=' + api;
+
+            if (video_id === "") {
+                return "";
+            }
+            if (video_width !== "") {
+                styleAttr += 'width:' + tarteaucitron.getStyleSize(video_width) + ';';
+            }
+            if (video_height !== undefined) {
+                styleAttr += 'height:' + tarteaucitron.getStyleSize(video_height) + ';';
+            }
+            if (embed_type === "" || !['video', 'playlist'].includes(embed_type)) {
+                embed_type = "video";
+            }
+            video_frame = '<iframe title="' + frame_title + '" src="//www.dailymotion.com/embed/' + embed_type + '/' + video_id + '?' + params + '" style="' + styleAttr + '" ' + (allowfullscreen == '0' ? '' : ' webkitallowfullscreen mozallowfullscreen allowfullscreen') + '></iframe>';
+            return video_frame;
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'dailymotion';
+        tarteaucitron.fallback(['dailymotion_player'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'width'));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'height'));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

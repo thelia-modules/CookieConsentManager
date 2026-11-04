@@ -1,0 +1,31 @@
+tarteaucitron.services.podcloud = {
+    "key": "podcloud",
+    "type": "video",
+    "name": "podCloud",
+    "uri": "https://podcloud.fr/privacy",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['tac_podcloud'], function (x) {
+            var frame_title = tarteaucitron.getElemAttr(x, "title") || 'podCloud iframe',
+                width = tarteaucitron.getElemAttr(x, "width"),
+                height = tarteaucitron.getElemAttr(x, "height"),
+                url = tarteaucitron.getElemAttr(x, "data-url"),
+                allowfullscreen = tarteaucitron.getElemAttr(x, "allowfullscreen");
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return '<iframe title="' + frame_title + '" src="' + url + '" style="' + styleAttr + '" allowtransparency ' + (allowfullscreen == '0' ? '' : ' webkitallowfullscreen mozallowfullscreen allowfullscreen') + '></iframe>';
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'podcloud';
+        tarteaucitron.fallback(['tac_podcloud'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'width'));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'height'));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

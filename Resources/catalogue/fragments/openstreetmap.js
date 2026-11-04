@@ -1,0 +1,30 @@
+tarteaucitron.services.openstreetmap = {
+    "key": "openstreetmap",
+    "type": "api",
+    "name": "Openstreetmap Embed",
+    "uri": "https://wiki.osmfoundation.org/wiki/Privacy_Policy#Cookies",
+    "needConsent": true,
+    "cookies": ['apisid', 'hsid', 'nid', 'sapisid', 'sid', 'sidcc', 'ssid', '1p_jar'],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['openstreetmap'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'Openstreetmap iframe',
+                width = tarteaucitron.getElemWidth(x),
+                height = tarteaucitron.getElemHeight(x),
+                url = tarteaucitron.getElemAttr(x, "data-url");
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return '<iframe title="' + frame_title + '" src="' + url + '" style="' + styleAttr + '" allowfullscreen></iframe>';
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'openstreetmap';
+        tarteaucitron.fallback(['openstreetmap'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemWidth(elem));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemHeight(elem));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

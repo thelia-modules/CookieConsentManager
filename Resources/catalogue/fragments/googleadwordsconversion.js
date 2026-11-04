@@ -1,0 +1,30 @@
+tarteaucitron.services.googleadwordsconversion = {
+    "key": "googleadwordsconversion",
+    "type": "ads",
+    "name": "Google Adwords (conversion)",
+    "uri": "https://www.google.com/settings/ads",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+        if (tarteaucitron.user.adwordsconversionId === undefined) {
+            return;
+        }
+
+        tarteaucitron.addScript('//www.googleadservices.com/pagead/conversion_async.js', '', function () {
+            window.google_trackConversion({
+                google_conversion_id: tarteaucitron.user.adwordsconversionId,
+                google_conversion_label: tarteaucitron.user.adwordsconversionLabel,
+                google_conversion_language: tarteaucitron.user.adwordsconversionLanguage,
+                google_conversion_format: tarteaucitron.user.adwordsconversionFormat,
+                google_conversion_color: tarteaucitron.user.adwordsconversionColor,
+                google_conversion_value: tarteaucitron.user.adwordsconversionValue,
+                google_conversion_currency: tarteaucitron.user.adwordsconversionCurrency,
+                google_custom_params: {
+                    parameter1: tarteaucitron.user.adwordsconversionCustom1,
+                    parameter2: tarteaucitron.user.adwordsconversionCustom2
+                }
+            });
+        });
+    }
+};

@@ -1,0 +1,30 @@
+tarteaucitron.services.addthis = {
+    "key": "addthis",
+    "type": "social",
+    "name": "AddThis",
+    "uri": "https://www.addthis.com/privacy/privacy-policy#publisher-visitors",
+    "needConsent": true,
+    "cookies": ['__atuvc', '__atuvs'],
+    "js": function () {
+        "use strict";
+        if (tarteaucitron.user.addthisPubId === undefined) {
+            return;
+        }
+        if (tarteaucitron.isAjax === true) {
+            window.addthis = null;
+            window._adr = null;
+            window._atc = null;
+            window._atd = null;
+            window._ate = null;
+            window._atr = null;
+            window._atw = null;
+        }
+        tarteaucitron.fallback(['addthis_inline_share_toolbox'], '');
+        tarteaucitron.addScript('//s7.addthis.com/js/300/addthis_widget.js#pubid=' + tarteaucitron.user.addthisPubId);
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'addthis';
+        tarteaucitron.fallback(['addthis_inline_share_toolbox'], tarteaucitron.engage(id));
+    }
+};

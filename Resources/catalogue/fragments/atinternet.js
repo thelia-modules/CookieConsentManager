@@ -1,0 +1,71 @@
+tarteaucitron.services.atinternet = {
+    "key": "atinternet",
+    "type": "analytic",
+    "name": "AT Internet (privacy by design)",
+    "uri": "https://www.atinternet.com/rgpd-et-vie-privee/",
+    "needConsent": true,
+    "safeanalytic": false,
+    "cookies": ['atidvisitor', 'atreman', 'atredir', 'atsession'],
+    "js": function () {
+        "use strict";
+        if (tarteaucitron.user.atLibUrl === undefined) {
+            return;
+        }
+
+        if (tarteaucitron.user.atinternetAlreadyLoaded !== undefined) {
+            return;
+        }
+
+        tarteaucitron.addScript(tarteaucitron.user.atLibUrl, '', function () {
+
+            window.tag = new ATInternet.Tracker.Tag();
+
+            if (typeof window.tag.privacy !== 'undefined') {
+                window.tag.privacy.setVisitorOptin();
+            }
+
+            if (typeof tarteaucitron.user.atMore === 'function') {
+                tarteaucitron.user.atMore();
+            }
+
+            if (tarteaucitron.user.atinternetSendData !== false) {
+                window.tag.page.send();
+            }
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        if (tarteaucitron.user.atLibUrl === undefined) {
+            return;
+        }
+
+        if (tarteaucitron.user.atNoFallback === true) {
+            return;
+        }
+
+        tarteaucitron.user.atinternetAlreadyLoaded = true;
+
+        tarteaucitron.addScript(tarteaucitron.user.atLibUrl, '', function () {
+
+            window.tag = new ATInternet.Tracker.Tag();
+
+            if (typeof window.tag.privacy !== 'undefined') {
+
+                var visitorMode = window.tag.privacy.getVisitorMode();
+                if (visitorMode !== null && visitorMode.name !== undefined && visitorMode.name == "optout") {
+                    window.tag.privacy.setVisitorOptout();
+                } else {
+                    window.tag.privacy.setVisitorMode('cnil', 'exempt');
+                }
+            }
+
+            if (typeof tarteaucitron.user.atMore === 'function') {
+                tarteaucitron.user.atMore();
+            }
+
+            if (tarteaucitron.user.atinternetSendData !== false) {
+                window.tag.page.send();
+            }
+        });
+    }
+};

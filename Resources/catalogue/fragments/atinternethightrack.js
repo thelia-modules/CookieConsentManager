@@ -1,0 +1,23 @@
+tarteaucitron.services.atinternethightrack = {
+    "key": "atinternethightrack",
+    "type": "analytic",
+    "name": "AT Internet",
+    "uri": "https://www.atinternet.com/rgpd-et-vie-privee/",
+    "needConsent": true,
+    "cookies": ['atidvisitor', 'atreman', 'atredir', 'atsession'],
+    "js": function () {
+        "use strict";
+        if (tarteaucitron.user.atLibUrl === undefined) {
+            return;
+        }
+
+        tarteaucitron.addScript(tarteaucitron.user.atLibUrl, '', function () {
+
+            var tag = new ATInternet.Tracker.Tag();
+
+            if (typeof tarteaucitron.user.atMore === 'function') {
+                tarteaucitron.user.atMore();
+            }
+        })
+    }
+};

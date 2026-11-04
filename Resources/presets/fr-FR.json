@@ -1,0 +1,35 @@
+{
+  "schema": "ccm-config/1",
+  "preset": {
+    "code": "fr-FR",
+    "country": "FR",
+    "label": "France (CNIL)",
+    "legal_basis": ["RGPD", "Directive 2002/58/CE art. 5(3)", "Loi Informatique et Libertés art. 82", "CNIL délibérations 2020-091 et 2020-092"],
+    "reviewed_at": "2026-11-01"
+  },
+  "general": { "layout": "bar", "close_button": true, "floating_button": false, "reload_on_script_withdraw": true, "block_embedded_iframes": true, "renewal_months": 6 },
+  "policy": { "page_title": "Politique de cookies" },
+  "texts": {
+    "fr": {
+      "title": "Votre choix sur les cookies",
+      "body": "Avec votre accord, nous et nos partenaires déposons des cookies et utilisons des traceurs. Vous pouvez tout accepter, tout refuser ou choisir finalité par finalité avec « Personnaliser ».",
+      "accept": "Tout accepter",
+      "reject": "Tout refuser",
+      "customize": "Personnaliser",
+      "close": "Continuer sans accepter",
+      "allow": "Autoriser",
+      "preferences": "Gérer mes cookies",
+      "free_text": ""
+    }
+  },
+  "purposes": [
+    { "code": "analytics", "label": { "fr": "Mesure d'audience" }, "description": { "fr": "Mesurer la fréquentation du site et comprendre comment il est utilisé afin de l'améliorer." } },
+    { "code": "ads", "label": { "fr": "Publicité personnalisée et mesure de sa performance" }, "description": { "fr": "Afficher des publicités adaptées à vos centres d'intérêt, limiter leur répétition et en mesurer l'efficacité. Nos partenaires publicitaires peuvent vous suivre d'un site à l'autre." } },
+    { "code": "social", "label": { "fr": "Réseaux sociaux" }, "description": { "fr": "Partager des contenus et interagir avec les réseaux sociaux. Ces services peuvent vous suivre sur d'autres sites." } },
+    { "code": "media", "label": { "fr": "Vidéos et contenus intégrés" }, "description": { "fr": "Lire des vidéos et afficher des contenus hébergés par des tiers (cartes, vidéos)." } },
+    { "code": "support", "label": { "fr": "Assistance et chat" }, "description": { "fr": "Vous répondre en direct et conserver votre conversation." } },
+    { "code": "personalization", "label": { "fr": "Préférences et personnalisation" }, "description": { "fr": "Mémoriser vos préférences d'affichage et personnaliser votre expérience." } }
+  ],
+  "consent_mode": { "enabled": true, "mode": "basic", "ads_data_redaction": true, "url_passthrough": false, "wait_for_update_ms": 500, "regions": [] },
+  "registry": { "retention_months": 25, "ip_mode": "none" }
+}

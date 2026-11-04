@@ -1,0 +1,39 @@
+tarteaucitron.services.firebase = {
+    "key": "firebase",
+    "type": "analytic",
+    "name": "Firebase",
+    "uri": "https://firebase.google.com/support/privacy",
+    "needConsent": true,
+    "cookies": (function () {
+        var googleIdentifier = tarteaucitron.user.firebaseMeasurementId,
+            tagGCookie = '_ga_' + googleIdentifier;
+
+        tagGCookie = tagGCookie.replace(/G-/g, '');
+
+        return ['_ga', tagGCookie];
+    })(),
+    "js": function () {
+        "use strict";
+
+        if (tarteaucitron.user.firebaseApiKey === undefined) {
+            return;
+        }
+
+        tarteaucitron.addScript('https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js', '', function () {
+            tarteaucitron.addScript('https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js', '', function () {
+
+                var firebaseConfig = {
+                    apiKey: tarteaucitron.user.firebaseApiKey,
+                    authDomain: tarteaucitron.user.firebaseAuthDomain,
+                    databaseURL: tarteaucitron.user.firebaseDatabaseUrl,
+                    projectId: tarteaucitron.user.firebaseProjectId,
+                    storageBucket: tarteaucitron.user.firebaseStorageBucket,
+                    appId: tarteaucitron.user.firebaseAppId,
+                    measurementId: tarteaucitron.user.firebaseMeasurementId,
+                };
+                firebase.initializeApp(firebaseConfig);
+                firebase.analytics();
+            });
+        });
+    }
+};
