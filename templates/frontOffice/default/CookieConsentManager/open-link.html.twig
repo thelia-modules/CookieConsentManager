@@ -1,3 +1,3 @@
 {# ccm-templates:1 #}
 {# ccm-templates/1 : link that reopens the preferences (Twig helper ccm_open_link). #}
-{% if wrapper|default(false) %}<nav class="ccm ccm-footer-link" aria-label="{{ label }}">{% endif %}<a class="ccm-open-link" href="/ccm/preferences" data-ccm-open>{{ label }}</a>{% if wrapper|default(false) %}</nav>{% endif %}
+{% if wrapper|default(false) %}<nav class="ccm ccm-footer-link" aria-label="{{ label }}">{% endif %}<a class="ccm-open-link" href="{{ preferences_url|default('/ccm/preferences') }}" data-ccm-open>{{ label }}</a>{% if wrapper|default(false) %}</nav>{% endif %}

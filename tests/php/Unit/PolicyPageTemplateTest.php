@@ -11,6 +11,7 @@ use CookieConsentManager\Draft\DraftNormalizer;
 use CookieConsentManager\Front\FrontTexts;
 use CookieConsentManager\Front\TemplateContext;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
+use CookieConsentManager\Tests\Support\ModuleRoutes;
 use PHPUnit\Framework\TestCase;
 
 final class PolicyPageTemplateTest extends TestCase
@@ -27,7 +28,7 @@ final class PolicyPageTemplateTest extends TestCase
     }
 
     /** @param array{name: string, address: string, email: string} $identity */
-    private function template(array $identity = ['name' => 'Boutique <Test> SAS', 'address' => '1 rue de la Paix, 75002 Paris', 'email' => 'contact@example.org']): PolicyPageTemplate
+    private function template(array $identity = ['name' => 'Boutique <Test> SAS', 'address' => '1 rue de la Paix, 75002 Paris', 'email' => 'contact@example.org'], string $baseUrl = ''): PolicyPageTemplate
     {
         $frontTexts = new FrontTexts(new CatalogueTranslator());
         $shop = new class($identity) extends ShopIdentity {
@@ -42,7 +43,7 @@ final class PolicyPageTemplateTest extends TestCase
             }
         };
 
-        return new PolicyPageTemplate($frontTexts, new TemplateContext($frontTexts), $shop, new JointResponsibility(__DIR__.'/../../../Resources/catalogue/joint-responsibility.json'));
+        return new PolicyPageTemplate($frontTexts, new TemplateContext($frontTexts), $shop, new JointResponsibility(__DIR__.'/../../../Resources/catalogue/joint-responsibility.json'), ModuleRoutes::urls($baseUrl));
     }
 
     public function testItKeepsWhatIsStableAndSendsToTheLivePageForTheServices(): void
@@ -60,6 +61,13 @@ final class PolicyPageTemplateTest extends TestCase
         }
         self::assertStringNotContainsString('&lt;p&gt;', $html, 'no escaped tag shown to the visitor');
         self::assertStringNotContainsString('conjointement', $html, 'no joint service here');
+    }
+
+    public function testTheLinkToThePreferencesCarriesTheBasePathOfTheShop(): void
+    {
+        $html = $this->template(baseUrl: '/shop')->render($this->snapshot(), 'fr');
+
+        self::assertStringContainsString('<a href="/shop/ccm/preferences">Liste à jour des services et des cookies</a>', $html);
     }
 
     public function testItStatesTheJointResponsibilityWhenAServiceCallsForIt(): void

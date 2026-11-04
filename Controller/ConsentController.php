@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final readonly class ConsentController
 {
     public const PATH = '/ccm/consent';
+    public const ROUTE = 'cookieconsentmanager_consent';
     public const MAX_BODY_BYTES = 8192;
 
     public function __construct(
@@ -28,7 +29,7 @@ final readonly class ConsentController
     }
 
     // stateless: true, otherwise every POST would open a session.
-    #[Route(self::PATH, name: 'cookieconsentmanager_consent', methods: ['POST'], stateless: true)]
+    #[Route(self::PATH, name: self::ROUTE, methods: ['POST'], stateless: true)]
     public function __invoke(Request $request): Response
     {
         try {

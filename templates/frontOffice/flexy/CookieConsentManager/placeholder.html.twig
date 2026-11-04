@@ -2,7 +2,7 @@
 {# ccm-templates/1 (Flexy) : placeholder of a service. In template mode (template_mode) it is the box the engine
    fills in for the fragments of the catalogue: {{key}}, {{name}}, {{controller}} and {{policyUrl}} are replaced and escaped by the engine.
    Phrasing content only: the placeholder replaces an iframe, which may sit in a paragraph. #}
-{% macro box(service, texts, template_mode, ccmStyle) %}
+{% macro box(service, texts, template_mode, ccmStyle, preferencesUrl) %}
     <span class="ccm ccm--flexy ccm-box"{% if template_mode %} data-ccm-placeholder-box{% endif %}{% if ccmStyle|trim %} style="{{ ccmStyle|trim }}"{% endif %}>
         <span class="ccm-box-title">{{ texts.blocked|replace({'%name%': service.name}) }}</span>
         {% if template_mode %}<span class="ccm-box-meta">{{ texts.purpose }}{{ texts.colon }}{{ '{{purposeLabel}}' }}</span>{% elseif service.purpose_label %}<span class="ccm-box-meta">{{ texts.purpose }}{{ texts.colon }}{{ service.purpose_label }}</span>{% endif %}
@@ -11,14 +11,14 @@
             <button type="button" class="ccm-btn ccm-btn--choice" data-ccm-action="service_allow" data-ccm-service="{{ service.key }}">{{ texts.allow_service|replace({'%name%': service.name}) }}</button>
             <button type="button" class="ccm-btn ccm-btn--outline" data-ccm-open>{{ texts.preferences_link }}</button>
         </span>
-        <a class="ccm-btn ccm-btn--outline ccm-nojs-only" href="/ccm/preferences">{{ texts.preferences_link }}</a>
+        <a class="ccm-btn ccm-btn--outline ccm-nojs-only" href="{{ preferencesUrl }}">{{ texts.preferences_link }}</a>
     </span>
 {% endmacro %}
 {% set ccmStyle %}{% if colors|default(false) %}--ccm-primary:{{ colors.primary }};--ccm-on-primary:{{ colors.on_primary }};--ccm-surface:{{ colors.surface }};--ccm-text:{{ colors.text }};{% endif %}{% endset %}
 {% if template_mode|default(false) %}
-    {{ _self.box(service, texts, true, ccmStyle) }}
+    {{ _self.box(service, texts, true, ccmStyle, preferences_url|default('/ccm/preferences')) }}
 {% else %}
     <span class="ccm ccm--flexy ccm-placeholder" data-ccm-placeholder="{{ service.key }}"{% if src|default('') %} data-ccm-src="{{ src }}"{% endif %}{% for name, value in attributes|default({}) %} data-ccm-attr-{{ name }}="{{ value }}"{% endfor %}>
-        {{ _self.box(service, texts, false, ccmStyle) }}
+        {{ _self.box(service, texts, false, ccmStyle, preferences_url|default('/ccm/preferences')) }}
     </span>
 {% endif %}

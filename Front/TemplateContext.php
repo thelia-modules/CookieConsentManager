@@ -71,6 +71,7 @@ final readonly class TemplateContext
             'close_enabled' => (bool) $config['general']['close_button'],
             'floating_button' => (bool) $config['general']['floating_button'],
             'policy_url' => self::policyUrl($config['policy'] ?? [], $language),
+            'preferences_url' => $front->config['preferencesUrl'] ?? '/ccm/preferences',
             'locale' => $locale,
             'language' => $language,
             'exempt_services' => $exempt,

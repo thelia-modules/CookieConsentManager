@@ -9,9 +9,9 @@ use CookieConsentManager\Catalogue\CatalogueReader;
 use CookieConsentManager\Draft\DraftNormalizer;
 use CookieConsentManager\Draft\DraftRepository;
 use CookieConsentManager\Front\AssembledScriptHasher;
+use CookieConsentManager\Front\FrontUrls;
 use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Publication\ModuleVersion;
-use CookieConsentManager\Publication\NoOverriddenTemplates;
 use CookieConsentManager\Publication\PublishedConfigBuilder;
 use CookieConsentManager\Publication\PublishedVersionPointer;
 use CookieConsentManager\Publication\Publisher;
@@ -43,6 +43,7 @@ final class Wiring
     public Publisher $publisher;
     public SnapshotAssembler $assembler;
     public PublishedConfigBuilder $builder;
+    public FrontUrls $urls;
     public VersionRestorer $restorer;
     public ConfigExporter $exporter;
     public ConfigImporter $importer;
@@ -109,6 +110,7 @@ final class Wiring
             $this->pointer,
         );
         $this->builder = new PublishedConfigBuilder();
+        $this->urls = ModuleRoutes::urls();
         $this->restorer = new VersionRestorer($this->versions, $this->drafts);
         $this->exporter = new ConfigExporter($this->drafts, $this->catalogue, $moduleVersion, $this->versions);
         $policy = new class extends PolicyUrlResolver {

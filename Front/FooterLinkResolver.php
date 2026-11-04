@@ -20,7 +20,6 @@ use Thelia\Core\Content\Slot\ContentSlots;
 final readonly class FooterLinkResolver implements ContentSlotResolverInterface
 {
     public const ANCHOR = '#ccm-preferences';
-    public const URL = '/ccm/preferences'.self::ANCHOR;
 
     /** @param iterable<ContentSlotResolverInterface> $resolvers */
     public function __construct(
@@ -57,6 +56,6 @@ final readonly class FooterLinkResolver implements ContentSlotResolverInterface
         $language = strtolower(substr($locale, 0, 2));
         $label = $this->context->texts($front->snapshot['config']['texts'], $language)['preferences'];
 
-        return [...$links, new ContentSlotLink($label, self::URL, 'ccm')];
+        return [...$links, new ContentSlotLink($label, $front->config['preferencesUrl'].self::ANCHOR, 'ccm')];
     }
 }

@@ -28,7 +28,7 @@ final readonly class PreviewProofListener
         }
 
         $response = $event->getResponse();
-        $response->headers->setCookie(Cookie::create(PreviewToken::PROOF_COOKIE, $this->tokens->proofFor($token), 0, '/ccm/', null, $request->isSecure(), true, false, Cookie::SAMESITE_LAX));
+        $response->headers->setCookie(Cookie::create(PreviewToken::PROOF_COOKIE, $this->tokens->proofFor($token), 0, $request->getBasePath().'/ccm/', null, $request->isSecure(), true, false, Cookie::SAMESITE_LAX));
         $response->headers->set('Cache-Control', 'no-store, private');
     }
 }

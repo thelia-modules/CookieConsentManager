@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace CookieConsentManager\Admin;
 
 use CookieConsentManager\Catalogue\JointResponsibility;
-use CookieConsentManager\Controller\PreferencesPageController;
 use CookieConsentManager\Front\CookieDuration;
 use CookieConsentManager\Front\FrontTexts;
+use CookieConsentManager\Front\FrontUrls;
 use CookieConsentManager\Front\TemplateContext;
 
 /**
@@ -22,6 +22,7 @@ final readonly class PolicyPageTemplate
         private TemplateContext $context,
         private ShopIdentity $identity,
         private JointResponsibility $joint,
+        private FrontUrls $urls,
     ) {
     }
 
@@ -37,7 +38,7 @@ final readonly class PolicyPageTemplate
         $words = $this->frontTexts->policyPage($language);
         $texts = $this->context->texts($config['texts'], $language);
         $identity = $this->identity->read();
-        $listLink = '<a href="'.PreferencesPageController::PATH.'">'.self::e($words['policy_list_link']).'</a>';
+        $listLink = '<a href="'.self::e($this->urls->preferences()).'">'.self::e($words['policy_list_link']).'</a>';
 
         $html = [];
         $html[] = '<p>'.self::e($words['policy_intro']).'</p>';

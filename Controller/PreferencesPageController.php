@@ -20,6 +20,7 @@ use Twig\Environment;
 final readonly class PreferencesPageController
 {
     public const PATH = '/ccm/preferences';
+    public const ROUTE = 'cookieconsentmanager_preferences';
 
     public function __construct(
         private FrontConfigProvider $configs,
@@ -30,7 +31,7 @@ final readonly class PreferencesPageController
     ) {
     }
 
-    #[Route(self::PATH, name: 'cookieconsentmanager_preferences', methods: ['GET'])]
+    #[Route(self::PATH, name: self::ROUTE, methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
         $front = $this->configs->forRequest($request);

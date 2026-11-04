@@ -40,6 +40,7 @@ final class FrontConfigProvider implements ResetInterface
         private readonly PublishedVersionPointer $pointer,
         #[Autowire(service: 'cache.app')]
         private readonly CacheInterface $cache,
+        private readonly FrontUrls $urls,
     ) {
     }
 
@@ -54,7 +55,8 @@ final class FrontConfigProvider implements ResetInterface
         $memoKey = $locale.'|'.($preview ?? '').'|'.($audit ?? '');
 
         if (!\array_key_exists($memoKey, $this->memo)) {
-            $this->memo[$memoKey] = $this->resolve($locale, $preview, $audit);
+            $resolved = $this->resolve($locale, $preview, $audit);
+            $this->memo[$memoKey] = null === $resolved ? null : $this->withUrls($resolved, $preview);
         }
 
         if ('preview' === $this->memo[$memoKey]?->mode()) {
@@ -75,7 +77,22 @@ final class FrontConfigProvider implements ResetInterface
     {
         $number = $this->pointer->latest();
 
-        return 0 === $number ? null : $this->published($number, $locale);
+        $published = 0 === $number ? null : $this->published($number, $locale);
+
+        return null === $published ? null : $this->withUrls($published, null);
+    }
+
+    // The cached configuration holds root paths; the ones of this request come from the router, so a shop in a sub-directory gets its base path.
+    private function withUrls(FrontConfig $front, ?string $preview): FrontConfig
+    {
+        $script = 'preview' === $front->mode() && null !== $preview
+            ? $this->urls->previewScript($preview)
+            : $this->urls->script($front->config['version'], $front->config['hash']);
+
+        return new FrontConfig(
+            array_replace($front->config, ['endpoint' => $this->urls->endpoint(), 'script' => $script, 'preferencesUrl' => $this->urls->preferences()]),
+            $front->snapshot,
+        );
     }
 
     private function resolve(string $locale, ?string $preview, ?string $audit): ?FrontConfig
@@ -88,7 +105,7 @@ final class FrontConfigProvider implements ResetInterface
                 $snapshot = $this->assembler->assemble($draft);
 
                 return new FrontConfig(
-                    $this->builder->build($snapshot, $locale, $number, substr($preview, 0, 12), 0, 'preview', \sprintf('/ccm/preview-%s.js', $preview)),
+                    $this->builder->build($snapshot, $locale, $number, substr($preview, 0, 12), 0, 'preview'),
                     $snapshot,
                 );
             }

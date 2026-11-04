@@ -21,7 +21,6 @@ use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Front\StyleSheet;
 use CookieConsentManager\Front\TemplateContext;
 use CookieConsentManager\Publication\ModuleVersion;
-use CookieConsentManager\Publication\NoOverriddenTemplates;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\SnapshotAssembler;
 use CookieConsentManager\Registry\ConsentCookie;
@@ -29,6 +28,7 @@ use CookieConsentManager\Registry\RequestConsentReader;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
 use CookieConsentManager\Tests\Support\CcmTestCase;
 use CookieConsentManager\Tests\Support\MutableOverrides;
+use CookieConsentManager\Tests\Support\NoOverriddenTemplates;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,7 +60,7 @@ final class FrontTest extends CcmTestCase
         $this->hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates, $this->ccm->pool);
         $this->publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion, $this->ccm->pointer);
         $this->tokens = new PreviewToken('test-secret');
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool);
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
     }
 
     private function security(bool $admin): SecurityContext
@@ -73,7 +73,7 @@ final class FrontTest extends CcmTestCase
 
     private function controller(): ServedScriptController
     {
-        return new ServedScriptController($this->ccm->versions, $this->hashes, $this->script, $this->ccm->assembler, $this->ccm->drafts, $this->tokens);
+        return new ServedScriptController($this->ccm->versions, $this->hashes, $this->script, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->ccm->urls);
     }
 
     private function twig(string $theme): Environment
@@ -104,12 +104,12 @@ final class FrontTest extends CcmTestCase
         self::assertNull($this->configs->forRequest(Request::create('/')), 'a saved draft is not published');
 
         $token = $this->tokens->forDraft($this->ccm->drafts->load());
-        $preview = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool))
+        $preview = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls))
             ->forRequest(Request::create('/', 'GET', [PreviewToken::QUERY => $token]));
         self::assertSame('preview', $preview?->mode());
         self::assertSame('/ccm/preview-'.$token.'.js', $preview->config['script']);
 
-        $wrong = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool))
+        $wrong = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls))
             ->forRequest(Request::create('/', 'GET', [PreviewToken::QUERY => str_repeat('a', 32)]));
         self::assertNull($wrong);
     }
@@ -144,7 +144,7 @@ final class FrontTest extends CcmTestCase
         // The theme gets an override after the page was cached: the served hash of the same version changes.
         $templates = new MutableOverrides();
         $hashes = new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher($this->script), new ModuleVersion($this->module.'/Config/module.xml'), $templates, $this->ccm->pool);
-        $controller = new ServedScriptController($this->ccm->versions, $hashes, $this->script, $this->ccm->assembler, $this->ccm->drafts, $this->tokens);
+        $controller = new ServedScriptController($this->ccm->versions, $hashes, $this->script, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->ccm->urls);
         $previous = $hashes->forVersion($version);
 
         $templates->overridden = true;
@@ -181,7 +181,7 @@ final class FrontTest extends CcmTestCase
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
         $this->publisher->publish('alice');
         $token = $this->tokens->forDraft($this->ccm->drafts->load());
-        $anonymous = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(false), $this->ccm->pointer, $this->ccm->pool);
+        $anonymous = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(false), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
 
         $request = Request::create('/', 'GET', [PreviewToken::QUERY => $token]);
         self::assertSame('live', $anonymous->forRequest($request)?->mode(), 'a visitor holding the token gets the normal rendering');
@@ -322,7 +322,7 @@ final class FrontTest extends CcmTestCase
         $draft['general']['block_embedded_iframes'] = false;
         $this->ccm->drafts->replace($draft, 'alice');
         $this->publisher->publish('alice');
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool);
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
         self::assertSame($page, $run(Request::create('/produit'), new Response($page)));
     }
 
@@ -420,7 +420,7 @@ final class FrontTest extends CcmTestCase
 
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
         $this->publisher->publish('alice');
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool);
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
         $response = $make()($request);
         $html = (string) $response->getContent();
 

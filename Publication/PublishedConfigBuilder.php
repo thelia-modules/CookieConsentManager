@@ -8,18 +8,21 @@ use CookieConsentManager\Draft\DefaultSettings;
 
 /**
  * Builds the configuration published inline in the head (CONTRATS.md section 3) from a
- * snapshot only: the same snapshot gives the same JSON for a given language.
+ * snapshot only: the same snapshot gives the same JSON for a given language. The URLs it carries
+ * are the root paths of the routes: the front replaces them at render time by the ones the router
+ * generates for the current request (base path of the shop).
  */
 final readonly class PublishedConfigBuilder
 {
     public const ENDPOINT = '/ccm/consent';
+    public const PREFERENCES = '/ccm/preferences';
 
     /**
      * @param array<string, mixed> $snapshot
      *
      * @return array<string, mixed>
      */
-    public function build(array $snapshot, string $locale, int|string $version, string $hash, int $substantialVersion, string $mode = 'live', ?string $scriptUrl = null): array
+    public function build(array $snapshot, string $locale, int|string $version, string $hash, int $substantialVersion, string $mode = 'live'): array
     {
         $config = $snapshot['config'];
         $resolved = $snapshot['services_resolved'];
@@ -44,7 +47,8 @@ final readonly class PublishedConfigBuilder
             'locale' => $locale,
             'mode' => $mode,
             'endpoint' => self::ENDPOINT,
-            'script' => $scriptUrl ?? \sprintf('/ccm/%s-%s.js', $version, $hash),
+            'script' => \sprintf('/ccm/%s-%s.js', $version, $hash),
+            'preferencesUrl' => self::PREFERENCES,
             'repromptDays' => intdiv(min($config['general']['renewal_months'], 13) * 365, 12),
             'options' => [
                 'layout' => $config['general']['layout'],

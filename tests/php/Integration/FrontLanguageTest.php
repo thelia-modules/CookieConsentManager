@@ -15,10 +15,10 @@ use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Front\StyleSheet;
 use CookieConsentManager\Front\TemplateContext;
 use CookieConsentManager\Publication\ModuleVersion;
-use CookieConsentManager\Publication\NoOverriddenTemplates;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\SnapshotAssembler;
 use CookieConsentManager\Tests\Support\CcmTestCase;
+use CookieConsentManager\Tests\Support\NoOverriddenTemplates;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -99,7 +99,7 @@ final class FrontLanguageTest extends CcmTestCase
         $hashes = new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher(new ServedScriptAssembler($module)), $moduleVersion, new NoOverriddenTemplates(), $this->ccm->pool);
         $security = $this->createStub(SecurityContext::class);
         $security->method('hasAdminUser')->willReturn(true);
-        $configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool);
+        $configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
         $twig = new Environment(new FilesystemLoader([$module.'/templates/frontOffice/flexy']), ['strict_variables' => true]);
         $hook = new ConsentThemeHook($stack, $configs, new TemplateContext($texts), $texts, new StyleSheet($module.'/assets/css/ccm.css'), $twig, $module.'/assets/js/head.js');
 
@@ -139,7 +139,7 @@ final class FrontLanguageTest extends CcmTestCase
 
         $security = $this->createStub(SecurityContext::class);
         $security->method('hasAdminUser')->willReturn(true);
-        $front = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool))->forRequest(Request::create('/'));
+        $front = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls))->forRequest(Request::create('/'));
         self::assertNotNull($front);
 
         return $front;

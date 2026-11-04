@@ -36,4 +36,15 @@ final class PreviewProofListenerTest extends TestCase
         self::assertSame('/ccm/', $cookie->getPath());
         self::assertTrue($previewed->headers->hasCacheControlDirective('no-store'));
     }
+
+    public function testTheProofCookieIsScopedUnderTheBasePathOfAShopInASubDirectory(): void
+    {
+        $request = Request::create('/shop/fr/', 'GET', [], [], [], ['SCRIPT_FILENAME' => '/var/www/shop/index.php', 'SCRIPT_NAME' => '/shop/index.php', 'PHP_SELF' => '/shop/index.php']);
+        $request->attributes->set(PreviewToken::PROOF_ATTRIBUTE, str_repeat('a', 32));
+        $response = new Response();
+
+        (new PreviewProofListener(new PreviewToken('secret')))->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+        self::assertSame('/shop/ccm/', $response->headers->getCookies()[0]->getPath());
+    }
 }

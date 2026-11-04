@@ -13,11 +13,11 @@ use CookieConsentManager\Front\PreviewToken;
 use CookieConsentManager\Front\ServedHashResolver;
 use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Publication\ModuleVersion;
-use CookieConsentManager\Publication\NoOverriddenTemplates;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\SnapshotAssembler;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
 use CookieConsentManager\Tests\Support\CcmTestCase;
+use CookieConsentManager\Tests\Support\NoOverriddenTemplates;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
@@ -42,7 +42,7 @@ final class WorkerModeTest extends CcmTestCase
         $this->hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates, $this->ccm->pool);
         $this->publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion, $this->ccm->pointer);
         $security = $this->createStub(SecurityContext::class);
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $this->hashes, $security, $this->ccm->pointer, $this->ccm->pool);
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $this->hashes, $security, $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
     }
 
     public function testEveryServiceThatMemoisesAcrossRequestsIsResetByTheKernel(): void
