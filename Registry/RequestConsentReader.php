@@ -6,7 +6,7 @@ namespace CookieConsentManager\Registry;
 
 use Symfony\Component\HttpFoundation\Request;
 
-/** Reads the consent carried by a request (PHP API of SPEC 10.3, behind the Twig helpers). */
+/** Reads the consent carried by a request (PHP side of the Twig helpers). */
 final readonly class RequestConsentReader
 {
     public function hasConsent(Request $request, string $service, int $repromptDays, int $substantialVersion): bool

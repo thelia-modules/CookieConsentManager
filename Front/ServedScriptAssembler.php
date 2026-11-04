@@ -7,7 +7,7 @@ namespace CookieConsentManager\Front;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Concatenates the served script in the order CONTRATS.md section 6 sets: compatibility layer,
+ * Concatenates the served script in the order docs/runtime-contracts.md ("Served script") sets: compatibility layer,
  * engine, boot, fragments of the active services (verbatim) and code of the custom ones, start.
  */
 final readonly class ServedScriptAssembler

@@ -7,7 +7,7 @@ namespace CookieConsentManager\Admin;
 use CookieConsentManager\Model\ConsentEntry;
 use CookieConsentManager\Publication\VersionRepository;
 
-/** What a proof sheet holds: the entry, the version the visitor was served and its hashes (SPEC 6.4). */
+/** What a proof sheet holds: the entry, the version the visitor was served and its hashes (printable from the browser). */
 final readonly class RegistryProof
 {
     public function __construct(private VersionRepository $versions)

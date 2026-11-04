@@ -79,7 +79,7 @@ final readonly class Publisher
 
     /**
      * Hash of the rendering the visitor is served: the published configuration, the version of
-     * the module, the served script and the resolved templates (SPEC 6.3).
+     * the module, the served script and the resolved templates (a SHA-256, recomputed when the cache is cleared; the dashboard alerts when it differs from the published one).
      *
      * @param list<array<string, string>> $templates
      */

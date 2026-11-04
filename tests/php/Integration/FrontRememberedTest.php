@@ -10,7 +10,7 @@ use CookieConsentManager\Front\TemplateContext;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
 use CookieConsentManager\Tests\Support\CcmTestCase;
 
-/** R4 #2: the panel says for how long the choice is remembered (the renewal delay). */
+/** The panel says for how long the choice is remembered (the renewal delay). */
 final class FrontRememberedTest extends CcmTestCase
 {
     public function testThePanelSaysHowLongTheChoiceIsRemembered(): void

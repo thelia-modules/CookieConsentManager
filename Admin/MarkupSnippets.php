@@ -6,7 +6,7 @@ namespace CookieConsentManager\Admin;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-/** The HTML an editor pastes in a page for the services that work on markup (SPEC 5.2). */
+/** The HTML an editor pastes in a page for the services that work on markup (the `markup` field of the catalogue). */
 final class MarkupSnippets
 {
     /** @var array<string, string>|null */

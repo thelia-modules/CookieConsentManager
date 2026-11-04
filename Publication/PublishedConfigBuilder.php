@@ -7,7 +7,7 @@ namespace CookieConsentManager\Publication;
 use CookieConsentManager\Draft\DefaultSettings;
 
 /**
- * Builds the configuration published inline in the head (CONTRATS.md section 3) from a
+ * Builds the configuration published inline in the head (shape in docs/runtime-contracts.md, "Published configuration") from a
  * snapshot only: the same snapshot gives the same JSON for a given language. The URLs it carries
  * are the root paths of the routes: the front replaces them at render time by the ones the router
  * generates for the current request (base path of the shop).

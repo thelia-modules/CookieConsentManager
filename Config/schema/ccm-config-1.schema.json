@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://cookie-consent-manager.openstudio.fr/schema/ccm-config-1.schema.json",
+  "$id": "https://raw.githubusercontent.com/thelia-modules/CookieConsentManager/main/Config/schema/ccm-config-1.schema.json",
   "title": "CookieConsentManager configuration export, schema ccm-config/1",
   "description": "Every key the export writes and the import reads. Keys marked x-environment depend on the site (identifiers, URLs, regions): an import makes the admin confirm them.",
   "type": "object",

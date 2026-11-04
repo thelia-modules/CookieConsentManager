@@ -27,7 +27,7 @@ use CookieConsentManager\Validation\ValidationIssue;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/** The alerts of the dashboard (SPEC 8): each one is a measured fact, with where to act. */
+/** The alerts of the dashboard (docs/administrator-guide.md, "Dashboard"): each one is a measured fact, with where to act. */
 final readonly class AlertCollector
 {
     public const DOMAIN = 'cookieconsentmanager.bo.default-twig';

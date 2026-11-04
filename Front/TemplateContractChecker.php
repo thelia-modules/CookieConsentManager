@@ -7,7 +7,7 @@ namespace CookieConsentManager\Front;
 use CookieConsentManager\Publication\OverriddenTemplatesProvider;
 
 /**
- * For the back-office (red alert "contract version differs", SPEC annex E): the theme templates
+ * For the back-office (red alert "contract version differs"; the marker is described in docs/integrator-guide.md): the theme templates
  * whose declared version is not the one of this module, a missing marker included.
  */
 final readonly class TemplateContractChecker

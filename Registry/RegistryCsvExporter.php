@@ -8,7 +8,7 @@ use CookieConsentManager\Admin\CsvLabeler;
 use CookieConsentManager\Model\ConsentEntry;
 use Propel\Runtime\Propel;
 
-/** Columns of SPEC annex B, in order; the optional ones only when the matching option is on. */
+/** Technical columns of the registry export (docs/runtime-contracts.md, "Registry CSV"), in order; the optional ones only when the matching option is on. */
 final readonly class RegistryCsvExporter
 {
     public const COLUMNS = ['consent_id', 'recorded_at_utc', 'action', 'source', 'version', 'version_hash', 'locale', 'path', 'browser', 'purposes_json', 'services_json'];

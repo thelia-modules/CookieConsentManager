@@ -8,7 +8,7 @@ namespace CookieConsentManager\Front;
 final readonly class FrontConfig
 {
     /**
-     * @param array<string, mixed> $config   inline configuration (CONTRATS.md section 3)
+     * @param array<string, mixed> $config   inline configuration (docs/runtime-contracts.md, "Published configuration")
      * @param array<string, mixed> $snapshot
      */
     public function __construct(

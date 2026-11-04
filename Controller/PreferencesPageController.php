@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 
-/** Target of the footer link without JavaScript (SPEC 4.3): explains how to manage the choices and lists the services. */
+/** Target of the footer link without JavaScript (`/ccm/preferences`): explains how to manage the choices and lists the services. */
 #[AsController]
 final readonly class PreferencesPageController
 {

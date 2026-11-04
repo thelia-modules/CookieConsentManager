@@ -1,7 +1,7 @@
 /*
- * CookieConsentManager: tarteaucitron compatibility layer (ADR-001 v2, CONTRATS.md section 6).
+ * CookieConsentManager: tarteaucitron compatibility layer (decision record docs/decisions/001-service-catalogue.md, contract in docs/runtime-contracts.md).
  * Exposes window.CCMCompat.create(engineAdapter), which returns the `tarteaucitron` object the
- * vendored service fragments are written against. Only the surface listed in the contract exists
+ * vendored service fragments are written against. Only the surface listed in that decision record exists
  * here; the engine owns window.tarteaucitron and window.timeExpire.
  *
  * getElemAttr, fixSelfXSS, getStyleSize, getElemWidth/Height, fallback, extend, addScript are

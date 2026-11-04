@@ -7,7 +7,7 @@ namespace CookieConsentManager\Front;
 use CookieConsentManager\Draft\DefaultSettings;
 use Thelia\Model\ConfigQuery;
 
-/** Variables of the front templates (SPEC annex E), built from a snapshot for one language. */
+/** Variables of the front templates (listed in docs/integrator-guide.md, "Template variables"), built from a snapshot for one language. */
 final readonly class TemplateContext
 {
     public const CONTRACT = 'ccm-templates/1';

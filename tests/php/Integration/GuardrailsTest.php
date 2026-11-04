@@ -10,7 +10,7 @@ use CookieConsentManager\Registry\RegistryOptions;
 use CookieConsentManager\Tests\Support\CcmTestCase;
 use CookieConsentManager\Validation\ExemptionWhitelist;
 
-/** Lot H2: what the back-office refuses to publish, and what it only flags. */
+/** What the back-office refuses to publish, and what it only flags. */
 final class GuardrailsTest extends CcmTestCase
 {
     /** @return list<string> */

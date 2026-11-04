@@ -6,8 +6,7 @@ namespace CookieConsentManager\Publication;
 
 /**
  * Hash (SHA-256, hexadecimal) of the JavaScript that would be served for a snapshot.
- * The front lot provides the real implementation, which hashes the very bytes of the
- * served script; the one bound by default is provisional.
+ * AssembledScriptHasher, bound in CookieConsentManager.php, hashes the very bytes of the served script.
  */
 interface ServedScriptHasher
 {

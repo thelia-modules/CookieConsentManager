@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Replaces the iframes of the media services by their placeholder (SPEC 5.4). It works on the markup
+ * Replaces the iframes of the media services by their placeholder, only when the service is active and published. It works on the markup
  * as text, not through a DOM parser, so that the rest of the page stays byte for byte what the theme
  * produced; scripts, styles, templates, textareas and comments are never touched.
  */

@@ -38,7 +38,7 @@ final readonly class RegistryPurger
 
     /**
      * True when entries wait past the retention and no purge ran for more than seven days (the dashboard
-     * alert, SPEC 6.4): a registry with nothing to purge is never late.
+     * alert): a registry with nothing to purge is never late.
      */
     public function isLate(?\DateTimeImmutable $now = null): bool
     {

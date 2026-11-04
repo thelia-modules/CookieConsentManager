@@ -6,7 +6,7 @@ namespace CookieConsentManager\Registry;
 
 use CookieConsentManager\Publication\VersionRepository;
 
-/** Request schema of CONTRATS.md section 2. */
+/** Request schema of `POST /ccm/consent` (docs/runtime-contracts.md, "Registry endpoint"). */
 final readonly class ConsentPayloadValidator
 {
     public const ACTIONS = ['accept_all', 'reject_all', 'custom', 'service_allow', 'withdraw', 'close_reject', 'exempt_optout', 'renew'];

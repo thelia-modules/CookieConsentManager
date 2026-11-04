@@ -276,7 +276,7 @@
     live.textContent = '';
     setTimeout(() => { live.textContent = msg; }, 30);
   };
-  // v: true, false or 'mixed' (a purpose of which only some services are granted, SPEC 4.5).
+  // v: true, false or 'mixed' (a purpose of which only some services are granted, state 2 of the `ccm_consent` cookie).
   const setSwitch = (el, v) => {
     if (el.tagName === 'INPUT') { el.checked = v === true; el.indeterminate = v === 'mixed'; }
     el.setAttribute('aria-checked', v === 'mixed' ? 'mixed' : v ? 'true' : 'false');

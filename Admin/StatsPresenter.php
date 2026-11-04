@@ -7,7 +7,7 @@ namespace CookieConsentManager\Admin;
 use CookieConsentManager\Registry\DailyStatRepository;
 use CookieConsentManager\Registry\FirstChoiceMetrics;
 
-/** First choices of an identifier over a period, as rates (SPEC 6.5). */
+/** First choices of an identifier over a period, as rates (the first entry of an identifier in the registry, counted on the day it was recorded). */
 final readonly class StatsPresenter
 {
     public const PERIODS = [7, 30, 90];

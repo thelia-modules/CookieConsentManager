@@ -10,7 +10,7 @@ use CookieConsentManager\Admin\DraftWriter;
 use CookieConsentManager\Publication\PublicationRefusedException;
 use CookieConsentManager\Tests\Support\CcmTestCase;
 
-/** What a preset makes mandatory (R4: #1 responsible of every active service, #3 a cookie policy page of its own). */
+/** What a preset makes mandatory (a responsible entity for every active service, a cookie policy page of its own). */
 final class PresetRulesTest extends CcmTestCase
 {
     /** @return list<string> */

@@ -6,7 +6,7 @@ namespace CookieConsentManager\Admin;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/** The link to the privacy policy that the banner shows must lead to a page (SPEC F). */
+/** The link to the privacy policy that the banner shows must lead to a page that answers 200 and, under the France preset, is not a terms-and-conditions page. */
 final readonly class PolicyUrlAlert
 {
     public function __construct(

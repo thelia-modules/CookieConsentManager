@@ -12,7 +12,7 @@ use Twig\Extension\GlobalsInterface;
 use Twig\TwigFunction;
 
 /**
- * SPEC 10.2. These functions do not exist while the module is disabled: a theme must not call them
+ * Twig helpers of the module. These functions do not exist while the module is disabled: a theme must not call them
  * outside a template of the module (the Flexy theme of the module never does).
  */
 final class ConsentTwigExtension extends AbstractExtension implements GlobalsInterface
@@ -27,7 +27,7 @@ final class ConsentTwigExtension extends AbstractExtension implements GlobalsInt
     ) {
     }
 
-    /** @return array<string, string> available in every template, the ones of a theme included (annex E) */
+    /** @return array<string, string> available in every template, the ones of a theme included */
     public function getGlobals(): array
     {
         return ['ccm_contract' => TemplateContext::CONTRACT];

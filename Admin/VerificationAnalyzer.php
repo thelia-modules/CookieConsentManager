@@ -6,7 +6,7 @@ namespace CookieConsentManager\Admin;
 
 /**
  * Turns the raw readings of the audited pages into a verdict per domain and per cookie.
- * The readings come from the page itself (contract in the lot journal); the services
+ * The readings come from the page itself (the script of the Verification screen); the services
  * and their domains come from the published snapshot, never from the draft.
  */
 final class VerificationAnalyzer

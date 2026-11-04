@@ -272,7 +272,7 @@ final class FrontTest extends CcmTestCase
         self::assertSame([false, false], $read(60, 1), 'choice older than the last substantial version');
     }
 
-    /** R1-10: the contract version is read in the templates of a theme, not only in those of the module. */
+    /** The contract version is read in the templates of a theme, not only in those of the module. */
     public function testTheContractVersionIsAGlobalOfEveryTemplate(): void
     {
         $twig = $this->twig('flexy');
@@ -326,7 +326,7 @@ final class FrontTest extends CcmTestCase
         self::assertSame($page, $run(Request::create('/produit'), new Response($page)));
     }
 
-    /** SPEC annex E: the attributes the engine reads, in both bundled themes. */
+    /** The attributes the engine reads, in both bundled themes. */
     public function testTheTemplatesOfBothThemesKeepTheAttributesTheEngineNeeds(): void
     {
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');

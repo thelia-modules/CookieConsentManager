@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CookieConsentManager\Admin;
 
 /**
- * WCAG 2.x contrast of the banner colors (SPEC 9.3): text 4.5:1, button 3:1.
+ * WCAG 2.x contrast of the banner colors (WCAG 1.4.3 and 1.4.11): text 4.5:1, button 3:1.
  * The button label is assumed white on the primary color, as the Flexy banner renders it.
  */
 final class ContrastChecker

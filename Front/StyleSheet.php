@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * The stylesheet of the module is printed in the head instead of being linked: the banner is part of
- * the first paint, a request on the critical path is what SPEC 9.6 forbids, and nothing has to be
+ * the first paint, a request on the critical path would delay it, and nothing has to be
  * installed in public/ (the themes compile their own CSS and never see the templates of a module).
  */
 final class StyleSheet

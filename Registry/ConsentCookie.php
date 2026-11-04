@@ -6,7 +6,7 @@ namespace CookieConsentManager\Registry;
 
 use Symfony\Component\HttpFoundation\Cookie;
 
-/** `ccm_consent`: CONTRATS.md section 1. */
+/** `ccm_consent`: format in docs/runtime-contracts.md, "Consent cookie". */
 final class ConsentCookie extends Cookie
 {
     public const NAME = 'ccm_consent';
