@@ -1,5 +1,5 @@
 // Shared harness: loads compat.js + a catalogue fragment into jsdom behind a Proxy that rejects
-// every access outside the ADR-001 v2 contract, then runs fallback() and js().
+// every access outside the contract of docs/decisions/001-service-catalogue.md, then runs fallback() and js().
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

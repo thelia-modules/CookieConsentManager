@@ -8,7 +8,7 @@ const turbo = (a) => a.doc.dispatchEvent(new a.win.Event('turbo:load'));
 const modalConfig = () => { const c = baseConfig(); c.options.layout = 'modal'; return c; };
 const sheetMedia = (matches) => (win) => { win.matchMedia = (q) => ({ matches: matches && /max-width/.test(q), media: q, addEventListener() {}, removeEventListener() {} }); };
 
-test('R1-03 : après le turbo:load initial, retirer un media rend l espace réservé sans rechargement', async () => {
+test('après le turbo:load initial, retirer un media rend l espace réservé sans rechargement', async () => {
   const a = boot({ cookie: media(), fragments: { youtube: { js() {}, fallback() {} } } });
   assert.ok(a.doc.querySelector('iframe'));
   turbo(a);
@@ -19,7 +19,7 @@ test('R1-03 : après le turbo:load initial, retirer un media rend l espace rése
   assert.equal(a.win.__reloaded, undefined);
 });
 
-test('R1-19 : le piège de focus de la modale survit au turbo:load initial', () => {
+test('le piège de focus de la modale survit au turbo:load initial', () => {
   const a = boot({ config: modalConfig() });
   turbo(a);
   const buttons = [...a.doc.querySelectorAll('[data-ccm-banner] button')];
@@ -30,7 +30,7 @@ test('R1-19 : le piège de focus de la modale survit au turbo:load initial', () 
   assert.equal(a.doc.activeElement, buttons[0]);
 });
 
-test('R1-19 : sur petit écran la modale devient une feuille basse, non bloquante, sans piège ni aria-modal', () => {
+test('sur petit écran la modale devient une feuille basse, non bloquante, sans piège ni aria-modal', () => {
   const a = boot({ config: modalConfig(), beforeHead: sheetMedia(true) });
   const banner = a.doc.querySelector('[data-ccm-banner]');
   assert.equal(banner.getAttribute('aria-modal'), 'false');
@@ -43,7 +43,7 @@ test('R1-19 : sur petit écran la modale devient une feuille basse, non bloquant
   assert.equal(wide.doc.querySelector('[data-ccm-banner]').getAttribute('aria-modal'), 'true');
 });
 
-test('R1-19 : après un choix dans la bannière, le focus va au lien de réouverture', async () => {
+test('après un choix dans la bannière, le focus va au lien de réouverture', async () => {
   const a = boot();
   a.doc.body.insertAdjacentHTML('beforeend', '<a href="#ccm-preferences" id="reopen">Cookies</a>');
   a.doc.querySelector('[data-ccm-action="accept_all"]').focus();
@@ -52,7 +52,7 @@ test('R1-19 : après un choix dans la bannière, le focus va au lien de réouver
   assert.equal(a.doc.activeElement.id, 'reopen');
 });
 
-test('R1-19 : l iframe débloquée reste dans l ordre de tabulation et porte un titre', async () => {
+test('l iframe débloquée reste dans l ordre de tabulation et porte un titre', async () => {
   const a = boot({ fragments: { youtube: { js() {}, fallback() {} } } });
   a.doc.querySelector('#vid').removeAttribute('data-ccm-attr-title');
   a.doc.querySelector('#vid').innerHTML = '<div data-ccm-placeholder-box><button id="al" data-ccm-action="service_allow" data-ccm-service="youtube">Allow</button></div>';
@@ -65,7 +65,7 @@ test('R1-19 : l iframe débloquée reste dans l ordre de tabulation et porte un 
   assert.equal(a.doc.activeElement, f);
 });
 
-test('R1-20 : un choix hors ligne est rejoué avec sa source et son action d origine', async () => {
+test('un choix hors ligne est rejoué avec sa source et son action d origine', async () => {
   const a = boot({ fetchOpts: { fail: true } });
   a.click('[data-ccm-banner] [data-ccm-action="accept_all"]');
   await a.settle();
@@ -78,13 +78,13 @@ test('R1-20 : un choix hors ligne est rejoué avec sa source et son action d ori
   assert.equal(b.calls[0].body.action, 'accept_all');
 });
 
-test('R1-20 : un cookie sans source (ancien format) est rejoué comme avant', async () => {
+test('un cookie sans source (ancien format) est rejoué comme avant', async () => {
   const b = boot({ cookie: state({ pd: 1 }) });
   await b.settle();
   assert.equal(b.calls[0].body.source, 'preferences');
 });
 
-test('R1-24 : en aperçu, aucun service exécuté, aucune iframe, scripts balisés inertes, bandeau Aperçu visible', async () => {
+test('en aperçu, aucun service exécuté, aucune iframe, scripts balisés inertes, bandeau Aperçu visible', async () => {
   const log = [];
   const g = { js() { log.push('js'); }, fallback() {} };
   const a = boot({ config: { ...baseConfig(), mode: 'preview' }, messages: { preview: 'Aperçu du brouillon : simulation.' }, fragments: { gtag: g, youtube: g, 'acme-widget': g } });
@@ -101,7 +101,7 @@ test('R1-24 : en aperçu, aucun service exécuté, aucune iframe, scripts balis�
   assert.equal(a.doc.querySelectorAll('[data-ccm-preview-note]').length, 1);
 });
 
-test('R1-06 : le relevé d audit retient les ressources vues par l observateur jusqu à l envoi', async () => {
+test('le relevé d audit retient les ressources vues par l observateur jusqu à l envoi', async () => {
   const sent = [];
   let observer = null;
   const a = boot({
@@ -122,7 +122,7 @@ test('R1-06 : le relevé d audit retient les ressources vues par l observateur j
   assert.deepEqual([...sent[0].hosts].sort(), ['fonts.googleapis.com', 'fonts.gstatic.com']);
 });
 
-test('R1-17 : un espace réservé sans src est remplacé par le rendu du service après Autoriser', async () => {
+test('un espace réservé sans src est remplacé par le rendu du service après Autoriser', async () => {
   const a = boot({ fragments: { youtube: { js() { a.doc.querySelectorAll('.youtube_player').forEach((e) => { e.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/abc"></iframe>'; }); }, fallback() {} } } });
   a.doc.querySelector('#vid').remove();
   a.doc.body.insertAdjacentHTML('beforeend', '<div id="ph" data-ccm-placeholder="youtube" data-ccm-attr-class="youtube_player" data-ccm-attr-videoid="abc"><div data-ccm-placeholder-box><button id="al" data-ccm-action="service_allow" data-ccm-service="youtube">Allow</button></div></div>');
@@ -135,7 +135,7 @@ test('R1-17 : un espace réservé sans src est remplacé par le rendu du service
   assert.ok(ph.classList.contains('youtube_player'));
 });
 
-test('R1-17 : sans élément amont, le bloc est au moins vidé et l événement est émis', async () => {
+test('sans élément amont, le bloc est au moins vidé et l événement est émis', async () => {
   const a = boot({ fragments: { youtube: { js() {}, fallback() {} } } });
   a.doc.querySelector('#vid').remove();
   a.doc.body.insertAdjacentHTML('beforeend', '<div id="ph" data-ccm-placeholder="youtube"><div data-ccm-placeholder-box><button id="al" data-ccm-action="service_allow" data-ccm-service="youtube">Allow</button></div></div>');
@@ -147,7 +147,7 @@ test('R1-17 : sans élément amont, le bloc est au moins vidé et l événement 
   assert.equal(fired, 1);
 });
 
-test('R1-02 : la réserve de défilement suit la hauteur de la bannière non bloquante', () => {
+test('la réserve de défilement suit la hauteur de la bannière non bloquante', () => {
   const a = boot();
   const dialog = a.doc.querySelector('[data-ccm-banner]');
   Object.defineProperty(dialog, 'offsetHeight', { configurable: true, get: () => 180 });
@@ -157,7 +157,7 @@ test('R1-02 : la réserve de défilement suit la hauteur de la bannière non blo
   assert.ok(a.doc.documentElement.classList.contains('ccm-reserve'));
 });
 
-test('R1-02 : après le choix la réserve est retirée', async () => {
+test('après le choix la réserve est retirée', async () => {
   const a = boot();
   a.click('[data-ccm-action="accept_all"]');
   await a.settle();
@@ -165,7 +165,7 @@ test('R1-02 : après le choix la réserve est retirée', async () => {
   assert.equal(a.doc.documentElement.style.getPropertyValue('--ccm-reserve'), '');
 });
 
-test('R1-06 : le relevé d audit ajoute l hôte des polices chargées par une feuille de style externe (absent de Resource Timing)', async () => {
+test('le relevé d audit ajoute l hôte des polices chargées par une feuille de style externe (absent de Resource Timing)', async () => {
   const sent = [];
   const a = boot({
     config: { ...baseConfig(), mode: 'audit' }, start: false, url: 'https://shop.example.com/fr/page.html?ccm_audit=tok&ccm_audit_phase=before',

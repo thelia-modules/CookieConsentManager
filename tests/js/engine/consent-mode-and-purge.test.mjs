@@ -13,13 +13,13 @@ const counters = () => {
   return { ran, fragments: { gtag: { js: () => { ran.gtag++; } }, youtube: { js: () => { ran.youtube++; } } } };
 };
 
-// ---- Q3 / uti#C1: an outdated choice is no choice -----------------------
+// ---- an outdated choice is no choice -----------------------
 
 for (const [name, mutate] of [
   ['choix expiré (repromptDays)', (st) => { st.t = nowSeconds() - 183 * DAY; }],
   ['version substantielle', (st, config) => { config.substantialVersion = 12; st.ver = 11; }]
 ]) {
-  test('Q3 ' + name + ' : aucun service non essentiel ne tourne, Consent Mode reste au défaut, bannière demandée', () => {
+  test(name + ' : aucun service non essentiel ne tourne, Consent Mode reste au défaut, bannière demandée', () => {
     const config = baseConfig();
     const st = granted();
     mutate(st, config);
@@ -38,7 +38,7 @@ for (const [name, mutate] of [
     assert.deepEqual(Object.keys(ready.ccm.services), []);
   });
 
-  test('Q3 ' + name + ' : « Tout accepter » relance les services (action renew)', async () => {
+  test(name + ' : « Tout accepter » relance les services (action renew)', async () => {
     const config = baseConfig();
     const st = granted();
     mutate(st, config);
@@ -51,7 +51,7 @@ for (const [name, mutate] of [
     assert.ok(gtagCommands(win).some((c) => c.cmd === 'update' && c.args.analytics_storage === 'granted'));
   });
 
-  test('Q3 ' + name + ' : « Tout refuser » ne laisse rien tourner', async () => {
+  test(name + ' : « Tout refuser » ne laisse rien tourner', async () => {
     const config = baseConfig();
     const st = granted();
     mutate(st, config);
@@ -65,7 +65,7 @@ for (const [name, mutate] of [
     assert.ok(Object.values(u).every((v) => v === 'denied'));
   });
 
-  test('Q3 ' + name + ' : autoriser une vidéo ne ressuscite pas les anciens accords', async () => {
+  test(name + ' : autoriser une vidéo ne ressuscite pas les anciens accords', async () => {
     const config = baseConfig();
     const st = granted();
     st.s.gtag = 1;
@@ -81,7 +81,7 @@ for (const [name, mutate] of [
   });
 }
 
-test('Q3 nouveau service ajouté : les services déjà accordés continuent de tourner', () => {
+test('nouveau service ajouté : les services déjà accordés continuent de tourner', () => {
   const st = granted();
   delete st.s['tiktok-via-gtm'];
   st.p.ads = 1;
@@ -94,7 +94,7 @@ test('Q3 nouveau service ajouté : les services déjà accordés continuent de t
   assert.ok(doc.documentElement.classList.contains('ccm-show'), 'la bannière revient pour le nouveau service');
 });
 
-test('Q3 head : choix périmé = aucun update Consent Mode et événement ready sans accord', () => {
+test('head : choix périmé = aucun update Consent Mode et événement ready sans accord', () => {
   const st = granted();
   st.t = nowSeconds() - 200 * DAY;
   const { win } = boot({ cookie: st, start: false });
@@ -104,9 +104,9 @@ test('Q3 head : choix périmé = aucun update Consent Mode et événement ready 
   assert.deepEqual(Object.keys(ready.ccm.services), []);
 });
 
-// ---- jur#C2: refusal and withdrawal cover every managed signal ----------------
+// ---- refusal and withdrawal cover every managed signal ----------------
 
-test('jur#C2 « Tout refuser » : update de tous les signaux gérés, même ceux d aucune finalité', async () => {
+test('« Tout refuser » : update de tous les signaux gérés, même ceux d aucune finalité', async () => {
   const config = baseConfig();
   config.purposes = config.purposes.filter((p) => p.code !== 'ads');
   config.gcm.defaults[1].ad_storage = 'granted';
@@ -120,7 +120,7 @@ test('jur#C2 « Tout refuser » : update de tous les signaux gérés, même ceux
   assert.equal('security_storage' in u, false);
 });
 
-test('jur#C2 head : un choix mémorisé refuse aussi les signaux des défauts hors finalités', () => {
+test('head : un choix mémorisé refuse aussi les signaux des défauts hors finalités', () => {
   const config = baseConfig();
   config.purposes = config.purposes.filter((p) => p.code !== 'ads');
   const { win } = boot({ config, cookie: state(), start: false });
@@ -129,7 +129,7 @@ test('jur#C2 head : un choix mémorisé refuse aussi les signaux des défauts ho
   assert.equal(u.ad_user_data, 'denied');
 });
 
-test('jur#C2 « Tout refuser » depuis la première visite purge les _ga déjà posés', async () => {
+test('« Tout refuser » depuis la première visite purge les _ga déjà posés', async () => {
   const { doc, click, settle } = boot({ cookies: ['_ga=GA1.1.1; Path=/', '_ga_ABC123=GS1; Path=/', 'autre=1; Path=/'] });
   click('[data-ccm-banner] [data-ccm-action="reject_all"]');
   await settle();
@@ -138,7 +138,7 @@ test('jur#C2 « Tout refuser » depuis la première visite purge les _ga déjà 
   assert.ok(/(^|; )autre=1/.test(doc.cookie), 'les autres cookies restent');
 });
 
-test('jur#C2 retrait : les _ga sont purgés', async () => {
+test('retrait : les _ga sont purgés', async () => {
   const st = state({ p: { analytics: 1, ads: 0, media: 0, support: 0, personalization: 0 }, s: { gtag: 1 } });
   const { doc, click, settle } = boot({ cookie: st, cookies: ['_ga=GA1.1.1; Path=/'] });
   click('[data-ccm-panel] [data-ccm-service="gtag"]');
@@ -147,16 +147,16 @@ test('jur#C2 retrait : les _ga sont purgés', async () => {
   assert.ok(!/(^|; )_ga=/.test(doc.cookie));
 });
 
-// ---- uti#C3 : état partiel -------------------------------------------------------
+// ---- état partiel -------------------------------------------------------
 
-test('uti#C3 une finalité partielle (2) s affiche « mixed »', () => {
+test('une finalité partielle (2) s affiche « mixed »', () => {
   const st = state({ p: { analytics: 1, ads: 2, media: 0, support: 0, personalization: 0 }, s: { gtag: 1, googletagmanager: 1 } });
   const { doc } = boot({ cookie: st });
   assert.equal(doc.querySelector('[data-ccm-purpose="ads"]').getAttribute('aria-checked'), 'mixed');
   assert.equal(doc.querySelector('[data-ccm-purpose="analytics"]').getAttribute('aria-checked'), 'true');
 });
 
-test('uti#C3 un seul service sur deux allumé : l interrupteur de la finalité passe à « mixed »', () => {
+test('un seul service sur deux allumé : l interrupteur de la finalité passe à « mixed »', () => {
   const { doc, click } = boot();
   doc.querySelector('[data-ccm-panel]').insertAdjacentHTML('beforeend', '<button role="switch" aria-checked="false" data-ccm-service="tiktok-via-gtm"></button>');
   click('[data-ccm-panel] [data-ccm-service="googletagmanager"]');
@@ -165,9 +165,9 @@ test('uti#C3 un seul service sur deux allumé : l interrupteur de la finalité p
   assert.equal(doc.querySelector('[data-ccm-purpose="ads"]').getAttribute('aria-checked'), 'true');
 });
 
-// ---- uti#C2 : cookies tiers restants ---------------------------------------------
+// ---- cookies tiers restants ---------------------------------------------
 
-test('uti#C2 la phrase sur les cookies tiers restants apparaît dès qu un service est refusé', () => {
+test('la phrase sur les cookies tiers restants apparaît dès qu un service est refusé', () => {
   const withNote = (cookie) => {
     const ctx = boot({ cookie, start: false });
     ctx.doc.querySelector('[data-ccm-panel]').insertAdjacentHTML('beforeend', '<p data-ccm-withdrawn hidden>note</p>');
@@ -180,7 +180,7 @@ test('uti#C2 la phrase sur les cookies tiers restants apparaît dès qu un servi
   assert.equal(withNote(undefined), true, 'sans choix : rien à dire');
 });
 
-// ---- jur#C13: the placeholder names the controller ------------------------------
+// ---- the placeholder names the controller ------------------------------
 
 const withTemplate = (policy) => {
   const ctx = boot({ start: false });
@@ -192,20 +192,20 @@ const withTemplate = (policy) => {
   return ctx;
 };
 
-test('jur#C13 espace réservé construit par le moteur : responsable et lien de politique', () => {
+test('espace réservé construit par le moteur : responsable et lien de politique', () => {
   const { doc } = withTemplate('https://policies.google.com/privacy');
   assert.equal(doc.querySelector('#vid .who').textContent, 'Google Ireland Limited');
   assert.equal(doc.querySelector('#vid .pol').getAttribute('href'), 'https://policies.google.com/privacy');
 });
 
-test('jur#C13 sans URL de politique valide, le lien disparaît (schéma javascript: refusé)', () => {
+test('sans URL de politique valide, le lien disparaît (schéma javascript: refusé)', () => {
   assert.equal(withTemplate('').doc.querySelector('#vid .pol'), null);
   const bad = withTemplate('javascript:alert(1)').doc;
   assert.equal(bad.querySelector('#vid .pol'), null);
   assert.equal(bad.querySelector('#vid .who').textContent, 'Google Ireland Limited');
 });
 
-test('jur#C13 sans entrée de méta : le nom du service tient lieu de responsable', () => {
+test('sans entrée de méta : le nom du service tient lieu de responsable', () => {
   const ctx = boot({ start: false });
   ctx.doc.body.insertAdjacentHTML('beforeend', '<template data-ccm-placeholder-template><span data-ccm-placeholder-box><span class="who">{{controller}}</span></span></template>');
   ctx.doc.querySelector('#vid').innerHTML = '';
@@ -213,9 +213,9 @@ test('jur#C13 sans entrée de méta : le nom du service tient lieu de responsabl
   assert.equal(ctx.doc.querySelector('#vid .who').textContent, 'YouTube');
 });
 
-// ---- jur#C16: the modal opens on the start of the message ---------------------------
+// ---- the modal opens on the start of the message ---------------------------
 
-test('jur#C16 modale : le focus initial ne fait pas défiler le texte, la zone est en haut', () => {
+test('modale : le focus initial ne fait pas défiler le texte, la zone est en haut', () => {
   const config = baseConfig();
   config.options.layout = 'modal';
   const ctx = boot({ config, start: false });

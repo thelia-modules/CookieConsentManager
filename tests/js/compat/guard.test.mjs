@@ -1,4 +1,4 @@
-// Execution guard (ADR-001 v2, decision 7): every non-excluded service runs js() and fallback()
+// Execution guard (docs/decisions/001-service-catalogue.md, decision 7): every non-excluded service runs js() and fallback()
 // against the compat layer wrapped in a Proxy that throws on any access outside the contract.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

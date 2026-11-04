@@ -131,7 +131,7 @@ test('payload conforme au contrat §2', async () => {
   assert.equal(a.calls[0].url, '/ccm/consent');
 });
 
-test('LEG-09 : le choix qui suit une relance est tracé renew, même UUID, états réels conservés', async () => {
+test('le choix qui suit une relance est tracé renew, même UUID, états réels conservés', async () => {
   const old = Math.floor(Date.now() / 1000) - 183 * 86400;
   const cases = [
     ['accept_all', '[data-ccm-action="accept_all"]', 1],

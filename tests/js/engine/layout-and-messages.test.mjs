@@ -8,7 +8,7 @@ import { boot, baseConfig, state } from './_helpers.mjs';
 const css = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../../../assets/css/ccm.css'), 'utf8');
 const media = () => state({ p: { analytics: 0, ads: 0, media: 1, support: 0, personalization: 0 }, s: { gtag: 0, googletagmanager: 0, youtube: 1, 'acme-widget': 0, 'tiktok-via-gtm': 0 } });
 
-test('R2 visiteur#C1 : l iframe restaurée est contrainte à son conteneur et garde son ratio', () => {
+test('l iframe restaurée est contrainte à son conteneur et garde son ratio', () => {
   const a = boot({ cookie: media(), fragments: { youtube: { js() {}, fallback() {} } } });
   a.doc.body.insertAdjacentHTML('beforeend', '<div id="v2" data-ccm-placeholder="youtube" data-ccm-src="https://www.youtube-nocookie.com/embed/x" data-ccm-attr-width="560" data-ccm-attr-height="315"></div>');
   a.doc.dispatchEvent(new a.win.Event('turbo:load'));
@@ -18,14 +18,14 @@ test('R2 visiteur#C1 : l iframe restaurée est contrainte à son conteneur et ga
   assert.equal(f.style.getPropertyValue('--ccm-ar'), '560 / 315');
 });
 
-test('R2 visiteur#C1 : la feuille de style borne iframes restaurées, espaces réservés et panneau à l écran', () => {
+test('la feuille de style borne iframes restaurées, espaces réservés et panneau à l écran', () => {
   assert.match(css, /iframe\[data-ccm-restored\]\s*\{[^}]*max-width:\s*100%/);
   assert.match(css, /aspect-ratio:\s*var\(--ccm-ar\)/);
   assert.match(css, /\.ccm-placeholder\s*\{[^}]*max-width:\s*100%/);
   assert.match(css, /\.ccm-panel\s*\{\s*max-width:\s*100vw/);
 });
 
-test('R2 visiteur#C2 : après un choix, le focus ramène l élément à l écran (pas de preventScroll)', async () => {
+test('après un choix, le focus ramène l élément à l écran (pas de preventScroll)', async () => {
   const a = boot();
   a.doc.body.insertAdjacentHTML('beforeend', '<a href="#ccm-preferences" id="reopen">Cookies</a>');
   const calls = [];
@@ -48,7 +48,7 @@ const scrolling = (a, over) => {
   return el;
 };
 
-test('R2 visiteur#C4 : la zone de texte n est un arrêt de tabulation que si elle défile', () => {
+test('la zone de texte n est un arrêt de tabulation que si elle défile', () => {
   const a = boot({ start: false });
   a.doc.querySelector('[data-ccm-banner]').insertAdjacentHTML('afterbegin', '<div data-ccm-scroll role="region"></div>');
   const el = scrolling(a, false);
@@ -62,14 +62,14 @@ test('R2 visiteur#C4 : la zone de texte n est un arrêt de tabulation que si ell
   assert.equal(el.hasAttribute('tabindex'), false);
 });
 
-test('H4 : le bandeau d aperçu vient des messages servis par le serveur (#ccm-messages), repli anglais sans eux', () => {
+test('le bandeau d aperçu vient des messages servis par le serveur (#ccm-messages), repli anglais sans eux', () => {
   const note = (messages) => { const c = baseConfig(); c.mode = 'preview'; c.locale = 'de_DE'; return boot({ config: c, messages }).doc.querySelector('[data-ccm-preview-note]').textContent; };
   assert.equal(note({ preview: 'Entwurfsvorschau: Simulation, es wird kein Dienst ausgeführt.' }), 'Entwurfsvorschau: Simulation, es wird kein Dienst ausgeführt.');
   assert.match(note(undefined), /^Draft preview/);
   assert.match(note({}), /^Draft preview/);
 });
 
-test('H4 : les messages servis couvrent annonce de sauvegarde, contenu débloqué et espace réservé sans gabarit', async () => {
+test('les messages servis couvrent annonce de sauvegarde, contenu débloqué et espace réservé sans gabarit', async () => {
   const a = boot({ messages: { saved: 'Ihre Auswahl wurde gespeichert.', blocked: 'Blockierter Inhalt: {{name}}', allow: '{{name}} zulassen', prefs: 'Einstellungen' } });
   const html = a.cmp.__placeholderHtml ? a.cmp.__placeholderHtml('youtube') : null;
   if (html) { assert.match(html, /Blockierter Inhalt: /); assert.match(html, /zulassen/); assert.match(html, /Einstellungen/); }

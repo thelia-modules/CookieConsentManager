@@ -1,4 +1,4 @@
-// Builds the served script the way ServedScriptAssembler does (CONTRATS.md section 6) so that the
+// Builds the served script the way ServedScriptAssembler does (order in docs/runtime-contracts.md, "Served script") so that the
 // real engine, the real compat layer and real catalogue fragments run together in jsdom.
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

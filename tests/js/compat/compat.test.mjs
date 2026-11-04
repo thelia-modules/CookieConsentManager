@@ -181,7 +181,7 @@ test('re-create: only the latest adapter receives allow()', () => {
   assert.deepEqual(second.allowed, ['k']);
 });
 
-test('H4: the fragments read their words from the adapter (language of the visitor), English without them', () => {
+test('the fragments read their words from the adapter (language of the visitor), English without them', () => {
   const german = setup('', { lang: { allow: 'Zulassen', fallback: 'ist deaktiviert.' } });
   assert.deepEqual({ ...german.t.lang }, { allow: 'Zulassen', fallback: 'ist deaktiviert.' });
   assert.deepEqual({ ...setup().t.lang }, { allow: 'Allow', fallback: 'is disabled.' });
