@@ -6,7 +6,8 @@
     "require": {
         "php": ">=8.3",
         "thelia/installer": "^1.6",
-        "justinrainbow/json-schema": "^6.0"
+        "justinrainbow/json-schema": "^6.0",
+        "symfony/http-client": "^7.4"
     },
     "conflict": {
         "thelia/core": "<3.0.0"
