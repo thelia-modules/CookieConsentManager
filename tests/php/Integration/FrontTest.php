@@ -28,6 +28,7 @@ use CookieConsentManager\Registry\ConsentCookie;
 use CookieConsentManager\Registry\RequestConsentReader;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
 use CookieConsentManager\Tests\Support\CcmTestCase;
+use CookieConsentManager\Tests\Support\MutableOverrides;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,10 +57,10 @@ final class FrontTest extends CcmTestCase
         $this->script = new ServedScriptAssembler($this->module);
         $hasher = new AssembledScriptHasher($this->script);
         $templates = new NoOverriddenTemplates();
-        $this->hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates);
-        $this->publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion);
+        $this->hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates, $this->ccm->pool);
+        $this->publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion, $this->ccm->pointer);
         $this->tokens = new PreviewToken('test-secret');
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true));
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool);
     }
 
     private function security(bool $admin): SecurityContext
@@ -103,17 +104,17 @@ final class FrontTest extends CcmTestCase
         self::assertNull($this->configs->forRequest(Request::create('/')), 'a saved draft is not published');
 
         $token = $this->tokens->forDraft($this->ccm->drafts->load());
-        $preview = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true)))
+        $preview = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool))
             ->forRequest(Request::create('/', 'GET', [PreviewToken::QUERY => $token]));
         self::assertSame('preview', $preview?->mode());
         self::assertSame('/ccm/preview-'.$token.'.js', $preview->config['script']);
 
-        $wrong = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true)))
+        $wrong = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool))
             ->forRequest(Request::create('/', 'GET', [PreviewToken::QUERY => str_repeat('a', 32)]));
         self::assertNull($wrong);
     }
 
-    public function testTheServedScriptIsVersionedImmutableAndNotFoundForAnyOtherHash(): void
+    public function testTheServedScriptIsVersionedImmutableAndNotFoundForAnUnknownVersion(): void
     {
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
         $version = $this->publisher->publish('alice');
@@ -130,13 +131,40 @@ final class FrontTest extends CcmTestCase
         self::assertSame($this->script->assemble($this->ccm->versions->snapshot($version)), $response->getContent());
         self::assertStringContainsString('tarteaucitron.services.gtag', (string) $response->getContent());
 
-        foreach ([[$version->getVersion(), str_repeat('0', 12)], [$version->getVersion() + 1, $config['hash']]] as [$number, $hash]) {
-            try {
-                $this->controller()->script($number, $hash);
-                self::fail('404 expected');
-            } catch (NotFoundHttpException) {
-                self::addToAssertionCount(1);
-            }
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->script($version->getVersion() + 1, $config['hash']);
+    }
+
+    public function testAnOutdatedHashOfAnExistingVersionRedirectsToTheCurrentScript(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $version = $this->publisher->publish('alice');
+        $number = $version->getVersion();
+
+        // The theme gets an override after the page was cached: the served hash of the same version changes.
+        $templates = new MutableOverrides();
+        $hashes = new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher($this->script), new ModuleVersion($this->module.'/Config/module.xml'), $templates, $this->ccm->pool);
+        $controller = new ServedScriptController($this->ccm->versions, $hashes, $this->script, $this->ccm->assembler, $this->ccm->drafts, $this->tokens);
+        $previous = $hashes->forVersion($version);
+
+        $templates->overridden = true;
+        $hashes->reset();
+        $current = $hashes->forVersion($version);
+        self::assertNotSame($previous, $current);
+
+        $redirect = $controller->script($number, $previous);
+        self::assertSame(302, $redirect->getStatusCode());
+        self::assertSame(\sprintf('/ccm/%d-%s.js', $number, $current), $redirect->headers->get('Location'));
+        self::assertSame('60', $redirect->headers->getCacheControlDirective('max-age'));
+        self::assertFalse($redirect->headers->hasCacheControlDirective('immutable'));
+
+        self::assertSame(200, $controller->script($number, $current)->getStatusCode());
+
+        try {
+            $controller->script($number + 1, $previous);
+            self::fail('404 expected for a version that does not exist');
+        } catch (NotFoundHttpException) {
+            self::addToAssertionCount(1);
         }
     }
 
@@ -153,7 +181,7 @@ final class FrontTest extends CcmTestCase
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
         $this->publisher->publish('alice');
         $token = $this->tokens->forDraft($this->ccm->drafts->load());
-        $anonymous = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(false));
+        $anonymous = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(false), $this->ccm->pointer, $this->ccm->pool);
 
         $request = Request::create('/', 'GET', [PreviewToken::QUERY => $token]);
         self::assertSame('live', $anonymous->forRequest($request)?->mode(), 'a visitor holding the token gets the normal rendering');
@@ -222,6 +250,28 @@ final class FrontTest extends CcmTestCase
         self::assertFalse($this->extension($audit)->hasPurposeConsent('analytics'));
     }
 
+    public function testTwigHelpersIgnoreAnExpiredChoiceAndOneOlderThanTheLastSubstantialVersion(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $this->publisher->publish('alice');
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $this->publisher->publish('alice', true);
+        $front = $this->configs->forRequest(Request::create('/'));
+        self::assertSame(2, $front->config['substantialVersion']);
+
+        $read = function (int $age, int $version): array {
+            $request = Request::create('/');
+            $request->cookies->set(ConsentCookie::NAME, ConsentCookie::forChoice('4f1c2b9e-8d7a-4c3e-9b1f-2a6d5e7c8b90', $version, time() - $age, ['analytics' => 1], ['gtag' => 1], [], true)->getValue());
+            $helpers = $this->extension($request);
+
+            return [$helpers->hasConsent('gtag'), $helpers->hasPurposeConsent('analytics')];
+        };
+
+        self::assertSame([true, true], $read(60, 2), 'valid choice');
+        self::assertSame([false, false], $read($front->config['repromptDays'] * 86400 + 60, 2), 'expired choice');
+        self::assertSame([false, false], $read(60, 1), 'choice older than the last substantial version');
+    }
+
     /** R1-10: the contract version is read in the templates of a theme, not only in those of the module. */
     public function testTheContractVersionIsAGlobalOfEveryTemplate(): void
     {
@@ -272,7 +322,7 @@ final class FrontTest extends CcmTestCase
         $draft['general']['block_embedded_iframes'] = false;
         $this->ccm->drafts->replace($draft, 'alice');
         $this->publisher->publish('alice');
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true));
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool);
         self::assertSame($page, $run(Request::create('/produit'), new Response($page)));
     }
 
@@ -370,7 +420,7 @@ final class FrontTest extends CcmTestCase
 
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
         $this->publisher->publish('alice');
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true));
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool);
         $response = $make()($request);
         $html = (string) $response->getContent();
 

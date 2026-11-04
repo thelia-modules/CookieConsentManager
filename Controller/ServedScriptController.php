@@ -10,6 +10,7 @@ use CookieConsentManager\Front\ServedHashResolver;
 use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Publication\SnapshotAssembler;
 use CookieConsentManager\Publication\VersionRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -34,8 +35,17 @@ final readonly class ServedScriptController
     public function script(int $version, string $hash): Response
     {
         $published = $this->versions->find($version);
-        if (null === $published || !hash_equals($this->hashes->forVersion($published), $hash)) {
+        if (null === $published) {
             throw new NotFoundHttpException();
+        }
+
+        // A page cached before an update of the module or of a theme still points to the previous hash: its buttons must not die, so it gets the current script of the same version.
+        $current = $this->hashes->forVersion($published);
+        if (!hash_equals($current, $hash)) {
+            $redirect = new RedirectResponse(\sprintf('/ccm/%d-%s.js', $version, $current), Response::HTTP_FOUND);
+            $redirect->headers->set('Cache-Control', 'public, max-age=60');
+
+            return $redirect;
         }
 
         $response = $this->response($this->assembler->assemble($this->versions->snapshot($published)));
