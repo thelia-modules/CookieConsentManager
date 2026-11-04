@@ -34,6 +34,9 @@ final readonly class DraftValidator
 
     public const DISCONTINUED = 'universal-analytics';
 
+    /** Issues that refuse an import outright: an address that is not a path of the shop or an https URL is never stored. */
+    public const URL_ERROR_CODES = ['policy_url_invalid', 'script_url'];
+
     private ServiceControllers $controllers;
     private ActiveLanguages $languages;
     private CookieDurations $durations;
@@ -200,7 +203,7 @@ final readonly class DraftValidator
         }
 
         $scriptUrl = (string) ($service['script_url'] ?? '');
-        if ('script' === $service['kind'] && '' !== $scriptUrl && 1 !== preg_match('~^https://[^\s"\'<>]+$~i', $scriptUrl)) {
+        if ('' !== $scriptUrl && 1 !== preg_match('~^https://[^\s"\'<>]+$~i', $scriptUrl)) {
             $issues[] = $this->error('script_url', $field.'.script_url', 'A script service needs an https URL.');
 
             return;

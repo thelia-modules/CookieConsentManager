@@ -17,7 +17,7 @@
                         {{ ccm.csrf() }}
                         {{ ccm.issues(issues, 'services.' ~ service.key) }}
                         <div class="row g-2 align-items-end">
-                            <div class="col-md-4"><strong>{{ service.name }}</strong><br><span class="small text-secondary">{{ service.controller }} - <a href="{{ service.policy_url }}" rel="noopener noreferrer">{{ 'privacy policy'|trans }}</a></span></div>
+                            <div class="col-md-4"><strong>{{ service.name }}</strong><br><span class="small text-secondary">{{ service.controller }} - <a href="{{ service.policy_url|ccm_safe_url }}" rel="noopener noreferrer">{{ 'privacy policy'|trans }}</a></span></div>
                             <div class="col-md-3">
                                 <label class="form-label" for="proposed_{{ service.key }}_purpose">{{ 'Purpose'|trans }}</label>
                                 <select class="form-select" id="proposed_{{ service.key }}_purpose" name="purpose">{{ local.purpose_options(purposes, service.purpose, service.strictly_necessary, ui_locale) }}</select>

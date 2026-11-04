@@ -8,6 +8,7 @@ use CookieConsentManager\Catalogue\CatalogueReader;
 use CookieConsentManager\Draft\DraftNormalizer;
 use CookieConsentManager\Draft\DraftRepository;
 use CookieConsentManager\Validation\DraftValidator;
+use CookieConsentManager\Validation\ValidationIssue;
 
 final readonly class ConfigImporter
 {
@@ -61,6 +62,14 @@ final readonly class ConfigImporter
 
                 return true;
             }));
+        }
+
+        $dangerous = array_values(array_filter(
+            $this->validator->validate($draft),
+            static fn (ValidationIssue $issue): bool => $issue->isError() && \in_array($issue->code, DraftValidator::URL_ERROR_CODES, true),
+        ));
+        if ([] !== $dangerous) {
+            throw new ImportRefusedException(array_map(static fn (ValidationIssue $issue): string => $issue->field.': '.$issue->message, $dangerous));
         }
 
         $pending = $this->environmentFields($draft);
