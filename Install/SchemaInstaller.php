@@ -23,6 +23,16 @@ final readonly class SchemaInstaller
         ['ccm_consent_entry', 'idx_ccm_consent_entry_action_recorded_at', '`action`, `recorded_at`'],
     ];
 
+    // Columns added after the first release, with the statement that fills them for the rows already there.
+    private const LATER_COLUMNS = [
+        [
+            'ccm_consent_entry',
+            'first_choice',
+            'TINYINT(1) DEFAULT 0 NOT NULL',
+            'UPDATE `ccm_consent_entry` e LEFT JOIN `ccm_consent_entry` earlier ON earlier.consent_id = e.consent_id AND earlier.id < e.id SET e.first_choice = 1 WHERE earlier.id IS NULL',
+        ],
+    ];
+
     public function apply(?ConnectionInterface $con = null): void
     {
         $con ??= Propel::getWriteConnection('TheliaMain');
@@ -32,6 +42,14 @@ final readonly class SchemaInstaller
             $exists = $con->query(\sprintf("SHOW INDEX FROM `%s` WHERE Key_name = '%s'", $table, $index))->fetch();
             if (false === $exists) {
                 $con->exec(\sprintf('ALTER TABLE `%s` ADD INDEX `%s` (%s)', $table, $index, $columns));
+            }
+        }
+
+        foreach (self::LATER_COLUMNS as [$table, $column, $definition, $fill]) {
+            $exists = $con->query(\sprintf("SHOW COLUMNS FROM `%s` LIKE '%s'", $table, $column))->fetch();
+            if (false === $exists) {
+                $con->exec(\sprintf('ALTER TABLE `%s` ADD COLUMN `%s` %s', $table, $column, $definition));
+                $con->exec($fill);
             }
         }
     }

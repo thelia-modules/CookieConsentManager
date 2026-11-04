@@ -22,8 +22,8 @@ final class StatsRebuildTest extends CcmTestCase
         $con->exec('DELETE FROM ccm_daily_stat');
 
         $insert = $con->prepare(
-            'INSERT INTO ccm_consent_entry (consent_id, recorded_at, action, source, version, version_hash, locale, path, purposes_json, services_json)'
-            .' VALUES (:consent, :at, :action, \'banner\', 1, \'abcdef012345\', \'fr_FR\', \'/p\', :purposes, :services)',
+            'INSERT INTO ccm_consent_entry (consent_id, recorded_at, action, source, version, version_hash, locale, path, purposes_json, services_json, first_choice)'
+            .' VALUES (:consent, :at, :action, \'banner\', 1, \'abcdef012345\', \'fr_FR\', \'/p\', :purposes, :services, :first)',
         );
         $expected = [];
         for ($i = 0; $i < self::ENTRIES; ++$i) {
@@ -38,6 +38,7 @@ final class StatsRebuildTest extends CcmTestCase
                 'action' => $action,
                 'purposes' => json_encode($purposes, \JSON_THROW_ON_ERROR),
                 'services' => json_encode($services, \JSON_THROW_ON_ERROR),
+                'first' => (int) $first,
             ]);
             if ($first) {
                 foreach (FirstChoiceMetrics::of($action, $purposes, $services) as $metric) {
@@ -63,5 +64,23 @@ final class StatsRebuildTest extends CcmTestCase
         unset($metrics);
         self::assertSame($expected, $actual);
         self::assertCount(3, $actual, 'the registry spans several days');
+    }
+
+    public function testARebuildAfterAPurgeDoesNotTurnAChangeOfMindIntoAFirstChoice(): void
+    {
+        $con = Propel::getWriteConnection('TheliaMain');
+        ConsentEntryQuery::create()->deleteAll();
+        $con->exec('DELETE FROM ccm_daily_stat');
+        $insert = $con->prepare(
+            'INSERT INTO ccm_consent_entry (consent_id, recorded_at, action, source, version, version_hash, locale, path, purposes_json, services_json, first_choice)'
+            .' VALUES (\'k-purged\', :at, :action, \'banner\', 1, \'abcdef012345\', \'fr_FR\', \'/p\', :purposes, \'{}\', :first)',
+        );
+        $insert->execute(['at' => '2020-01-01 10:00:00', 'action' => 'reject_all', 'purposes' => '{"analytics":0}', 'first' => 1]);
+        $insert->execute(['at' => '2026-09-02 10:00:00', 'action' => 'accept_all', 'purposes' => '{"analytics":1}', 'first' => 0]);
+
+        $this->ccm->entries->purgeOlderThan(new \DateTimeImmutable('2021-01-01 00:00:00', new \DateTimeZone('UTC')));
+
+        self::assertSame(0, (new DailyStatRepository())->rebuildFromRegistry(), 'the surviving entry is a change of mind');
+        self::assertSame(0, (int) $con->query("SELECT COUNT(*) FROM ccm_daily_stat WHERE day = '2026-09-02'")->fetchColumn());
     }
 }

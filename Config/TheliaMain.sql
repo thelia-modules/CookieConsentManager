@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `ccm_consent_entry`
     `exempt_json` TEXT,
     `ip_truncated` VARCHAR(45),
     `customer_id` INTEGER,
+    `first_choice` TINYINT(1) DEFAULT 0 NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_ccm_consent_entry_consent_id` (`consent_id`),
     INDEX `idx_ccm_consent_entry_recorded_at` (`recorded_at`),

@@ -63,7 +63,8 @@ final readonly class ConsentRecorder
                 ->setPurposesJson($this->json($payload->purposes))
                 ->setServicesJson($this->json($payload->services))
                 ->setExemptJson($this->json($payload->exempt))
-                ->setIpTruncated('truncated' === $options['ip_mode'] ? IpTruncator::truncate($request->getClientIp()) : null);
+                ->setIpTruncated('truncated' === $options['ip_mode'] ? IpTruncator::truncate($request->getClientIp()) : null)
+                ->setFirstChoice($first);
             $entry->save($con);
 
             if ($first) {

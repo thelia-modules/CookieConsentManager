@@ -47,11 +47,11 @@ final readonly class DailyStatRepository
             return 0;
         }
 
-        // A first choice is the entry with no earlier one for its consent: the lookup uses the consent_id index,
-        // so a batch costs the same wherever it sits in the registry.
+        // A first choice is flagged when it is recorded: once the purge has removed the first entry of a consent,
+        // its next entry has no earlier one left but is still a change of mind, not a first choice.
         $select = $con->prepare(
             'SELECT e.id, e.recorded_at, e.action, e.purposes_json, e.services_json FROM ccm_consent_entry e'
-            .' WHERE e.id > :last AND NOT EXISTS (SELECT 1 FROM ccm_consent_entry earlier WHERE earlier.consent_id = e.consent_id AND earlier.id < e.id)'
+            .' WHERE e.id > :last AND e.first_choice = 1'
             .' ORDER BY e.id LIMIT 500',
         );
 

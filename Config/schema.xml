@@ -57,6 +57,7 @@
         <column name="exempt_json" type="LONGVARCHAR"/>
         <column name="ip_truncated" size="45" type="VARCHAR"/>
         <column name="customer_id" type="INTEGER"/>
+        <column defaultValue="false" name="first_choice" required="true" type="BOOLEAN"/>
         <index name="idx_ccm_consent_entry_consent_id">
             <index-column name="consent_id"/>
         </index>

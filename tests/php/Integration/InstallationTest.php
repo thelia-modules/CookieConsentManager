@@ -65,6 +65,31 @@ final class InstallationTest extends CcmTestCase
         self::assertSame(['action', 'recorded_at'], $columns());
     }
 
+    public function testAnExistingInstallGetsTheFirstChoiceColumnFilledFromItsRegistry(): void
+    {
+        $con = Propel::getWriteConnection('TheliaMain');
+        $insert = $con->prepare(
+            'INSERT INTO ccm_consent_entry (consent_id, recorded_at, action, source, version, version_hash, locale, path, purposes_json, services_json)'
+            .' VALUES (:consent, :at, \'custom\', \'api\', 1, \'abcdef012345\', \'fr_FR\', \'/\', \'{}\', \'{}\')',
+        );
+        $con->exec('ALTER TABLE ccm_consent_entry DROP COLUMN first_choice');
+
+        try {
+            $insert->execute(['consent' => self::ID, 'at' => '2026-10-01 10:00:00']);
+            $insert->execute(['consent' => self::ID, 'at' => '2026-10-02 10:00:00']);
+        } finally {
+            $installer = SchemaInstaller::forModule(\dirname(__DIR__, 3));
+            $installer->apply();
+            $installer->apply();
+        }
+
+        self::assertSame(
+            ['1', '0'],
+            array_map('strval', $con->query("SELECT first_choice FROM ccm_consent_entry WHERE consent_id = '".self::ID."' ORDER BY id")->fetchAll(\PDO::FETCH_COLUMN)),
+            'the earliest entry of a consent is its first choice, the next one is not',
+        );
+    }
+
     public function testAScriptThatWouldDropOrTruncateIsRefusedBeforeAnyStatementRuns(): void
     {
         $file = tempnam(sys_get_temp_dir(), 'ccm-sql');
