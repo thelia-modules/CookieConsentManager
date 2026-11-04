@@ -1,0 +1,264 @@
+{
+  "rules": {
+    "acast": {
+      "embed.acast.com": [
+        "/"
+      ]
+    },
+    "amazon": {
+      "ws-eu.amazon-adsystem.com": [
+        "/widgets/q"
+      ]
+    },
+    "archive": {
+      "archive.org": [
+        "/embed/"
+      ]
+    },
+    "artetv": {
+      "www.arte.tv": [
+        "/player/v5/index.php"
+      ]
+    },
+    "ausha": {
+      "player.ausha.co": [
+        "/index.html"
+      ]
+    },
+    "bandcamp": {
+      "bandcamp.com": [
+        "/EmbeddedPlayer/album="
+      ]
+    },
+    "calameo": {
+      "v.calameo.com": [
+        "/"
+      ]
+    },
+    "calameolibrary": {
+      "v.calameo.com": [
+        "/library/"
+      ]
+    },
+    "canalu": {
+      "www.canal-u.tv": [
+        "/embed/"
+      ]
+    },
+    "dailymotion": {
+      "www.dailymotion.com": [
+        "/embed/"
+      ]
+    },
+    "datingaffiliation": {
+      "www.tools-affil2.com": [
+        "/rotaban/ban.php"
+      ]
+    },
+    "deezer": {
+      "widget.deezer.com": [
+        "/widget/"
+      ]
+    },
+    "discord": {
+      "discord.com": [
+        "/widget"
+      ]
+    },
+    "facebookpost": {
+      "www.facebook.com": [
+        "/plugins/post.php"
+      ]
+    },
+    "fculture": {
+      "www.franceculture.fr": [
+        "/player/export-reecouter"
+      ]
+    },
+    "gagenda": {
+      "www.google.com": [
+        "/calendar/embed"
+      ]
+    },
+    "gdocs": {
+      "docs.google.com": [
+        "/document/d/e/"
+      ]
+    },
+    "genially": {
+      "view.genial.ly": [
+        "/"
+      ]
+    },
+    "gforms": {
+      "docs.google.com": [
+        "/forms/d/e/"
+      ]
+    },
+    "googlemapssearch": {
+      "www.google.com": [
+        "/maps/embed/v1/place"
+      ]
+    },
+    "gsheets": {
+      "docs.google.com": [
+        "/spreadsheets/d/e/"
+      ]
+    },
+    "gslides": {
+      "docs.google.com": [
+        "/presentation/d/e/"
+      ]
+    },
+    "instagram": {
+      "www.instagram.com": [
+        "/"
+      ]
+    },
+    "issuu": {
+      "e.issuu.com": [
+        "/embed.html"
+      ]
+    },
+    "maps_noapi": {
+      "www.google.com": [
+        "/maps/embed"
+      ]
+    },
+    "matterport": {
+      "my.matterport.com": [
+        "/show/"
+      ]
+    },
+    "meteofrance": {
+      "meteofrance.com": [
+        "/widget/prevision/"
+      ]
+    },
+    "mixcloud": {
+      "www.mixcloud.com": [
+        "/widget/iframe/"
+      ]
+    },
+    "playplay": {
+      "playplay.com": [
+        "/app/embed-video/"
+      ]
+    },
+    "prezi": {
+      "prezi.com": [
+        "/embed/"
+      ]
+    },
+    "slideshare": {
+      "www.slideshare.net": [
+        "/slideshow/embed_code/key/"
+      ]
+    },
+    "slido": {
+      "app.sli.do": [
+        "/event/"
+      ]
+    },
+    "soundcloud": {
+      "w.soundcloud.com": [
+        "/player/"
+      ]
+    },
+    "spotify": {
+      "open.spotify.com": [
+        "/embed/"
+      ]
+    },
+    "timelinejs": {
+      "cdn.knightlab.com": [
+        "/libs/timeline/latest/embed/index.html"
+      ]
+    },
+    "twitch": {
+      "player.twitch.tv": [
+        "/"
+      ]
+    },
+    "videas": {
+      "app.videas.fr": [
+        "/embed/"
+      ]
+    },
+    "vimeo": {
+      "player.vimeo.com": [
+        "/video/"
+      ]
+    },
+    "webtvnu": {
+      "webtv.normandie-univ.fr": [
+        "/permalink/"
+      ]
+    },
+    "youtube": {
+      "www.youtube-nocookie.com": [
+        "/embed/"
+      ]
+    },
+    "youtubeplaylist": {
+      "www.youtube-nocookie.com": [
+        "/embed/videoseries"
+      ]
+    }
+  },
+  "undetectable": {
+    "addthis": "the fragment builds no iframe (script, widget or markup driven)",
+    "addtoanyshare": "the fragment builds no iframe (script, widget or markup driven)",
+    "adsense": "the fragment builds no iframe (script, widget or markup driven)",
+    "adsensesearch": "the fragment builds no iframe (script, widget or markup driven)",
+    "adsensesearchresult": "the fragment builds no iframe (script, widget or markup driven)",
+    "aduptech_ads": "the fragment builds no iframe (script, widget or markup driven)",
+    "calendly": "the fragment builds no iframe (script, widget or markup driven)",
+    "clicmanager": "no fragment",
+    "criteo": "no fragment",
+    "datingaffiliationpopup": "no fragment",
+    "disqus": "the fragment builds no iframe (script, widget or markup driven)",
+    "facebook": "the fragment builds no iframe (script, widget or markup driven)",
+    "facebookcomment": "the fragment builds no iframe (script, widget or markup driven)",
+    "facebookcustomerchat": "the fragment builds no iframe (script, widget or markup driven)",
+    "facebooklikebox": "the fragment builds no iframe (script, widget or markup driven)",
+    "fillout": "the fragment builds no iframe (script, widget or markup driven)",
+    "gallica": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "geoportail": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "googlemaps": "the fragment builds no iframe (script, widget or markup driven)",
+    "googlemapsembed": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "googlepartners": "the fragment builds no iframe (script, widget or markup driven)",
+    "gplus": "the fragment builds no iframe (script, widget or markup driven)",
+    "gplusbadge": "the fragment builds no iframe (script, widget or markup driven)",
+    "hcaptcha": "the fragment builds no iframe (script, widget or markup driven)",
+    "helloasso": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "iframe": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "intercomChat": "the fragment builds no iframe (script, widget or markup driven)",
+    "kwanko": "the fragment builds no iframe (script, widget or markup driven)",
+    "linkedin": "the fragment builds no iframe (script, widget or markup driven)",
+    "m6meteo": "the fragment builds no iframe (script, widget or markup driven)",
+    "openstreetmap": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "pinterest": "the fragment builds no iframe (script, widget or markup driven)",
+    "pipedrive": "the fragment builds no iframe (script, widget or markup driven)",
+    "podcloud": "the iframe address is typed by the editor, the fragment holds no fixed host",
+    "prelinker": "no fragment",
+    "pubdirecte": "no fragment",
+    "recaptcha": "the fragment builds no iframe (script, widget or markup driven)",
+    "rumbletalk": "the fragment builds no iframe (script, widget or markup driven)",
+    "seamlessaccess": "the fragment builds no iframe (script, widget or markup driven)",
+    "shareaholic": "the fragment builds no iframe (script, widget or markup driven)",
+    "shareasale": "the fragment builds no iframe (script, widget or markup driven)",
+    "sharethis": "the fragment builds no iframe (script, widget or markup driven)",
+    "statcounter": "no fragment",
+    "tidycal": "the fragment builds no iframe (script, widget or markup driven)",
+    "tiktokvideo": "the fragment builds no iframe (script, widget or markup driven)",
+    "trustpilot": "the fragment builds no iframe (script, widget or markup driven)",
+    "twitter": "the fragment builds no iframe (script, widget or markup driven)",
+    "twitterembed": "the fragment builds no iframe (script, widget or markup driven)",
+    "twittertimeline": "the fragment builds no iframe (script, widget or markup driven)",
+    "twitterwidgetsapi": "the fragment builds no iframe (script, widget or markup driven)",
+    "vshop": "the fragment builds no iframe (script, widget or markup driven)",
+    "xandrconversion": "the fragment builds no iframe (script, widget or markup driven)",
+    "xandrsegment": "the fragment builds no iframe (script, widget or markup driven)"
+  }
+}

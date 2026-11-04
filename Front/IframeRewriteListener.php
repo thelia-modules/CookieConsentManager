@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CookieConsentManager\Front;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -14,22 +15,33 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Option `blockEmbeds`: the iframes of the media services that are active and published are served
  * as placeholders. Runs before the shared cache stores the page (priority -1026): the cached copy is
  * for visitors without a cookie, who have consented to nothing.
+ *
+ * The answers of a LiveComponent are rewritten too: the browser morphs them into the page, so an untouched
+ * iframe would replace the placeholder (or be inserted) without any consent. The engine watches the nodes
+ * added to the page and restores the iframe itself when the service is already granted.
  */
 final readonly class IframeRewriteListener
 {
+    private const LIVE_COMPONENT_TYPE = 'application/vnd.live-component+html';
+
     public function __construct(
         private FrontConfigProvider $configs,
         private IframeRewriter $rewriter,
         private PlaceholderRenderer $placeholders,
+        private FrontThemeActivator $theme,
     ) {
     }
 
     // A response that has not been prepared yet carries no Content-Type: the kernel sets text/html afterwards.
-    private function isHtml(Response $response): bool
+    private function isRewritable(Request $request, Response $response): bool
     {
         $type = $response->headers->get('Content-Type');
 
-        return null === $type || str_contains($type, 'text/html');
+        if ($request->attributes->has('_live_component')) {
+            return null !== $type && str_starts_with($type, self::LIVE_COMPONENT_TYPE);
+        }
+
+        return !$request->isXmlHttpRequest() && (null === $type || str_contains($type, 'text/html'));
     }
 
     #[AsEventListener(event: KernelEvents::RESPONSE, priority: 0)]
@@ -42,9 +54,8 @@ final readonly class IframeRewriteListener
             !$event->isMainRequest()
             || $response instanceof StreamedResponse
             || 200 !== $response->getStatusCode()
-            || $request->isXmlHttpRequest()
             || str_starts_with($request->getPathInfo(), '/admin')
-            || !$this->isHtml($response)
+            || !$this->isRewritable($request, $response)
         ) {
             return;
         }
@@ -57,6 +68,11 @@ final readonly class IframeRewriteListener
         $front = $this->configs->forRequest($request);
         if (null === $front || !($front->config['options']['blockEmbeds'] ?? false)) {
             return;
+        }
+
+        // The route of a LiveComponent is not a page of the theme: the placeholder template is found through the active theme.
+        if ($request->attributes->has('_live_component')) {
+            $this->theme->activate();
         }
 
         $rewritten = $this->rewriter->rewrite(

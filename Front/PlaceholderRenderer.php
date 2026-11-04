@@ -47,7 +47,7 @@ final readonly class PlaceholderRenderer
     {
         $keys = [];
         foreach ($front->config['services'] as $service) {
-            if ('media' === $service['kind'] && isset(EmbedRules::RULES[$service['key']])) {
+            if ('media' === $service['kind'] && isset(EmbedRules::rules()[$service['key']])) {
                 $keys[] = $service['key'];
             }
         }
