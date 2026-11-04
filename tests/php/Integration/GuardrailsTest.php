@@ -125,7 +125,8 @@ final class GuardrailsTest extends CcmTestCase
     public function testImplicitConsentAndUnequalLabelsAreFlaggedWithoutBlocking(): void
     {
         $draft = $this->publishableDraft();
-        $draft['texts']['fr']['body'] = 'En poursuivant votre navigation, vous acceptez les cookies.';
+        // A complete French row: the default draft only carries English texts.
+        $draft['texts']['fr'] = array_replace($draft['texts']['en'], ['body' => 'En poursuivant votre navigation, vous acceptez les cookies.']);
         $draft['texts']['en']['body'] = 'By continuing to browse, you agree.';
         $draft['texts']['en']['reject'] = 'No';
         $draft['texts']['en']['accept'] = 'I accept and enjoy an optimal experience';
