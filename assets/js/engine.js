@@ -186,7 +186,7 @@
     // The purpose labels travel with the metadata (the panel that carries them is not in the page until it is opened).
     const lab = $('[data-ccm-purpose="' + (s.purpose || '') + '"][data-ccm-purpose-label]');
     const label = metaOf('@purposes')[s.purpose] || (lab && lab.getAttribute('data-ccm-purpose-label')) || s.purpose || '';
-    const policy = /^(https?:\/\/|\/(?!\/))/i.test(m.policy_url || '') ? m.policy_url : '';
+    const policy = /^(https?:\/\/|\/(?!\/))/i.test(m.policy_url || '') && (m.policy_url || '').indexOf('\\') < 0 ? m.policy_url : '';
     const name = s.name || key;
     const out = h.replace(/\{\{\s*(key|name|purposeLabel|purpose|controller|policyUrl)\s*\}\}/g, (x, k) => esc(
       k === 'key' ? key : k === 'name' ? name : k === 'purposeLabel' ? label : k === 'controller' ? (m.controller || name) : k === 'policyUrl' ? policy : (s.purpose || '')
@@ -197,10 +197,15 @@
     $$('[data-ccm-if-policy]', box).forEach((e) => e.parentNode.removeChild(e));
     return box.innerHTML;
   };
+  // Attributes a placeholder may hand back to the element it stands for: never an event handler, srcdoc or an address.
+  const attrAllowed = (n) => /^(class|id|width|height|title|allow|allowfullscreen|frameborder|loading|referrerpolicy|name|style|scrolling|sandbox|videoid|aria-[a-z-]+|data-(?!ccm-)[a-z0-9_-]+)$/.test(n);
+  // https, or protocol-relative as the server accepts it (EmbedRules); never a script scheme nor `/\` read as `//`.
+  const safeSrc = (u) => /^(https:)?\/\/[^/\\]/i.test(u || '');
   const restoreIframe = (ph) => {
+    if (!safeSrc(ph.getAttribute('data-ccm-src'))) return null;
     const f = d.createElement('iframe');
     Array.from(ph.attributes).forEach((a) => {
-      if (a.name.indexOf('data-ccm-attr-') === 0) f.setAttribute(a.name.slice(14), a.value);
+      if (a.name.indexOf('data-ccm-attr-') === 0 && attrAllowed(a.name.slice(14))) f.setAttribute(a.name.slice(14), a.value);
     });
     if (!f.getAttribute('title')) f.setAttribute('title', (svc(ph.getAttribute('data-ccm-placeholder')) || {}).name || ph.getAttribute('data-ccm-placeholder'));
     f.setAttribute('data-ccm-restored', '');
@@ -216,6 +221,7 @@
     Array.from(ph.attributes).forEach((a) => {
       if (a.name.indexOf('data-ccm-attr-') !== 0) return;
       const n = a.name.slice(14);
+      if (!attrAllowed(n)) return;
       if (n === 'class') a.value.split(/\s+/).forEach((c) => c && ph.classList.add(c)); else ph.setAttribute(n, a.value);
     });
     ph.setAttribute('data-ccm-released', '');
@@ -227,7 +233,7 @@
     $$('[data-ccm-placeholder]', root).forEach((ph) => {
       const k = ph.getAttribute('data-ccm-placeholder');
       if (on(cur, k) && mode !== 'preview') {
-        if (ph.getAttribute('data-ccm-src')) restoreIframe(ph);
+        if (safeSrc(ph.getAttribute('data-ccm-src'))) restoreIframe(ph);
         else if (!ph.hasAttribute('data-ccm-released')) releasePlaceholder(ph, k);
       } else if (!ph.firstElementChild && !ph.textContent.trim()) {
         ph.removeAttribute('data-ccm-released');

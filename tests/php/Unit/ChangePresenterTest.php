@@ -45,4 +45,23 @@ final class ChangePresenterTest extends TestCase
         self::assertSame('Refusé', $rows['consent_mode.regions.0.default.analytics_storage']['after']);
         self::assertSame('aucune', $rows['registry.ip_mode']['after']);
     }
+
+    public function testTheCodeOfAnAddedCustomServiceIsShownInFull(): void
+    {
+        $service = ['key' => 'chat', 'custom' => true, 'kind' => 'custom', 'purpose' => 'ads', 'enabled' => true, 'name' => 'Chat', 'script_url' => 'https://chat.test/a.js', 'code' => "window.chat = 1;\nload();"];
+        $rows = $this->present(['services' => []], ['services' => [$service]]);
+
+        self::assertSame("window.chat = 1;\nload();", $rows['services.chat.code']['after']);
+        self::assertSame('https://chat.test/a.js', $rows['services.chat.script_url']['after']);
+        self::assertArrayHasKey('services.chat', $rows, 'the folded row stays');
+    }
+
+    public function testTheCodeOfAChangedCustomServiceIsShownInFull(): void
+    {
+        $service = ['key' => 'chat', 'custom' => true, 'kind' => 'custom', 'purpose' => 'ads', 'enabled' => true, 'name' => 'Chat', 'code' => 'a();'];
+        $rows = $this->present(['services' => [$service]], ['services' => [['code' => 'b();'] + $service]]);
+
+        self::assertSame('a();', $rows['services.chat.code']['before']);
+        self::assertSame('b();', $rows['services.chat.code']['after']);
+    }
 }

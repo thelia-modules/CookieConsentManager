@@ -13,7 +13,7 @@
             <h2 class="h5 mb-0">{{ 'Version %version%'|trans({'%version%': version.version}) }}</h2>
             <div class="d-flex gap-2">
                 <a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_versions_export', {version: version.version}) }}">{{ 'Export (JSON)'|trans }}</a>
-                {% if can.update %}
+                {% if can.create %}
                     <form method="post" action="{{ path('ccm_admin_version_restore', {number: version.version}) }}" onsubmit="return confirm('{{ 'Replace the draft with this version?'|trans|e('js') }}')">
                         {{ ccm.csrf() }}<button class="btn btn-sm btn-outline-primary" type="submit" data-testid="ccm-restore"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ 'Restore as the draft'|trans }}</button>
                     </form>

@@ -71,7 +71,8 @@ return [
     'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.' => 'La importación sustituye el borrador, nunca la versión publicada. Los campos de entorno deben confirmarse antes de publicar.',
     'JSON file' => 'Archivo JSON',
     'Import into the draft' => 'Importar al borrador',
-    'Importing needs the UPDATE right.' => 'La importación requiere el permiso UPDATE.',
+    'Importing needs the CREATE right (the right that publishes).' => 'La importación requiere el permiso CREATE (el que publica).',
+    'The file could not be read or is larger than 1 MB: nothing was imported.' => 'No se pudo leer el archivo o supera 1 MB: no se importó nada.',
     'Published versions' => 'Versiones publicadas',
     'Date' => 'Fecha',
     'Author' => 'Autor',
@@ -597,6 +598,7 @@ return [
     'Generate a model of the cookie policy page' => 'Generar un modelo de página de política de cookies',
     'The cookie policy address of the language "%language%" (%url%) is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'La dirección de la política de cookies del idioma «%language%» (%url%) es una página de condiciones generales, no una política de cookies: publique una página dedicada a las cookies.',
     'The fallback address of the cookie policy (%url%), used by the language "%language%", is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'La dirección de reserva de la política de cookies (%url%), utilizada por el idioma «%language%», es una página de condiciones generales, no una política de cookies: publique una página dedicada a las cookies.',
+    'The fallback address of the cookie policy (%url%) is a page of terms and conditions. No active language uses it today, but a language activated later would show it to its visitors: replace it with a page dedicated to cookies.' => 'La dirección de reserva de la política de cookies (%url%) es una página de condiciones generales. Hoy ningún idioma activo la utiliza, pero un idioma activado más adelante la mostraría a sus visitantes: sustitúyala por una página dedicada a las cookies.',
     'The automatic blocking of embedded content is off while a video service is active (%services%): its videos would load before the visitor consents.' => 'El bloqueo automático de los contenidos incrustados está desactivado mientras un servicio de vídeo está activo (%services%): sus vídeos se cargarían antes del consentimiento del visitante.',
     'The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.' => 'El tema activo de la tienda no llama al hook o hooks de tema %hooks%: el banner y el script de consentimiento no se inyectan, así que nunca se pregunta a los visitantes. Utilice un tema Twig como Flexy o añada la llamada al hook en el layout del tema.',
 ];

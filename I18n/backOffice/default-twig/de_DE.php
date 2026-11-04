@@ -71,7 +71,8 @@ return [
     'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.' => 'Der Import ersetzt den Entwurf, nie die veröffentlichte Version. Umgebungsfelder müssen vor der Veröffentlichung bestätigt werden.',
     'JSON file' => 'JSON-Datei',
     'Import into the draft' => 'In den Entwurf importieren',
-    'Importing needs the UPDATE right.' => 'Für den Import ist die Berechtigung UPDATE erforderlich.',
+    'Importing needs the CREATE right (the right that publishes).' => 'Für den Import ist die Berechtigung CREATE (die zum Veröffentlichen) erforderlich.',
+    'The file could not be read or is larger than 1 MB: nothing was imported.' => 'Die Datei konnte nicht gelesen werden oder ist größer als 1 MB: es wurde nichts importiert.',
     'Published versions' => 'Veröffentlichte Versionen',
     'Date' => 'Datum',
     'Author' => 'Autor',
@@ -597,6 +598,7 @@ return [
     'Generate a model of the cookie policy page' => 'Vorlage der Cookie-Richtlinie erzeugen',
     'The cookie policy address of the language "%language%" (%url%) is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'Die Adresse der Cookie-Richtlinie der Sprache „%language%“ (%url%) ist eine Seite mit Geschäftsbedingungen, keine Cookie-Richtlinie: Veröffentlichen Sie eine eigene Seite zu Cookies.',
     'The fallback address of the cookie policy (%url%), used by the language "%language%", is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'Die Ersatzadresse der Cookie-Richtlinie (%url%), die von der Sprache „%language%“ verwendet wird, ist eine Seite mit Geschäftsbedingungen, keine Cookie-Richtlinie: Veröffentlichen Sie eine eigene Seite zu Cookies.',
+    'The fallback address of the cookie policy (%url%) is a page of terms and conditions. No active language uses it today, but a language activated later would show it to its visitors: replace it with a page dedicated to cookies.' => 'Die Ersatzadresse der Cookie-Richtlinie (%url%) ist eine Seite mit Geschäftsbedingungen. Derzeit verwendet keine aktive Sprache sie, aber eine später aktivierte Sprache würde sie ihren Besuchern zeigen: Ersetzen Sie sie durch eine eigene Seite zu Cookies.',
     'The automatic blocking of embedded content is off while a video service is active (%services%): its videos would load before the visitor consents.' => 'Die automatische Sperrung eingebetteter Inhalte ist deaktiviert, während ein Videodienst aktiv ist (%services%): Seine Videos würden vor der Einwilligung des Besuchers geladen.',
     'The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.' => 'Das aktive Frontend-Theme ruft den bzw. die Theme-Hooks %hooks% nicht auf: Banner und Consent-Skript werden nicht eingebunden, die Besucher werden nie gefragt. Verwenden Sie ein Twig-Theme wie Flexy oder fügen Sie den Hook-Aufruf im Layout des Themes hinzu.',
 ];

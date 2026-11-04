@@ -36,7 +36,7 @@ final readonly class PanelController
     ) {
     }
 
-    #[Route('/ccm/panel/{version}-{hash}-{locale}.html', name: self::ROUTE, requirements: ['version' => '\d+', 'hash' => '[0-9a-f]{12}', 'locale' => '[a-z]{2}(?:_[A-Z]{2})?'], methods: ['GET'], stateless: true)]
+    #[Route('/ccm/panel/{version}-{hash}-{locale}.html', name: self::ROUTE, requirements: ['version' => '\d{1,9}', 'hash' => '[0-9a-f]{12}', 'locale' => '[a-z]{2}(?:_[A-Z]{2})?'], methods: ['GET'], stateless: true)]
     public function __invoke(int $version, string $hash, string $locale): Response
     {
         // Only the languages of the shop: any other value would fill the cache with configurations nobody asked for.

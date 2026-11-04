@@ -22,6 +22,9 @@ final readonly class DraftValidator
     /** Issues that refuse an import outright: an address that is not a path of the shop or an https URL is never stored. */
     public const URL_ERROR_CODES = ['policy_url_invalid', 'script_url'];
 
+    /** Issues that refuse an import outright: a service claiming to come from a module that does not declare it, or going beyond its declaration. */
+    public const MODULE_ERROR_CODES = ['module_undeclared', 'module_code', 'module_script_url', 'module_necessary'];
+
     /** @param iterable<SectionValidator> $sections */
     public function __construct(
         #[AutowireIterator(SectionValidator::TAG, defaultPriorityMethod: 'priority')]
@@ -58,6 +61,10 @@ final readonly class DraftValidator
 
     public static function isPolicyUrl(string $url): bool
     {
+        if (str_contains($url, '\\')) {
+            return false;
+        }
+
         if (str_starts_with($url, '/')) {
             return !str_starts_with($url, '//') && 1 !== preg_match('/\s/', $url);
         }

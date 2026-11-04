@@ -75,7 +75,7 @@ abstract class AbstractScreenController extends BaseAdminController
     }
 
     /** A refusal is rendered in the back-office, in the language of the administrator. */
-    private function guardAccess(string $access): ?Response
+    protected function guardAccess(string $access): ?Response
     {
         if (null === $this->checkAuth([], [CookieConsentManager::getModuleCode()], $access)) {
             return null;

@@ -16,7 +16,7 @@
                     {% for entry in entries %}
                         <tr>
                             <td>{{ entry.id }}</td><td>{{ entry.recordedAt|date('Y-m-d H:i:s') }}</td><td>{{ entry.action }}</td><td>{{ entry.source }}</td><td>{{ entry.version }}</td><td><code>{{ entry.versionHash }}</code></td>
-                            <td><a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_proof', {id: entry.id}) }}">{{ 'Proof sheet'|trans }}</a></td>
+                            <td>{% if can.update %}<a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_proof', {id: entry.id}) }}">{{ 'Proof sheet'|trans }}</a>{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

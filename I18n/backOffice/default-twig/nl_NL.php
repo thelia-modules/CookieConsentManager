@@ -71,7 +71,8 @@ return [
     'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.' => 'De import vervangt het concept, nooit de gepubliceerde versie. Omgevingsvelden moeten vóór publicatie worden bevestigd.',
     'JSON file' => 'JSON-bestand',
     'Import into the draft' => 'In het concept importeren',
-    'Importing needs the UPDATE right.' => 'Importeren vereist het recht UPDATE.',
+    'Importing needs the CREATE right (the right that publishes).' => 'Importeren vereist het recht CREATE (het recht om te publiceren).',
+    'The file could not be read or is larger than 1 MB: nothing was imported.' => 'Het bestand kon niet worden gelezen of is groter dan 1 MB: er is niets geïmporteerd.',
     'Published versions' => 'Gepubliceerde versies',
     'Date' => 'Datum',
     'Author' => 'Auteur',
@@ -597,6 +598,7 @@ return [
     'Generate a model of the cookie policy page' => 'Een model van de cookiebeleidspagina genereren',
     'The cookie policy address of the language "%language%" (%url%) is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'Het adres van het cookiebeleid van de taal „%language%” (%url%) is een pagina met algemene voorwaarden, geen cookiebeleid: publiceer een aparte pagina over cookies.',
     'The fallback address of the cookie policy (%url%), used by the language "%language%", is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'Het terugvaladres van het cookiebeleid (%url%), gebruikt door de taal „%language%”, is een pagina met algemene voorwaarden, geen cookiebeleid: publiceer een aparte pagina over cookies.',
+    'The fallback address of the cookie policy (%url%) is a page of terms and conditions. No active language uses it today, but a language activated later would show it to its visitors: replace it with a page dedicated to cookies.' => 'Het terugvaladres van het cookiebeleid (%url%) is een pagina met algemene voorwaarden. Geen enkele actieve taal gebruikt het vandaag, maar een later geactiveerde taal zou het aan haar bezoekers tonen: vervang het door een aparte pagina over cookies.',
     'The automatic blocking of embedded content is off while a video service is active (%services%): its videos would load before the visitor consents.' => 'De automatische blokkering van ingesloten inhoud staat uit terwijl een videodienst actief is (%services%): de video\'s zouden worden geladen voordat de bezoeker toestemming geeft.',
     'The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.' => 'Het actieve front-thema roept de themahook(s) %hooks% niet aan: de banner en het toestemmingsscript worden niet ingevoegd, bezoekers worden nooit gevraagd. Gebruik een Twig-thema zoals Flexy of voeg de hookaanroep toe aan de layout van het thema.',
 ];

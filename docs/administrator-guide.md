@@ -49,7 +49,7 @@ The assistant has four steps, in order, for a first setup:
 - Catalogue: "verified" services are tested and documented. "Imported" services are experimental and hidden while "Experimental services" is off on the dashboard. Filter by level, category or search.
 - For a video, the service sheet gives the HTML to paste into the page ("HTML to paste in your page", with a Copy button). The embedded iframes of YouTube, Vimeo, Dailymotion, Google Maps and most other media services already in your pages are replaced by an "Allow" box while the service is active and published. The list of services that are not is in the [integrator guide](integrator-guide.md#hard-coded-scripts).
 - Services proposed by other modules: a module (payment, for example) can declare its own cookies. They stay inactive until you enable them and publish. A "strictly necessary" service stays flagged with its justification.
-- Custom services: a service that is not in the catalogue. It has a script address, your own code (UPDATE right required, kept in the version) or a plain declaration (a service loaded by Google Tag Manager).
+- Custom services: a service that is not in the catalogue. It has a script address, your own code (CREATE right required to write or change the code or the script address, kept in the version) or a plain declaration (a service loaded by Google Tag Manager).
 - Purpose of a catalogue service: read-only. Only a custom service chooses its own.
 - Exempt audience measurement: the exemption from consent is limited to a list of tools, displayed with a description: self-hosted Matomo, Wysistat in exempt mode, Plausible, Simple Analytics. For each, tick the conditions you confirm (they are set in the tool itself, and the module cannot see them). The missing condition is named with a help text. Google Analytics, custom services and services of other modules are never eligible. A tool that is already exempt and leaves the list stays visible so that you can remove it. When one of them is active, the banner announces it at the first level, with a link to object.
 - The list rests on a reading of the code each tool runs. None of the four tools has been tested on a real account. The third CNIL page names no product. It states conditions (measurement of the publisher's own audience only, anonymous statistics only, no cross-referencing with other processing) and recommends a tracker lifetime of 13 months at most and a retention of 25 months at most. The conditions are yours to check on the tool's side. See [decision 004](decisions/004-audience-measurement-allowlist.md).
@@ -189,7 +189,7 @@ Ask your developer to host the fonts on the site (font files copied into the the
 ## From test to production
 
 1. On the test site: tab "Versions and verification", "Export the draft (JSON)". The export holds the draft, not the published version, so publish first if needed.
-2. On production: "Import a configuration (JSON)" (UPDATE right). The import replaces the draft, never the live version. Only invalid addresses block the write. Other errors are imported so that you can correct them in the back-office. Experimental services of the file are skipped while "Experimental services" is off.
+2. On production: "Import a configuration (JSON)" (CREATE right, the one that publishes, because a file can carry code). The import replaces the draft, never the live version. A file over 1 MB is refused. Invalid addresses, and services presented as coming from a module that does not declare them, block the write. Other errors are imported so that you can correct them in the back-office. Experimental services of the file are skipped while "Experimental services" is off.
 3. The screen lists the environment fields: service identifiers (Google Analytics, Meta, Crisp...), policy address, regions. They come from the test site, so re-enter or confirm the production values one by one before publishing. Publication is refused until they are confirmed. For each field the test value is shown next to the input, and no box is pre-ticked.
 4. Check that the policy page exists on the production site, then publish.
 
@@ -202,17 +202,19 @@ Each action needs one right. Rights do not include each other: to open the scree
 
 | Action | Right needed |
 |--------|:------------:|
-| Browse all screens and the registry, preview the draft, run the Verification and download its report, export (registry CSV, JSON of the draft or of a version) | VIEW |
+| Browse all screens and the registry list, preview the draft, run the Verification and download its report, export (JSON of the draft or of a version) | VIEW |
+| Export the registry (CSV), open a proof sheet | UPDATE |
 | Edit the draft (services, purposes, texts, colours, Consent Mode, settings) | UPDATE |
 | Import a preset | UPDATE |
-| Write code in a custom service | UPDATE |
-| Import a configuration, confirm environment fields | UPDATE |
-| Restore a version as the draft | UPDATE |
+| Write or change the code or the script address of a custom service, switch on experimental services | CREATE |
+| Import a configuration | CREATE |
+| Confirm environment fields | UPDATE |
+| Restore a version as the draft | CREATE |
 | Set retention and truncated IP | UPDATE |
 | Publish a version (setup assistant included, last step) | CREATE |
 | Purge the registry | DELETE |
 
-Publishing is a sensitive right. It sends the configuration to every visitor, and that includes JavaScript: custom services with a `code` field and script services with a `script_url` serve code to all visitors of the shop. UPDATE alone can write such a service into the draft but cannot publish it. Give CREATE only to people who may put code on every page. DELETE covers the registry purge only.
+Publishing is a sensitive right. It sends the configuration to every visitor, and that includes JavaScript: custom services with a `code` field and script services with a `script_url` serve code to all visitors of the shop. Whatever can bring such code into the draft therefore needs CREATE too: writing or changing the code or script address of a service, importing a configuration, restoring a version, switching on experimental services. UPDATE alone edits everything else in the draft and cannot publish. Give CREATE only to people who may put code on every page. DELETE covers the registry purge only.
 
 Read-only profile (VIEW without UPDATE): every screen can be browsed, fields are disabled, write buttons are hidden, and a strip "Read-only access" says so. Without VIEW, the menu entry "Cookie consent" does not appear.
 

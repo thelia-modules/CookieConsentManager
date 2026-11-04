@@ -120,7 +120,7 @@ php Thelia ccm:config:publish --confirm-environment --comment="Go live"
 
 - Ce n'est pas une CMP certifiée IAB TCF 2.2 ni par Google. Non couverts : géolocalisation côté serveur, consentement inter-domaines, nonce CSP, signal de consentement de Microsoft Clarity.
 - Le module ne peut pas authentifier un visiteur anonyme : le registre prouve ce que le navigateur a envoyé, pas qui l'a envoyé.
-- Le droit de publier (CREATE sur le module dans Configuration, profils Administrateur) permet à un utilisateur de servir du JavaScript à tous les visiteurs, via les services personnalisés. Accordez-le avec soin.
+- Le droit de publier (CREATE sur le module dans Configuration, profils Administrateur) permet à un utilisateur de servir du JavaScript à tous les visiteurs, via les services personnalisés. Le même droit est exigé pour écrire ou changer le code ou l'adresse de script d'un service, importer une configuration, restaurer une version et activer les services expérimentaux. Accordez-le avec soin.
 - Derrière un reverse proxy ou un CDN, déclarez le proxy dans `framework.trusted_proxies`. Le point d'entrée du registre est limité à 120 requêtes par minute et par adresse client ; sans cette déclaration, tous les visiteurs partagent un seul compteur.
 - Le thème Flexy charge les polices Google avant le hook `layout.head.top`. Le module ne peut pas l'empêcher ; hébergez les polices sur le site. Le tableau de bord et la Vérification le signalent.
 - Le cache partagé de Thelia 3.3 ne sert que les visiteurs sans cookie : une page qui appelle `ccm_has_consent` doit rester en dehors.

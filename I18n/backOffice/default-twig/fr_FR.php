@@ -71,7 +71,8 @@ return [
     'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.' => 'L\'import remplace le brouillon, jamais la version publiée. Les champs d\'environnement doivent être confirmés avant publication.',
     'JSON file' => 'Fichier JSON',
     'Import into the draft' => 'Importer dans le brouillon',
-    'Importing needs the UPDATE right.' => 'L\'import exige le droit UPDATE.',
+    'Importing needs the CREATE right (the right that publishes).' => 'L\'import exige le droit CREATE (celui qui publie).',
+    'The file could not be read or is larger than 1 MB: nothing was imported.' => 'Le fichier n\'a pas pu être lu ou dépasse 1 Mo : rien n\'a été importé.',
     'Published versions' => 'Versions publiées',
     'Date' => 'Date',
     'Author' => 'Auteur',
@@ -597,6 +598,7 @@ return [
     'Generate a model of the cookie policy page' => 'Générer un modèle de page de politique de cookies',
     'The cookie policy address of the language "%language%" (%url%) is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'L\'adresse de la politique de cookies de la langue « %language% » (%url%) est une page de conditions générales, pas une politique de cookies : publiez une page dédiée aux cookies.',
     'The fallback address of the cookie policy (%url%), used by the language "%language%", is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'L\'adresse de repli de la politique de cookies (%url%), utilisée par la langue « %language% », est une page de conditions générales, pas une politique de cookies : publiez une page dédiée aux cookies.',
+    'The fallback address of the cookie policy (%url%) is a page of terms and conditions. No active language uses it today, but a language activated later would show it to its visitors: replace it with a page dedicated to cookies.' => 'L\'adresse de repli de la politique de cookies (%url%) est une page de conditions générales. Aucune langue active ne l\'utilise aujourd\'hui, mais une langue activée plus tard l\'afficherait à ses visiteurs : remplacez-la par une page dédiée aux cookies.',
     'The automatic blocking of embedded content is off while a video service is active (%services%): its videos would load before the visitor consents.' => 'Le blocage automatique des contenus intégrés est coupé alors qu\'un service vidéo est actif (%services%) : ses vidéos se chargeraient avant le consentement du visiteur.',
     'The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.' => 'Le thème de la boutique n\'appelle pas le ou les hooks de thème %hooks% : la bannière et le script de consentement ne sont pas injectés, les visiteurs ne sont jamais interrogés. Utilisez un thème Twig comme Flexy, ou ajoutez l\'appel du hook dans la mise en page du thème.',
 ];

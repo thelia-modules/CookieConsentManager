@@ -71,7 +71,8 @@ return [
     'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.' => 'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.',
     'JSON file' => 'JSON file',
     'Import into the draft' => 'Import into the draft',
-    'Importing needs the UPDATE right.' => 'Importing needs the UPDATE right.',
+    'Importing needs the CREATE right (the right that publishes).' => 'Importing needs the CREATE right (the right that publishes).',
+    'The file could not be read or is larger than 1 MB: nothing was imported.' => 'The file could not be read or is larger than 1 MB: nothing was imported.',
     'Published versions' => 'Published versions',
     'Date' => 'Date',
     'Author' => 'Author',
@@ -597,6 +598,7 @@ return [
     'Generate a model of the cookie policy page' => 'Generate a model of the cookie policy page',
     'The cookie policy address of the language "%language%" (%url%) is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'The cookie policy address of the language "%language%" (%url%) is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.',
     'The fallback address of the cookie policy (%url%), used by the language "%language%", is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.' => 'The fallback address of the cookie policy (%url%), used by the language "%language%", is a page of terms and conditions, not a cookie policy: publish a page dedicated to cookies.',
+    'The fallback address of the cookie policy (%url%) is a page of terms and conditions. No active language uses it today, but a language activated later would show it to its visitors: replace it with a page dedicated to cookies.' => 'The fallback address of the cookie policy (%url%) is a page of terms and conditions. No active language uses it today, but a language activated later would show it to its visitors: replace it with a page dedicated to cookies.',
     'The automatic blocking of embedded content is off while a video service is active (%services%): its videos would load before the visitor consents.' => 'The automatic blocking of embedded content is off while a video service is active (%services%): its videos would load before the visitor consents.',
     'The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.' => 'The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.',
 ];

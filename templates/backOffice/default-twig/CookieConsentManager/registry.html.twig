@@ -8,7 +8,7 @@
     <div class="card mb-3" data-testid="ccm-registry-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h5 mb-0">{{ 'Consent entries'|trans }} <span class="badge text-bg-secondary" data-testid="ccm-registry-total">{{ total }}</span></h2>
-            <a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_export', query) }}" data-testid="ccm-registry-export"><i class="bi bi-download" aria-hidden="true"></i> {{ 'Export CSV'|trans }}</a>
+            {% if can.update %}<a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_export', query) }}" data-testid="ccm-registry-export"><i class="bi bi-download" aria-hidden="true"></i> {{ 'Export CSV'|trans }}</a>{% endif %}
         </div>
         <div class="card-body">
             <form method="get" class="row g-2 mb-3" data-testid="ccm-registry-filters">
@@ -37,7 +37,7 @@
                                 <td>{{ entry.locale }}</td>
                                 <td class="text-truncate" style="max-width:12rem">{{ entry.path }}</td>
                                 <td>{{ entry.browser }}</td>
-                                <td><a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_proof', {id: entry.id}) }}" data-testid="ccm-registry-proof-link">{{ 'Proof sheet'|trans }}</a></td>
+                                <td>{% if can.update %}<a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_proof', {id: entry.id}) }}" data-testid="ccm-registry-proof-link">{{ 'Proof sheet'|trans }}</a>{% endif %}</td>
                             </tr>
                         {% else %}
                             <tr><td colspan="11" class="text-secondary text-center" data-testid="ccm-registry-empty">{{ 'No entry matches.'|trans }}</td></tr>
