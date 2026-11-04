@@ -8,7 +8,7 @@ use Thelia\Model\ConfigQuery;
 
 class LastPurgeStore
 {
-    private const KEY = 'ccm_last_purge_at';
+    public const KEY = 'ccm_last_purge_at';
 
     public function read(): ?\DateTimeImmutable
     {

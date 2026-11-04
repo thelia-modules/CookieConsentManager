@@ -11,6 +11,7 @@ use CookieConsentManager\Draft\DraftRepository;
 use CookieConsentManager\Front\AssembledScriptHasher;
 use CookieConsentManager\Front\FooterLinkResolver;
 use CookieConsentManager\Front\ThemeOverriddenTemplates;
+use CookieConsentManager\Install\DataEraser;
 use CookieConsentManager\Install\SchemaInstaller;
 use CookieConsentManager\Proposed\ProposedServiceSynchronizer;
 use CookieConsentManager\Publication\OverriddenTemplatesProvider;
@@ -87,6 +88,13 @@ final class CookieConsentManager extends BaseModule
         $installer = SchemaInstaller::forModule(__DIR__);
         $installer->apply($con);
         $installer->applyUpdates((string) $currentVersion, $con);
+    }
+
+    public function destroy(?ConnectionInterface $con = null, $deleteModuleData = false): void
+    {
+        if ($deleteModuleData) {
+            (new DataEraser())->erase($con);
+        }
     }
 
     public function postActivation(?ConnectionInterface $con = null): void
