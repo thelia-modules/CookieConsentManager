@@ -80,15 +80,15 @@ Verified keys whose upstream \`kind\` differs from the derived one (engage in fa
 
 - Callbacks (\`typeof tarteaucitron.user.X === 'function'\`) are not exposed as parameters: ${Object.entries(notes.callbacks).map(([k, v]) => `${k}: ${v.join('/')}`).join('; ') || 'none'}
 - \`required\` for imported services is a heuristic (early \`return\` when undefined).
-- Cross-check against the section 3 snippets (${section3 ? 'loaded' : 'file absent, skipped'}): ${notes.section3Diff.length} service(s) differ (the code is authoritative).
+- Cross-check against the optional services listing (${section3 ? 'loaded' : 'not provided, skipped'}): ${notes.section3Diff.length} service(s) differ (the code is authoritative).
 ${notes.section3Diff.map((d) => `  - ${d}`).join('\n')}
-- Services absent from section 3 (needsMarkup derived from the code, markup empty): ${notes.noSection3.join(', ') || 'none'}
+- Services absent from the listing (needsMarkup derived from the code, markup empty): ${notes.noSection3.join(', ') || 'none'}
 
 ## Consistency
 
 - Fragment key differing from the assignment key: ${notes.keyMismatch.join('; ') || 'none'}
 - \`OTHER_PURPOSE\` entries no longer of type "other": ${notes.unmappedOtherStale.join(', ') || 'none'}
-- \`domains\` is filled for verified services only (hosts to confirm in e2e); imported services have \`[]\`.
+- \`domains\` is filled for verified services only (not yet checked in a browser); imported services have \`[]\`.
 - The verified table is declared in \`tools/catalogue/verified.json\`; \`${Object.keys(verified).length}\` entries.
 `;
 }

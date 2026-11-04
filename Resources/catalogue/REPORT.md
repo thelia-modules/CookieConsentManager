@@ -120,28 +120,28 @@ Verified keys whose upstream `kind` differs from the derived one (engage in fall
 
 - Callbacks (`typeof tarteaucitron.user.X === 'function'`) are not exposed as parameters: skaze: skazeMore; snapchat: snapchatMore; clicky: clickyMore; criteoonetag: criteoonetagMore; gajs: gajsMore; analytics: analyticsMore/analyticsPrepare; googleads: googleadsMore; gtag: gtagMore; xiti: xitiMore; atinternet: atMore; atinternethightrack: atMore; facebookpixel: facebookpixelMore; matomo: matomoMore; matomocloud: matomocloudMore; bingads: bingadsMore; tiktok: tiktokMore
 - `required` for imported services is a heuristic (early `return` when undefined).
-- Cross-check against the section 3 snippets (loaded): 16 service(s) differ (the code is authoritative).
-  - statable: section3=[statableSiteId] code=[statableHost,statableSiteId]
-  - pipedrive: section3=[pipedriveCompany] code=[pipedriveCompany,pipedrivePlaybook]
-  - plausible: section3=[plausibleDomain] code=[plausibleDomain,plausibleEndpoint]
-  - addtoanyfeed: section3=[addtoanyfeedUri] code=[addtoanyfeedSubscribeLink,addtoanyfeedUri]
-  - criteoonetag: section3=[criteoonetagAccount] code=[criteoonetagAccount,criteoonetagMore]
-  - gajs: section3=[gajsMore,gajsUa] code=[gajsAnonymizeIp,gajsMore,gajsPageView,gajsUa]
-  - analytics: section3=[analyticsAnonymizeIp,analyticsMore,analyticsPageView,analyticsUa,analyticsUaCreate] code=[analyticsAnonymizeIp,analyticsMore,analyticsPageView,analyticsPrepare,analyticsUa,analyticsUaCreate]
-  - googleads: section3=[googleadsCustomDomain,googleadsId] code=[googleadsCustomDomain,googleadsId,googleadsMore]
-  - gtag: section3=[gtagCustomDomain,gtagMore,gtagUa] code=[gtagCrossdomain,gtagCustomDomain,gtagMore,gtagUa]
-  - recaptcha: section3=[recaptchaapi] code=[recaptchaOnLoad,recaptcha_hl,recaptchaapi]
-  - microsoftcampaignanalytics: section3=[microsoftcampaignanalyticsUUID,microsoftcampaignanalyticsactionId,microsoftcampaignanalyticsdomaineId] code=[microsoftcampaignanalyticsUUID,microsoftcampaignanalyticsactionId,microsoftcampaignanalyticsdomainId]
-  - atinternet: section3=[atLibUrl,atMore,atNoFallback,atinternetSendData] code=[atLibUrl,atMore,atNoFallback,atinternetAlreadyLoaded,atinternetSendData]
-  - matomo: section3=[matomoHost,matomoId] code=[matomoHost,matomoId,matomoMore]
-  - matomocloud: section3=[matomoCustomJSPath,matomoDontTrackPageView,matomoFullTracking,matomoHost,matomoId] code=[matomoCustomJSPath,matomoDontTrackPageView,matomoFullTracking,matomoHost,matomoId,matomocloudMore]
-  - bingads: section3=[bingadsID] code=[bingadsID,bingadsMore,bingadsStoreCookies]
-  - getquanty: section3=[getguanty] code=[getguanty,getquantyAlreadyLoaded]
-- Services absent from section 3 (needsMarkup derived from the code, markup empty): iframe, leadforensicsold, googlemapsembed, rumbletalk, atinternethightrack, youtubeplaylist, xiti_smarttag, matomohightrack, matterport, emolytics
+- Cross-check against the optional services listing (loaded): 16 service(s) differ (the code is authoritative).
+  - statable: listing=[statableSiteId] code=[statableHost,statableSiteId]
+  - pipedrive: listing=[pipedriveCompany] code=[pipedriveCompany,pipedrivePlaybook]
+  - plausible: listing=[plausibleDomain] code=[plausibleDomain,plausibleEndpoint]
+  - addtoanyfeed: listing=[addtoanyfeedUri] code=[addtoanyfeedSubscribeLink,addtoanyfeedUri]
+  - criteoonetag: listing=[criteoonetagAccount] code=[criteoonetagAccount,criteoonetagMore]
+  - gajs: listing=[gajsMore,gajsUa] code=[gajsAnonymizeIp,gajsMore,gajsPageView,gajsUa]
+  - analytics: listing=[analyticsAnonymizeIp,analyticsMore,analyticsPageView,analyticsUa,analyticsUaCreate] code=[analyticsAnonymizeIp,analyticsMore,analyticsPageView,analyticsPrepare,analyticsUa,analyticsUaCreate]
+  - googleads: listing=[googleadsCustomDomain,googleadsId] code=[googleadsCustomDomain,googleadsId,googleadsMore]
+  - gtag: listing=[gtagCustomDomain,gtagMore,gtagUa] code=[gtagCrossdomain,gtagCustomDomain,gtagMore,gtagUa]
+  - recaptcha: listing=[recaptchaapi] code=[recaptchaOnLoad,recaptcha_hl,recaptchaapi]
+  - microsoftcampaignanalytics: listing=[microsoftcampaignanalyticsUUID,microsoftcampaignanalyticsactionId,microsoftcampaignanalyticsdomaineId] code=[microsoftcampaignanalyticsUUID,microsoftcampaignanalyticsactionId,microsoftcampaignanalyticsdomainId]
+  - atinternet: listing=[atLibUrl,atMore,atNoFallback,atinternetSendData] code=[atLibUrl,atMore,atNoFallback,atinternetAlreadyLoaded,atinternetSendData]
+  - matomo: listing=[matomoHost,matomoId] code=[matomoHost,matomoId,matomoMore]
+  - matomocloud: listing=[matomoCustomJSPath,matomoDontTrackPageView,matomoFullTracking,matomoHost,matomoId] code=[matomoCustomJSPath,matomoDontTrackPageView,matomoFullTracking,matomoHost,matomoId,matomocloudMore]
+  - bingads: listing=[bingadsID] code=[bingadsID,bingadsMore,bingadsStoreCookies]
+  - getquanty: listing=[getguanty] code=[getguanty,getquantyAlreadyLoaded]
+- Services absent from the listing (needsMarkup derived from the code, markup empty): iframe, leadforensicsold, googlemapsembed, rumbletalk, atinternethightrack, youtubeplaylist, xiti_smarttag, matomohightrack, matterport, emolytics
 
 ## Consistency
 
 - Fragment key differing from the assignment key: none
 - `OTHER_PURPOSE` entries no longer of type "other": none
-- `domains` is filled for verified services only (hosts to confirm in e2e); imported services have `[]`.
+- `domains` is filled for verified services only (not yet checked in a browser); imported services have `[]`.
 - The verified table is declared in `tools/catalogue/verified.json`; `23` entries.

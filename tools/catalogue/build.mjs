@@ -2,8 +2,10 @@
 // Maintainer tool (Node 18, no network): vendors the upstream tarteaucitron services file and
 // generates Resources/catalogue/{catalogue.json,fragments/*.js,REPORT.md}. Never runs at runtime.
 //
-//   node tools/catalogue/build.mjs [--source <file>] [--section3 <json>] [--version 1.37.0] [--expected 248]
-// Expected count: 249 root assignments in v1.37.0 (ADR-001 says 248: its lowercase-only grep misses `intercomChat`).
+//   node tools/catalogue/build.mjs --source <tarteaucitron.services.js> [--section3 <json>] [--version 1.37.0] [--expected 249]
+// Expected count: 249 root assignments in v1.37.0 (a lowercase-only grep finds 248 and misses `intercomChat`).
+// --section3 (default: tools/catalogue/tarteaucitron-section3-services.json) is a JSON listing of the services (key, user_params, needs_html_markup, snippet), used to
+// cross-check parameters and to fill the HTML markup of services that need it. See docs/maintaining-the-catalogue.md.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -14,18 +16,16 @@ import { GOOGLE_TAG_KEYS, OTHER_PURPOSE, TYPE_TO_PURPOSE } from './purposes.mjs'
 import { renderReport } from './report.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const SOURCES = join(ROOT, '.project-datas/01-etat-de-l-art/sources');
 
 function args() {
-  const out = { version: '1.37.0', expected: 249, source: null, section3: null };
+  const out = { version: '1.37.0', expected: 249, source: null, section3: join(ROOT, 'tools/catalogue/tarteaucitron-section3-services.json') };
   const argv = process.argv.slice(2);
   for (let i = 0; i < argv.length; i += 2) {
     const name = argv[i].replace(/^--/, '');
     if (!(name in out) || argv[i + 1] === undefined) throw new Error(`Unknown or incomplete option: ${argv[i]}`);
     out[name] = name === 'expected' ? Number(argv[i + 1]) : argv[i + 1];
   }
-  out.source ??= join(SOURCES, `tarteaucitron.services.v${out.version}.js`);
-  out.section3 ??= join(SOURCES, 'tarteaucitron-section3-services.json');
+  if (!out.source) fail('--source <path to the upstream tarteaucitron.services.js> is required.');
   return out;
 }
 
@@ -84,7 +84,7 @@ if (fragments.length !== opts.expected) {
     + 'Upstream changed: review the diff, then pass --expected <n>.');
 }
 
-const section3 = existsSync(opts.section3) ? new Map(JSON.parse(readFileSync(opts.section3, 'utf8')).map((s) => [s.key, s])) : null;
+const section3 = opts.section3 && existsSync(opts.section3) ? new Map(JSON.parse(readFileSync(opts.section3, 'utf8')).map((s) => [s.key, s])) : null;
 const verified = JSON.parse(readFileSync(join(ROOT, 'tools/catalogue/verified.json'), 'utf8'));
 
 const notes = { keyMismatch: [], needConsentFalse: [], otherMapped: [], dynamicCookies: [], iifeCookies: [], kindMismatch: [], callbacks: {}, section3Diff: [], noSection3: [], unmappedOtherStale: [] };
@@ -121,7 +121,7 @@ for (const fragment of fragments) {
     else {
       const upstream = [...(sec.user_params ?? [])].sort().join(',');
       const found = params.concat(callbacks).sort().join(',');
-      if (upstream !== found) notes.section3Diff.push(`${fragment.key}: section3=[${upstream}] code=[${found}]`);
+      if (upstream !== found) notes.section3Diff.push(`${fragment.key}: listing=[${upstream}] code=[${found}]`);
     }
   }
 
