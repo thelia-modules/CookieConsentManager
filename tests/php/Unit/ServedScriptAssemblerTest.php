@@ -37,7 +37,7 @@ final class ServedScriptAssemblerTest extends TestCase
         ]));
 
         $positions = array_map(static fn (string $needle): int|false => strpos($script, $needle), [
-            'window.CCMCompat = ', 'w.CookieConsentManager = ', 'CookieConsentManager.__boot();',
+            'window.CCMCompat=', '.CookieConsentManager={', 'CookieConsentManager.__boot();',
             'tarteaucitron.services.gtag = ', 'tarteaucitron.services.youtube = ', 'tarteaucitron.services["acme"] = ', 'CookieConsentManager.__start();',
         ]);
 
@@ -98,9 +98,9 @@ final class ServedScriptAssemblerTest extends TestCase
     public function testEveryRuleTargetsAServiceOfTheCatalogue(): void
     {
         $catalogue = json_decode((string) file_get_contents(\dirname(__DIR__, 3).'/Resources/catalogue/catalogue.json'), true, 512, \JSON_THROW_ON_ERROR);
-        $media = array_column(array_filter($catalogue, static fn (array $row): bool => 'media' === $row['kind'] && $row['verified']), 'key');
+        $media = array_column(array_filter($catalogue, static fn (array $row): bool => 'media' === $row['kind']), 'key');
 
-        foreach (array_keys(EmbedRules::RULES) as $key) {
+        foreach (array_keys(EmbedRules::rules()) as $key) {
             self::assertContains($key, $media, $key);
         }
     }

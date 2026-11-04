@@ -8,9 +8,9 @@ import { JSDOM } from 'jsdom';
 const root = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = (p) => readFileSync(join(root, p), 'utf8').trimEnd();
 
-export const servedScript = (keys, custom = {}) => [
-  read('assets/js/compat.js'),
-  read('assets/js/engine.js'),
+export const servedScript = (keys, custom = {}, minified = false) => [
+  read(minified ? 'assets/js/compat.min.js' : 'assets/js/compat.js'),
+  read(minified ? 'assets/js/engine.min.js' : 'assets/js/engine.js'),
   'CookieConsentManager.__boot();',
   ...keys.map((k) => read(`Resources/catalogue/fragments/${k}.js`).trimEnd()),
   ...Object.entries(custom).map(([k, code]) => `tarteaucitron.services[${JSON.stringify(k)}] = {key:${JSON.stringify(k)}, js:function(){\n${code}\n}, fallback:function(){}};`),
@@ -18,6 +18,7 @@ export const servedScript = (keys, custom = {}) => [
 ].join('\n') + '\n';
 
 export const HEAD = read('assets/js/head.js');
+export const HEAD_MIN = read('assets/js/head.min.js');
 
 export const config = () => ({
   format: 1, version: 3, hash: 'fa2b686f8fb6', substantialVersion: 0, locale: 'fr_FR', mode: 'live', endpoint: '/ccm/consent',
@@ -48,7 +49,7 @@ export const PAGE = `
   </div>
 </main>`;
 
-export const load = ({ keys = ['gtag', 'youtube'], page = PAGE, cookie } = {}) => {
+export const load = ({ keys = ['gtag', 'youtube'], page = PAGE, cookie, minified = false } = {}) => {
   const dom = new JSDOM(`<!doctype html><html><head><script type="application/json" id="ccm-config">${JSON.stringify(config())}</script></head><body>${page}</body></html>`, {
     url: 'https://shop.example.com/fr/produit.html', runScripts: 'dangerously', pretendToBeVisual: true,
   });
@@ -61,8 +62,8 @@ export const load = ({ keys = ['gtag', 'youtube'], page = PAGE, cookie } = {}) =
     return Promise.resolve({ ok: true, status: 200, json: async () => ({}) });
   };
   if (cookie) win.document.cookie = 'ccm_consent=' + Buffer.from(JSON.stringify(cookie)).toString('base64url') + '; Path=/';
-  win.eval(HEAD);
-  win.eval(servedScript(keys));
+  win.eval(minified ? HEAD_MIN : HEAD);
+  win.eval(servedScript(keys, {}, minified));
   const click = (sel) => win.document.querySelector(sel).dispatchEvent(new win.MouseEvent('click', { bubbles: true, cancelable: true }));
   return { win, doc: win.document, calls, click, settle: () => win.CookieConsentManager.__wait() };
 };

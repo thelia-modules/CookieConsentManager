@@ -101,7 +101,7 @@ final class FrontLanguageTest extends CcmTestCase
         $security->method('hasAdminUser')->willReturn(true);
         $configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
         $twig = new Environment(new FilesystemLoader([$module.'/templates/frontOffice/flexy']), ['strict_variables' => true]);
-        $hook = new ConsentThemeHook($stack, $configs, new TemplateContext($texts), $texts, new StyleSheet($module.'/assets/css/ccm.css'), $twig, $module.'/assets/js/head.js');
+        $hook = new ConsentThemeHook($stack, $configs, new TemplateContext($texts), $texts, new StyleSheet($module.'/assets/css/ccm.css'), $this->ccm->urls, $twig, $module.'/assets/js/head.min.js');
 
         $body = $hook->render('layout.body.top', []);
         self::assertSame(1, preg_match('~<script type="application/json" id="ccm-messages">(.*?)</script>~s', $body, $found));

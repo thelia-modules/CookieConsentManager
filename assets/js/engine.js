@@ -183,8 +183,9 @@
     const h = t ? t.innerHTML : '<span data-ccm-placeholder-box><span>' + text('blocked') + '</span> ' +
       '<button type="button" data-ccm-action="service_allow" data-ccm-service="{{key}}">' + text('allow') + '</button> ' +
       '<button type="button" data-ccm-action="open">' + text('prefs') + '</button></span>';
+    // The purpose labels travel with the metadata (the panel that carries them is not in the page until it is opened).
     const lab = $('[data-ccm-purpose="' + (s.purpose || '') + '"][data-ccm-purpose-label]');
-    const label = (lab && lab.getAttribute('data-ccm-purpose-label')) || s.purpose || '';
+    const label = metaOf('@purposes')[s.purpose] || (lab && lab.getAttribute('data-ccm-purpose-label')) || s.purpose || '';
     const policy = /^(https?:\/\/|\/(?!\/))/i.test(m.policy_url || '') ? m.policy_url : '';
     const name = s.name || key;
     const out = h.replace(/\{\{\s*(key|name|purposeLabel|purpose|controller|policyUrl)\s*\}\}/g, (x, k) => esc(
@@ -356,9 +357,40 @@
     syncPlaceholders(root);
     syncScripts(root);
   };
+  // The second level is not in the page: it is fetched from its published address the first time the visitor opens it, then it stays in the page.
+  // The draft preview and the audit carry it inline.
+  let panelLoad = null;
+  const loadPanel = () => {
+    if ($('[data-ccm-panel]')) return Promise.resolve(true);
+    if (panelLoad) return panelLoad;
+    if (!cfg.panel || typeof w.fetch !== 'function') return Promise.resolve(false);
+    panelLoad = w.fetch(cfg.panel, { credentials: 'omit' })
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error('status ' + r.status))))
+      .then((html) => {
+        const box = d.createElement('div');
+        box.innerHTML = html;
+        Array.from(box.childNodes).forEach((n) => d.body.appendChild(n));
+        return !!$('[data-ccm-panel]');
+      })
+      .catch((e) => { log('panel: ' + e.message); return false; })
+      .then((ok) => { panelLoad = null; return ok; });
+    return panelLoad;
+  };
+  // Without the panel (network, blocked request) the page of the preferences is the way out: it lists the services and holds the same button.
+  const panelUnavailable = () => {
+    const url = cfg.preferencesUrl;
+    if (!url || mode !== 'live') return;
+    try {
+      if (new URL(url, w.location.href).pathname !== w.location.pathname) w.location.assign(url);
+    } catch (e) { /* noop */ }
+  };
   const openPanel = (from) => {
     const p = $('[data-ccm-panel]');
-    if (!p) return;
+    if (!p) {
+      const asker = from || d.activeElement;
+      loadPanel().then((ok) => (ok ? openPanel(asker) : panelUnavailable()));
+      return;
+    }
     opener = from || d.activeElement;
     panelOpen = true;
     if (from && from.hasAttribute && from.hasAttribute('data-ccm-open-exempt')) $$('[data-ccm-exempt-group]').forEach((g) => { g.open = true; });

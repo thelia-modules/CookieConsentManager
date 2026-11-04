@@ -39,7 +39,7 @@ Four steps, in order, for a first setup:
 
 - A service belongs to a purpose: audience measurement, advertising, social networks, embedded content (videos, maps), support, personalization. A purpose without an active service is not shown to visitors. "Essential" (needed by the site) is implicit and does not ask for consent.
 - Catalogue: "verified" services are tested and documented. "Imported" services are experimental and hidden while "Experimental services" is off on the dashboard. Filter by level, category or search.
-- For a video, the service sheet gives the HTML to paste into the page (Copy button). YouTube, Vimeo and Dailymotion videos and Google maps already in your pages are replaced by an "Allow" box while the service is active and published.
+- For a video, the service sheet gives the HTML to paste into the page (Copy button). The embedded iframes of YouTube, Vimeo, Dailymotion, Google maps and most other media services already in your pages are replaced by an "Allow" box while the service is active and published (the list of services that are not is in the integrator guide).
 - Services proposed by other modules: a module (payment, for example) can declare its own cookies. They stay inactive until you enable them and publish. A "strictly necessary" service stays flagged with its justification.
 - Custom services: a service that is not in the catalogue, with a script address, your own code (UPDATE right required, kept in the version) or a plain declaration (a service loaded by Google Tag Manager).
 - Purpose of a catalogue service: read-only. Only a custom service chooses its own.

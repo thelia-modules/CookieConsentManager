@@ -13,7 +13,7 @@ First public release.
 - Draft and immutable published versions, with a readable diff between versions, restore as draft, a "substantial change" option that shows the banner again to everyone, and a served hash that proves the rendering a visitor received.
 - Google Consent Mode v2 in basic or advanced mode, `gtag` and Google Tag Manager support, and the `ccm_consent_ready` and `ccm_consent_update` dataLayer events.
 - Service catalogue derived from tarteaucitron.js v1.37.0: 23 verified services and 213 experimental ones, custom services (script address, own code, or declaration only), and services declared by other modules with the `ccm.service` tag.
-- Blocking of hard-coded scripts (`type="text/plain" data-ccm-service` or `data-ccm-purpose`) and automatic replacement of YouTube, Vimeo, Dailymotion and Google Maps iframes by a placeholder.
+- Blocking of hard-coded scripts (`type="text/plain" data-ccm-service` or `data-ccm-purpose`) and automatic replacement by a placeholder of the iframes of 41 media services (YouTube, Vimeo, Dailymotion, Google Maps, Spotify, Google Docs and more), in pages and in LiveComponent answers.
 - Per-service responsible entity (prefilled for 18 of the 23 verified services), cookie durations (catalogue values from official documentation, administrator entry for the others), joint responsibility for services where the publisher and the site are joint controllers.
 - Five languages for the banner, the panel, the engine messages and the back-office: French, English, German, Dutch and Spanish.
 - Presets screen and a France (CNIL) preset: import per language, before and after preview, attachment of a language to a preset, alerts when a setting is less protective than the preset.

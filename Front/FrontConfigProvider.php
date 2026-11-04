@@ -82,6 +82,14 @@ final class FrontConfigProvider implements ResetInterface
         return null === $published ? null : $this->withUrls($published, null);
     }
 
+    /** The published configuration of one version for a language, as the page that embedded it saw it. */
+    public function forVersion(int $number, string $locale): ?FrontConfig
+    {
+        $published = $this->published($number, $locale);
+
+        return null === $published ? null : $this->withUrls($published, null);
+    }
+
     // The cached configuration holds root paths; the ones of this request come from the router, so a shop in a sub-directory gets its base path.
     private function withUrls(FrontConfig $front, ?string $preview): FrontConfig
     {
@@ -89,10 +97,13 @@ final class FrontConfigProvider implements ResetInterface
             ? $this->urls->previewScript($preview)
             : $this->urls->script($front->config['version'], $front->config['hash']);
 
-        return new FrontConfig(
-            array_replace($front->config, ['endpoint' => $this->urls->endpoint(), 'script' => $script, 'preferencesUrl' => $this->urls->preferences()]),
-            $front->snapshot,
-        );
+        $urls = ['endpoint' => $this->urls->endpoint(), 'script' => $script, 'preferencesUrl' => $this->urls->preferences()];
+        // The preferences panel is fetched when the visitor opens it. The draft preview inlines its own: the panel of the published version would not show it.
+        if ('preview' !== $front->mode()) {
+            $urls['panel'] = $this->urls->panel($front->config['version'], $front->config['hash'], $front->config['locale']);
+        }
+
+        return new FrontConfig(array_replace($front->config, $urls), $front->snapshot);
     }
 
     private function resolve(string $locale, ?string $preview, ?string $audit): ?FrontConfig

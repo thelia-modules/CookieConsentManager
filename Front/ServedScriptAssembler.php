@@ -7,7 +7,7 @@ namespace CookieConsentManager\Front;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Concatenates the served script in the order docs/runtime-contracts.md ("Served script") sets: compatibility layer,
+ * Concatenates the served script (the minified files `assets/js/*.min.js`, built by `npm run build`) in the order docs/runtime-contracts.md ("Served script") sets: compatibility layer,
  * engine, boot, fragments of the active services (verbatim) and code of the custom ones, start.
  */
 final readonly class ServedScriptAssembler
@@ -22,8 +22,8 @@ final readonly class ServedScriptAssembler
     public function assemble(array $snapshot): string
     {
         $parts = [
-            $this->read('assets/js/compat.js'),
-            $this->read('assets/js/engine.js'),
+            $this->read('assets/js/compat.min.js'),
+            $this->read('assets/js/engine.min.js'),
             'CookieConsentManager.__boot();',
         ];
 

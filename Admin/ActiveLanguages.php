@@ -25,4 +25,15 @@ class ActiveLanguages
 
         return $codes;
     }
+
+    /** @return list<string> locales of the languages active on the shop (fr_FR) */
+    public function locales(): array
+    {
+        $locales = [];
+        foreach (LangQuery::create()->filterByActive(true)->find() as $lang) {
+            $locales[] = $lang->getLocale();
+        }
+
+        return $locales;
+    }
 }

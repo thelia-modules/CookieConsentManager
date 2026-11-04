@@ -67,13 +67,14 @@ final class FrontBaseUrlTest extends CcmTestCase
         self::assertSame('/shop/ccm/consent', $shop['endpoint']);
         self::assertSame(\sprintf('/shop/ccm/%d-%s.js', $number, $shop['hash']), $shop['script']);
         self::assertSame('/shop/ccm/preferences', $shop['preferencesUrl']);
+        self::assertSame(\sprintf('/shop/ccm/panel/%d-%s-en_US.html', $number, $shop['hash']), $shop['panel']);
 
         // Same application cache, other request context: nothing host-specific was stored.
         $root = $this->provider('')->forRequest(Request::create('/'))->config;
         self::assertSame('/ccm/consent', $root['endpoint']);
         self::assertSame(\sprintf('/ccm/%d-%s.js', $number, $root['hash']), $root['script']);
         self::assertSame($shop['hash'], $root['hash'], 'the served hash is the same for every base path');
-        self::assertEquals(array_diff_key($shop, ['endpoint' => 1, 'script' => 1, 'preferencesUrl' => 1]), array_diff_key($root, ['endpoint' => 1, 'script' => 1, 'preferencesUrl' => 1]));
+        self::assertEquals(array_diff_key($shop, ['endpoint' => 1, 'script' => 1, 'preferencesUrl' => 1, 'panel' => 1]), array_diff_key($root, ['endpoint' => 1, 'script' => 1, 'preferencesUrl' => 1, 'panel' => 1]));
     }
 
     public function testThePreviewScriptCarriesTheBasePath(): void
@@ -96,11 +97,13 @@ final class FrontBaseUrlTest extends CcmTestCase
         $stack->push($request);
         $texts = new FrontTexts(new CatalogueTranslator());
         $twig = new Environment(new FilesystemLoader([$this->module.'/templates/frontOffice/flexy']), ['strict_variables' => true]);
-        $hook = new ConsentThemeHook($stack, $configs, new TemplateContext($texts), $texts, new StyleSheet($this->module.'/assets/css/ccm.css'), $twig, $this->module.'/assets/js/head.js');
+        $hook = new ConsentThemeHook($stack, $configs, new TemplateContext($texts), $texts, new StyleSheet($this->module.'/assets/css/ccm.css'), ModuleRoutes::urls('/shop'), $twig, $this->module.'/assets/js/head.min.js');
 
         $head = $hook->render('layout.head.top', []);
         self::assertStringContainsString('"endpoint":"/shop/ccm/consent"', $head);
         self::assertMatchesRegularExpression(\sprintf('~<script defer src="/shop/ccm/%d-[0-9a-f]{12}\.js"></script>~', $number), $head);
+        self::assertMatchesRegularExpression('~<link rel="stylesheet" id="ccm-style" href="/shop/ccm/[0-9a-f]{12}\.css">~', $head);
+        self::assertMatchesRegularExpression(\sprintf('~"panel":"/shop/ccm/panel/%d-[0-9a-f]{12}-[a-z]{2}_[A-Z]{2}\.html"~', $number), $head, 'the panel address carries the base path');
 
         $variables = (new TemplateContext($texts))->build($configs->forRequest($request));
         self::assertStringContainsString('href="/shop/ccm/preferences"', $twig->render('CookieConsentManager/open-link.html.twig', $variables + ['label' => 'x']));

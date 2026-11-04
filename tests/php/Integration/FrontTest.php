@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Tests\Integration;
 
+use CookieConsentManager\Admin\ActiveLanguages;
+use CookieConsentManager\Controller\PanelController;
 use CookieConsentManager\Controller\PreferencesPageController;
 use CookieConsentManager\Controller\ServedScriptController;
+use CookieConsentManager\Controller\StyleSheetController;
 use CookieConsentManager\Front\AssembledScriptHasher;
 use CookieConsentManager\Front\ConsentThemeHook;
 use CookieConsentManager\Front\ConsentTwigExtension;
@@ -308,7 +311,7 @@ final class FrontTest extends CcmTestCase
 
         $run = function (Request $request, Response $response): string {
             $context = new TemplateContext(new FrontTexts(new CatalogueTranslator()));
-            $listener = new IframeRewriteListener($this->configs, new IframeRewriter(), new PlaceholderRenderer($context, $this->twig('flexy')));
+            $listener = new IframeRewriteListener($this->configs, new IframeRewriter(), new PlaceholderRenderer($context, $this->twig('flexy')), $this->noThemeActivator());
             $listener->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
             return (string) $response->getContent();
@@ -324,6 +327,159 @@ final class FrontTest extends CcmTestCase
         $this->publisher->publish('alice');
         $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
         self::assertSame($page, $run(Request::create('/produit'), new Response($page)));
+    }
+
+    private function hook(Request $request): ConsentThemeHook
+    {
+        $stack = new RequestStack();
+        $stack->push($request);
+        $texts = new FrontTexts(new CatalogueTranslator());
+
+        return new ConsentThemeHook($stack, $this->configs, new TemplateContext($texts), $texts, new StyleSheet($this->module.'/assets/css/ccm.css'), $this->ccm->urls, $this->twig('flexy'), $this->module.'/assets/js/head.min.js');
+    }
+
+    public function testThePageCarriesNeitherThePanelNorTheStyleSheetNorMetadataOfServicesWithoutPlaceholder(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $this->publisher->publish('alice');
+        $hook = $this->hook(Request::create('/'));
+
+        $head = $hook->render('layout.head.top', []);
+        $body = $hook->render('layout.body.top', []);
+
+        self::assertStringNotContainsString('<style', $head, 'the CSS is a file');
+        self::assertMatchesRegularExpression('~<link rel="stylesheet" id="ccm-style" href="/ccm/[0-9a-f]{12}\.css">~', $head);
+        self::assertStringContainsString('data-ccm-banner', $body, 'the first level is part of the first paint');
+        self::assertStringNotContainsString('data-ccm-panel', $body);
+        self::assertStringNotContainsString('ccm-panel-title', $body);
+        self::assertMatchesRegularExpression('~"panel":"/ccm/panel/\d+-[0-9a-f]{12}-[a-z]{2}_[A-Z]{2}\.html"~', $head);
+
+        preg_match('~<script type="application/json" id="ccm-services-meta">(.*?)</script>~s', $body, $meta);
+        $decoded = json_decode($meta[1], true, 512, \JSON_THROW_ON_ERROR);
+        self::assertSame(['youtube', '@purposes'], array_keys($decoded), 'only the media services have a placeholder');
+        self::assertSame(['media'], array_keys($decoded['@purposes']));
+    }
+
+    public function testTheDraftPreviewAndTheAuditCarryThePanelInline(): void
+    {
+        $draft = $this->publishableDraft();
+        $this->ccm->drafts->replace($draft, 'alice');
+        $this->publisher->publish('alice');
+        $token = $this->tokens->forDraft($this->ccm->drafts->load());
+
+        $preview = $this->hook(Request::create('/', 'GET', [PreviewToken::QUERY => $token]));
+        self::assertStringContainsString('data-ccm-panel', $preview->render('layout.body.top', []));
+        self::assertStringNotContainsString('"panel":', $preview->render('layout.head.top', []));
+
+        $audit = $this->hook(Request::create('/', 'GET', [FrontConfigProvider::AUDIT_QUERY => $token]));
+        self::assertStringContainsString('data-ccm-panel', $audit->render('layout.body.top', []));
+    }
+
+    private function panelController(): PanelController
+    {
+        return new PanelController(
+            $this->configs,
+            new TemplateContext(new FrontTexts(new CatalogueTranslator())),
+            $this->noThemeActivator(),
+            $this->twig('flexy'),
+            $this->ccm->urls,
+            new class extends ActiveLanguages {
+                public function locales(): array
+                {
+                    return ['en_US', 'fr_FR'];
+                }
+            },
+        );
+    }
+
+    public function testThePanelIsServedImmutableUnderTheHashOfItsVersion(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $version = $this->publisher->publish('alice');
+        $config = $this->configs->forRequest(Request::create('/'))->config;
+        $controller = $this->panelController();
+
+        $response = $controller($version->getVersion(), $config['hash'], 'en_US');
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('immutable', (string) $response->headers->get('Cache-Control'));
+        self::assertStringContainsString('text/html', (string) $response->headers->get('Content-Type'));
+        self::assertStringContainsString('data-ccm-panel', (string) $response->getContent());
+        self::assertStringContainsString('data-ccm-service="youtube"', (string) $response->getContent());
+        self::assertSame(\sprintf('/ccm/panel/%d-%s-en_US.html', $version->getVersion(), $config['hash']), $config['panel']);
+
+        $stale = $controller($version->getVersion(), str_repeat('0', 12), 'en_US');
+        self::assertSame(302, $stale->getStatusCode(), 'a cached page that points to an older hash gets the current panel');
+        self::assertSame($config['panel'], $stale->headers->get('Location'));
+
+        foreach ([[$version->getVersion() + 1, 'en_US'], [$version->getVersion(), 'de_DE']] as [$number, $locale]) {
+            try {
+                $controller($number, $config['hash'], $locale);
+                self::fail('404 expected for '.$number.' '.$locale);
+            } catch (NotFoundHttpException) {
+                self::addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testTheStyleSheetIsServedUnderItsOwnHash(): void
+    {
+        $style = new StyleSheet($this->module.'/assets/css/ccm.css');
+        $controller = new StyleSheetController($style, $this->ccm->urls);
+
+        $response = $controller($style->hash());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('immutable', (string) $response->headers->get('Cache-Control'));
+        self::assertStringContainsString('text/css', (string) $response->headers->get('Content-Type'));
+        self::assertSame($style->minified(), $response->getContent());
+        self::assertStringContainsString('.ccm-banner', (string) $response->getContent());
+
+        $stale = $controller(str_repeat('0', 12));
+        self::assertSame(302, $stale->getStatusCode());
+        self::assertSame('/ccm/'.$style->hash().'.css', $stale->headers->get('Location'));
+    }
+
+    private function noThemeActivator(): FrontThemeActivator
+    {
+        return new class extends FrontThemeActivator {
+            public function __construct()
+            {
+            }
+
+            public function activate(): void
+            {
+            }
+        };
+    }
+
+    public function testTheListenerRewritesTheAnswersOfALiveComponentAndNoOtherAjaxResponse(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $this->publisher->publish('alice');
+        $fragment = '<div data-live-name-value="Video"><iframe src="https://www.youtube.com/embed/abc" title="v"></iframe></div>';
+
+        $run = function (Request $request, Response $response): string {
+            $context = new TemplateContext(new FrontTexts(new CatalogueTranslator()));
+            $listener = new IframeRewriteListener($this->configs, new IframeRewriter(), new PlaceholderRenderer($context, $this->twig('flexy')), $this->noThemeActivator());
+            $listener->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
+
+            return (string) $response->getContent();
+        };
+        $live = static function (): Request {
+            $request = Request::create('/_components/Video', 'POST');
+            $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+            $request->attributes->set('_live_component', 'Video');
+
+            return $request;
+        };
+
+        $rewritten = $run($live(), new Response($fragment, 200, ['Content-Type' => 'application/vnd.live-component+html']));
+        self::assertStringContainsString('data-ccm-placeholder="youtube"', $rewritten);
+        self::assertStringNotContainsString('<iframe src="https://www.youtube.com/embed/abc"', $rewritten);
+
+        $ajax = Request::create('/produit', 'GET');
+        $ajax->headers->set('X-Requested-With', 'XMLHttpRequest');
+        self::assertSame($fragment, $run($ajax, new Response($fragment, 200, ['Content-Type' => 'text/html'])), 'any other AJAX answer is left alone');
+        self::assertSame($fragment, $run($live(), new Response($fragment, 200, ['Content-Type' => 'application/json'])), 'a Live request answered with something else than HTML');
     }
 
     /** The attributes the engine reads, in both bundled themes. */
@@ -398,17 +554,9 @@ final class FrontTest extends CcmTestCase
         $make = fn (): PreferencesPageController => new PreferencesPageController(
             $this->configs,
             new TemplateContext(new FrontTexts(new CatalogueTranslator())),
-            new ConsentThemeHook($stack, $this->configs, new TemplateContext(new FrontTexts(new CatalogueTranslator())), new FrontTexts(new CatalogueTranslator()), new StyleSheet($this->module.'/assets/css/ccm.css'), $twig, $this->module.'/assets/js/head.js'),
+            new ConsentThemeHook($stack, $this->configs, new TemplateContext(new FrontTexts(new CatalogueTranslator())), new FrontTexts(new CatalogueTranslator()), new StyleSheet($this->module.'/assets/css/ccm.css'), $this->ccm->urls, $twig, $this->module.'/assets/js/head.min.js'),
             $twig,
-            new class extends FrontThemeActivator {
-                public function __construct()
-                {
-                }
-
-                public function activate(): void
-                {
-                }
-            },
+            $this->noThemeActivator(),
         );
 
         try {

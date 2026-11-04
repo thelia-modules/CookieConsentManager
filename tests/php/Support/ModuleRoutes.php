@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace CookieConsentManager\Tests\Support;
 
 use CookieConsentManager\Controller\ConsentController;
+use CookieConsentManager\Controller\PanelController;
 use CookieConsentManager\Controller\PreferencesPageController;
 use CookieConsentManager\Controller\ServedScriptController;
+use CookieConsentManager\Controller\StyleSheetController;
 use CookieConsentManager\Front\FrontUrls;
 use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
 use Symfony\Component\Routing\Generator\UrlGenerator;
@@ -20,7 +22,7 @@ final class ModuleRoutes
     public static function urls(string $baseUrl = ''): FrontUrls
     {
         $routes = new RouteCollection();
-        foreach ([ConsentController::class, PreferencesPageController::class, ServedScriptController::class] as $controller) {
+        foreach ([ConsentController::class, PanelController::class, PreferencesPageController::class, ServedScriptController::class, StyleSheetController::class] as $controller) {
             foreach ((new \ReflectionClass($controller))->getMethods() as $method) {
                 foreach ($method->getAttributes(RouteAttribute::class) as $attribute) {
                     $route = $attribute->newInstance();

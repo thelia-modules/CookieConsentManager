@@ -109,7 +109,7 @@ Rendered by the `layout.head.top` hook in `<script type="application/json" id="c
 ```
 
 - `mode` is `live`, `preview` (the draft, `no-store`, nothing written to the registry) or `audit` (the choice cookie is not read, nothing is written).
-- `endpoint`, `script` and `preferencesUrl` are root paths in the stored configuration. At render time the front replaces them with the URLs the router generates for the current request, so a shop installed in a sub-directory works.
+- `endpoint`, `script` and `preferencesUrl` are root paths in the stored configuration. At render time the front replaces them with the URLs the router generates for the current request, so a shop installed in a sub-directory works. It adds `panel`, the address of the preferences panel (`/ccm/panel/<version>-<hash>-<locale>.html`), absent in preview mode.
 - `gcm.defaults`: in basic mode one entry without region; regions only in advanced mode; the last entry is the fallback with an empty region list.
 - `services[].kind`: `script` (upstream fragment or URL), `media` (placeholder and `engage`), `custom` (administrator code), `declarative` (no script, the state is pushed to the `dataLayer`).
 - `services[].cookies` hold names or `*` patterns, purged on withdrawal on the host and on each parent domain. `services[].storage` lists the `localStorage` and `sessionStorage` keys purged on withdrawal.
@@ -123,12 +123,18 @@ Rendered by the `layout.head.top` hook in `<script type="application/json" id="c
 | `ccm_consent_ready` | every page load, after the `update` of the remembered choice (or without a choice) | `{event, ccm: {purposes, services, version}}` |
 | `ccm_consent_update` | every action of the visitor | same |
 
+## Preferences panel and stylesheet
+
+The pages carry the banner, not the preferences panel. `GET /ccm/panel/<version>-<hash>-<locale>.html` (stateless, `Cache-Control: public, max-age=31536000, immutable`) returns the markup of `preferences-panel.html.twig` for one published version and one active language of the shop; the engine fetches it (`credentials: 'omit'`) the first time the visitor opens the panel and appends it to `<body>`. A stale hash answers a 302 to the current address, an unknown version or language a 404. If the request fails, the engine sends the visitor to `preferencesUrl`. The draft preview (no `panel` key) and the audit mode carry the panel inline, and the engine uses a panel already in the page without a request.
+
+`GET /ccm/<hash>.css` (same cache headers) is the stylesheet, named after the hash of its own content; a stale hash answers a 302 to the current name. The page links it from `<head>` (`<link rel="stylesheet" id="ccm-style">`), which blocks the first paint like inline CSS did.
+
 ## Served script
 
 `GET /ccm/<version>-<hash>.js` (immutable cache). `ServedScriptAssembler` concatenates, in this order and without a bundler:
 
-1. `assets/js/compat.js`: defines `window.CCMCompat.create(engineAdapter)`, which returns the `tarteaucitron` object that the vendored fragments are written against.
-2. `assets/js/engine.js`: defines `window.CookieConsentManager`, the public API.
+1. `assets/js/compat.min.js` (minified from `compat.js` by `npm run build`; same for `engine.min.js` and `head.min.js`, and a test fails when a committed file is stale): defines `window.CCMCompat.create(engineAdapter)`, which returns the `tarteaucitron` object that the vendored fragments are written against.
+2. `assets/js/engine.min.js`: defines `window.CookieConsentManager`, the public API.
 3. `CookieConsentManager.__boot();`: reads `#ccm-config`, sets `window.tarteaucitron`, `window.timeExpire` and `tarteaucitron.user` (the merged `user` values of the services).
 4. The fragments of the active `script` and `media` services, verbatim from `Resources/catalogue/fragments/<key>.js`, then the administrator code of `custom` services wrapped in `tarteaucitron.services["<key>"] = {key, js: function () {...}, fallback: function () {}}`.
 5. `CookieConsentManager.__start();`: runs `js()` of the granted services and `fallback()` of the refused `media` services, then drains `window.ccmQueue`.

@@ -6,8 +6,8 @@ Pour le développeur qui branche CookieConsentManager sur un thème Thelia 3. In
 
 | Hook Flexy | Contenu |
 |------------|---------|
-| `layout.head.top` | config publiée (`<script type="application/json" id="ccm-config">`), script inline (Consent Mode `default` puis `update`, file `ccmQueue`, événement `ccm_consent_ready`), `<style id="ccm-style">`, `<script defer src="/ccm/<version>-<condensat>.js">` |
-| `layout.body.top` | bannière (`hidden`), panneau de préférences, modèle d'espace réservé, `<script type="application/json" id="ccm-services-meta">` (responsable et adresse de politique de chaque service, lus par le moteur pour l'espace réservé), `<script type="application/json" id="ccm-messages">` (messages du moteur dans la langue du visiteur), bouton flottant (option) |
+| `layout.head.top` | config publiée (`<script type="application/json" id="ccm-config">`), script inline (Consent Mode `default` puis `update`, file `ccmQueue`, événement `ccm_consent_ready`), `<link rel="stylesheet" id="ccm-style" href="/ccm/<condensat>.css">` (la feuille de style du module, un fichier nommé d'après son propre condensat), `<script defer src="/ccm/<version>-<condensat>.js">` |
+| `layout.body.top` | bannière (`hidden`), modèle d'espace réservé, `<script type="application/json" id="ccm-services-meta">` (responsable et adresse de politique des services média, et libellés des finalités sous `@purposes`, lus par le moteur pour l'espace réservé), `<script type="application/json" id="ccm-messages">` (messages du moteur dans la langue du visiteur), bouton flottant (option) |
 | `layout.footer.top` (3.0, 3.1) ou slot `footer_links` (3.2+) | lien « Gérer mes cookies » |
 
 - Rien n'est injecté tant qu'aucune version n'est publiée (hors aperçu).
@@ -74,6 +74,14 @@ Points d'attention :
 - GTM codé en dur dans le thème : procédure dans `docs/integrator-guide.md` (« Moving a hard-coded GTM »).
 - **Garde Twig** si un gabarit du thème appelle `ccm_*` : voir `docs/integrator-guide.md` (sonde `include ... ignore missing`). Module désactivé sans garde : erreur 500 sur tout le site.
 
+## Iframes remplacées par un encart
+
+- Les iframes des services média sont remplacées automatiquement par un encart « Autoriser » (option « Bloquer automatiquement les iframes intégrées », activée par défaut), seulement quand le service est actif et publié. Cela couvre 41 des 94 services média du catalogue : ceux dont l'intégration est une iframe d'hôte identifiable. Les hôtes et chemins viennent des fragments (`Resources/catalogue/embed-rules.json`, régénéré par `node tools/catalogue/embed-rules.mjs`), plus les hôtes d'intégration de YouTube, Vimeo, Dailymotion et Google Maps. Un hôte seul ne suffit jamais sur un domaine partagé (`www.google.com` sert aussi reCAPTCHA) : chaque règle porte des préfixes de chemin, le plus long l'emporte.
+- Les réponses d'un LiveComponent sont réécrites comme une page (le navigateur les fusionne dans la page : une iframe intacte contournerait le consentement). Les autres réponses AJAX ne sont pas touchées.
+- Non réécrits côté serveur, avec la raison :
+  - le service n'a pas d'iframe, il charge un script ou un widget (l'encart de son fragment s'applique une fois la page exécutée) : `addthis`, `addtoanyshare`, `adsense`, `adsensesearch`, `adsensesearchresult`, `aduptech_ads`, `calendly`, `clicmanager`, `criteo`, `datingaffiliationpopup`, `disqus`, `facebook`, `facebookcomment`, `facebookcustomerchat`, `facebooklikebox`, `fillout`, `googlemaps`, `googlepartners`, `gplus`, `gplusbadge`, `hcaptcha`, `intercomChat`, `kwanko`, `linkedin`, `m6meteo`, `pinterest`, `pipedrive`, `prelinker`, `pubdirecte`, `recaptcha`, `rumbletalk`, `seamlessaccess`, `shareaholic`, `shareasale`, `sharethis`, `statcounter`, `tidycal`, `tiktokvideo`, `trustpilot`, `twitter`, `twitterembed`, `twittertimeline`, `twitterwidgetsapi`, `vshop`, `xandrconversion`, `xandrsegment` ;
+  - l'adresse de l'iframe est saisie par l'éditeur, aucun hôte n'est connu d'avance : `gallica`, `geoportail`, `googlemapsembed`, `helloasso`, `iframe`, `openstreetmap`, `podcloud`. Pour ceux-là, envelopper l'iframe avec `ccm_placeholder('<clé>', {src: ..., title: ...})` dans le gabarit, ou étiqueter l'iframe à la main.
+
 ## 5. Module tiers
 
 Déclarer un service par tag `ccm.service` dans `configureServices` : exemple complet dans `docs/integrator-guide.md` (section « Declaring a service from another module »). À retenir pour 3.0 à 3.2 : le module tiers doit fournir un `Config/config.xml` (même vide).
@@ -85,7 +93,7 @@ Pour tester : `php Thelia module:refresh` puis, au back-office, « Finalités et
 ## 6. Politique de sécurité de contenu (CSP)
 
 Ce que le module émet, à autoriser :
-- script inline en tête de page et `<style>` inline (pas de nonce en v1) : `script-src 'unsafe-inline'` et `style-src 'unsafe-inline'`, ou bien une empreinte (hash) du script inline, **qui change à chaque version du module** ;
+- script inline en tête de page (pas de nonce en v1) : `script-src 'unsafe-inline'`, ou bien une empreinte (hash) du script inline, **qui change à chaque version du module** ;
 - script du moteur : même origine (`script-src 'self'`) ;
 - enregistrement des choix : `POST /ccm/consent` en même origine (`connect-src 'self'`) ;
 - le moteur n'emploie ni `eval` ni `unsafe-eval` ;
@@ -99,7 +107,7 @@ Le module est testé dans un site Thelia 3 de recette (il a besoin du cœur et d
 
 | Quoi | Commande |
 |------|----------|
-| JavaScript (moteur, couche de compatibilité, script servi) | `npm install` puis `npm run test:js` à la racine du module (`node --test tests/js/`) |
+| JavaScript (moteur, couche de compatibilité, script servi) | `npm install` puis `npm run test:js` à la racine du module (`node --test tests/js/`). Le serveur sert `assets/js/*.min.js` : après toute modification de `compat.js`, `engine.js` ou `head.js`, lancer `npm run build` et committer les fichiers minifiés (un test échoue s'ils sont périmés). Après une modification des fragments du catalogue, `node tools/catalogue/embed-rules.mjs` régénère les règles d'iframes |
 | PHP (unitaires et intégration) | dans le conteneur DDEV d'un site, base de test : `ddev exec 'cd /var/www/html && DATABASE_NAME=test <chemin>/vendor/bin/phpunit -c <chemin du module>/phpunit.xml.dist'` ; l'amorçage refuse toute base dont le nom ne contient pas `test` |
 | PHPStan (niveau 6) | `CCM_SITE_ROOT=$PWD vendor/bin/phpstan analyse -c local/modules/CookieConsentManager/phpstan.neon.dist --memory-limit=1G` depuis la racine du site (commande d'en-tête de `phpstan.neon.dist`) ; style : `php-cs-fixer check --config=.php-cs-fixer.dist.php` |
 | Régénérer le catalogue (mainteneur) | `npm run catalogue:build`, voir `docs/maintaining-the-catalogue.md` (en anglais) |

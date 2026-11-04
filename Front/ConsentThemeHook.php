@@ -29,8 +29,9 @@ final readonly class ConsentThemeHook implements ThemeHookInterface
         private TemplateContext $context,
         private FrontTexts $texts,
         private StyleSheet $style,
+        private FrontUrls $urls,
         private Environment $twig,
-        #[Autowire(value: __DIR__.'/../assets/js/head.js')]
+        #[Autowire(value: __DIR__.'/../assets/js/head.min.js')]
         private string $headScript,
     ) {
     }
@@ -69,10 +70,10 @@ final readonly class ConsentThemeHook implements ThemeHookInterface
         $json = json_encode($front->config, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG | \JSON_HEX_AMP);
 
         return \sprintf(
-            '<script type="application/json" id="ccm-config">%s</script>'."\n".'<script>%s</script>'."\n".'<style id="ccm-style">%s</style>'."\n".'<script defer src="%s"></script>'."\n",
+            '<script type="application/json" id="ccm-config">%s</script>'."\n".'<script>%s</script>'."\n".'<link rel="stylesheet" id="ccm-style" href="%s">'."\n".'<script defer src="%s"></script>'."\n",
             $json,
             file_get_contents($this->headScript),
-            $this->style->minified(),
+            htmlspecialchars($this->urls->style($this->style->hash()), \ENT_QUOTES),
             htmlspecialchars($front->config['script'], \ENT_QUOTES),
         );
     }
@@ -80,12 +81,14 @@ final readonly class ConsentThemeHook implements ThemeHookInterface
     private function body(FrontConfig $front): string
     {
         $variables = $this->context->build($front);
+        // The panel is fetched when the visitor opens it (PanelController). The draft preview and the audit carry it: the first shows what
+        // is not published yet, the second counts what a page loads without any script interaction.
         $html = $this->twig->render('CookieConsentManager/banner.html.twig', $variables)
-            .$this->twig->render('CookieConsentManager/preferences-panel.html.twig', $variables)
+            .(isset($front->config['panel']) && $front->isLive() ? '' : $this->twig->render('CookieConsentManager/preferences-panel.html.twig', $variables))
             .'<template data-ccm-placeholder-template>'
             .$this->twig->render('CookieConsentManager/placeholder.html.twig', $variables + ['template_mode' => true, 'service' => ['key' => '{{key}}', 'name' => '{{name}}', 'purpose_label' => '', 'controller' => '{{controller}}', 'policy_url' => '{{policyUrl}}'], 'attributes' => []])
             .'</template>'
-            .'<script type="application/json" id="ccm-services-meta">'.$this->servicesMeta($variables).'</script>'
+            .'<script type="application/json" id="ccm-services-meta">'.$this->servicesMeta($front, $variables).'</script>'
             .'<script type="application/json" id="ccm-messages">'.$this->encode($this->texts->messages($variables['language'])).'</script>';
 
         if ($variables['floating_button']) {
@@ -95,14 +98,33 @@ final readonly class ConsentThemeHook implements ThemeHookInterface
         return $html;
     }
 
-    /** @param array<string, mixed> $variables */
-    private function servicesMeta(array $variables): string
+    /**
+     * What a placeholder needs, and nothing else: the controller and the policy of the media services (only those have placeholders),
+     * under their key, and the label of the purposes under "@purposes" (not a possible service key).
+     *
+     * @param array<string, mixed> $variables
+     */
+    private function servicesMeta(FrontConfig $front, array $variables): string
     {
+        $media = [];
+        foreach ($front->config['services'] as $service) {
+            if ('media' === $service['kind']) {
+                $media[$service['key']] = true;
+            }
+        }
+
         $meta = [];
+        $labels = [];
         foreach ($variables['purposes'] as $purpose) {
             foreach ($purpose['services'] as $service) {
-                $meta[$service['key']] = ['controller' => $service['controller'], 'policy_url' => $service['policy_url']];
+                if (isset($media[$service['key']])) {
+                    $meta[$service['key']] = ['controller' => $service['controller'], 'policy_url' => $service['policy_url']];
+                    $labels[$purpose['code']] = $purpose['label'];
+                }
             }
+        }
+        if ([] !== $labels) {
+            $meta['@purposes'] = $labels;
         }
 
         return $this->encode((object) $meta);

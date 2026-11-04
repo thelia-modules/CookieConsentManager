@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace CookieConsentManager\Front;
 
 use CookieConsentManager\Controller\ConsentController;
+use CookieConsentManager\Controller\PanelController;
 use CookieConsentManager\Controller\PreferencesPageController;
 use CookieConsentManager\Controller\ServedScriptController;
+use CookieConsentManager\Controller\StyleSheetController;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -27,6 +29,16 @@ final readonly class FrontUrls
     public function script(int|string $version, string $hash): string
     {
         return $this->router->generate(ServedScriptController::ROUTE_SCRIPT, ['version' => $version, 'hash' => $hash]);
+    }
+
+    public function style(string $hash): string
+    {
+        return $this->router->generate(StyleSheetController::ROUTE, ['hash' => $hash]);
+    }
+
+    public function panel(int $version, string $hash, string $locale): string
+    {
+        return $this->router->generate(PanelController::ROUTE, ['version' => $version, 'hash' => $hash, 'locale' => $locale]);
     }
 
     public function previewScript(string $token): string
