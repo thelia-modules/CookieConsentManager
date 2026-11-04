@@ -1,0 +1,11 @@
+{# Entry of the consent manager in the top menu (main.in-top-menu-items) #}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% set is_active = app.request.pathInfo starts with '/admin/module/CookieConsentManager' %}
+{% if ccm_can('VIEW') %}
+<li class="nav-item">
+    <a class="nav-link {{ is_active ? 'active' : '' }}" title="{{ 'Cookie consent'|trans }}" href="{{ path('ccm_admin_dashboard') }}" data-testid="ccm-menu-item">
+        <i class="bi bi-shield-check me-2" aria-hidden="true"></i>
+        <span class="item-text">{{ 'Cookie consent'|trans }}</span>
+    </a>
+</li>
+{% endif %}

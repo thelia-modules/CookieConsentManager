@@ -1,0 +1,54 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% block ccm_crumb %}
+    <li class="breadcrumb-item"><a href="{{ path('ccm_admin_registry') }}">{{ 'Registry'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Proof sheet'|trans }}</li>
+{% endblock %}
+
+{% block ccm_content %}
+    {% set entry = proof.entry %}
+    <div class="d-flex justify-content-end mb-2 ccm-no-print"><button class="btn btn-primary" type="button" onclick="window.print()" data-testid="ccm-proof-print"><i class="bi bi-printer" aria-hidden="true"></i> {{ 'Print'|trans }}</button></div>
+    <article class="card" data-testid="ccm-proof">
+        <div class="card-header"><h2 class="h4 mb-0">{{ 'Consent proof sheet'|trans }}</h2><div class="small text-secondary">{{ 'Generated on %date%'|trans({'%date%': generated_at.utc ~ ' (' ~ generated_at.local ~ ' ' ~ generated_at.zone ~ ')'}) }}</div></div>
+        <div class="card-body">
+            <h3 class="h6">{{ 'Entry'|trans }}</h3>
+            <dl class="row small">
+                <dt class="col-sm-3">{{ 'Identifier'|trans }}</dt><dd class="col-sm-9"><code>{{ entry.consent_id }}</code></dd>
+                <dt class="col-sm-3">{{ 'Recorded'|trans }}</dt><dd class="col-sm-9" data-testid="ccm-proof-recorded">{{ entry.recorded_at.utc }} ({{ entry.recorded_at.local }} {{ entry.recorded_at.zone }})</dd>
+                <dt class="col-sm-3">{{ 'Action'|trans }} / {{ 'Source'|trans }}</dt><dd class="col-sm-9">{{ entry.action|ccm_code('action') }} / {{ entry.source|ccm_code('source') }}</dd>
+                <dt class="col-sm-3">{{ 'Language'|trans }}</dt><dd class="col-sm-9">{{ entry.locale }}</dd>
+                <dt class="col-sm-3">{{ 'Page'|trans }}</dt><dd class="col-sm-9">{{ entry.path }}</dd>
+                <dt class="col-sm-3">{{ 'Browser'|trans }}</dt><dd class="col-sm-9">{{ entry.browser }}</dd>
+                {% if entry.ip_truncated %}<dt class="col-sm-3">{{ 'Truncated IP'|trans }}</dt><dd class="col-sm-9">{{ entry.ip_truncated }}</dd>{% endif %}
+                {% if entry.customer_id %}<dt class="col-sm-3">{{ 'Customer'|trans }}</dt><dd class="col-sm-9">{{ entry.customer_id }}</dd>{% endif %}
+            </dl>
+            <h3 class="h6">{{ 'Choices recorded'|trans }}</h3>
+            <div class="row small mb-3">
+                <div class="col-md-6"><strong>{{ 'Purposes'|trans }}</strong>
+                    <ul>{% for code, state in entry.purposes %}<li>{{ proof.purposes_labels[code]|default(ccm_purpose(code)) }}: {{ state == 1 ? 'granted'|trans : (state == 2 ? 'partial'|trans : 'refused'|trans) }}</li>{% endfor %}</ul></div>
+                <div class="col-md-6"><strong>{{ 'Services'|trans }}</strong>
+                    <ul>{% for key, state in entry.services %}<li>{{ proof.service_names[key]|default(key) }}: {{ state == 1 ? 'granted'|trans : 'refused'|trans }}</li>{% endfor %}</ul></div>
+            </div>
+            <h3 class="h6">{{ 'Version seen by the visitor'|trans }}</h3>
+            {% if proof.version %}
+                <dl class="row small">
+                    <dt class="col-sm-3">{{ 'Version'|trans }}</dt><dd class="col-sm-9">{{ proof.version.number }} - {{ proof.version.created_at.utc }} ({{ proof.version.created_at.local }} {{ proof.version.created_at.zone }}) - {{ proof.version.author|default('-') }}{{ proof.version.substantial ? ' - ' ~ 'substantial change'|trans : '' }}</dd>
+                    <dt class="col-sm-3">{{ 'Served hash recorded'|trans }}</dt><dd class="col-sm-9"><code>{{ proof.version.served_hash }}</code> {% if proof.hash_matches %}<span class="badge text-bg-success">{{ 'matches the entry'|trans }}</span>{% else %}<span class="badge text-bg-warning">{{ 'differs from the entry (rendering changed after publication)'|trans }}</span>{% endif %}</dd>
+                    <dt class="col-sm-3">{{ 'Configuration hash'|trans }}</dt><dd class="col-sm-9"><code class="text-break">{{ proof.version.config_hash }}</code></dd>
+                    <dt class="col-sm-3">{{ 'Script hash'|trans }}</dt><dd class="col-sm-9"><code class="text-break">{{ proof.version.js_hash }}</code></dd>
+                    <dt class="col-sm-3">{{ 'Module version'|trans }}</dt><dd class="col-sm-9">{{ proof.version.module_version }}</dd>
+                </dl>
+                <h3 class="h6">{{ 'Banner text shown (language of the entry)'|trans }}</h3>
+                <dl class="row small">
+                    {% for field, text in proof.texts %}{% if text %}<dt class="col-sm-3">{{ ccm_field('texts.' ~ entry.locale|slice(0, 2) ~ '.' ~ field)|split('›')|last|trim }}</dt><dd class="col-sm-9">{{ text }}</dd>{% endif %}{% endfor %}
+                </dl>
+                <p class="small"><strong>{{ 'Cookie policy URL'|trans }}</strong> : {{ proof.policy_url|default('-') }}<br><strong>{{ 'Layout'|trans }}</strong> : {{ proof.layout|default('-') }}</p>
+                <h3 class="h6">{{ 'Services in force'|trans }}</h3>
+                <ul class="small">{% for service in proof.services_resolved %}<li>{{ service.name }}{% if service.controller and service.controller != service.name %} ({{ service.controller }}){% endif %}, {{ ccm_purpose(service.purpose) }}{% if service.cookies|length %}, {{ 'Cookies'|trans }} : {{ service.cookies|join(', ') }}{% endif %}</li>{% endfor %}</ul>
+            {% else %}
+                <p class="text-danger">{{ 'The version of this entry no longer exists.'|trans }}</p>
+            {% endif %}
+        </div>
+    </article>
+{% endblock %}

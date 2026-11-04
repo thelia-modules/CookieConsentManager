@@ -1,0 +1,14 @@
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% if ccm_can('VIEW') %}
+<div class="card mb-3" data-testid="ccm-module-configuration">
+    <div class="card-header">
+        <h2 class="card-title h5 mb-0">{{ 'Cookie consent'|trans }}</h2>
+    </div>
+    <div class="card-body">
+        <p>{{ 'Banner, consent registry and Google Consent Mode v2 for your shop.'|trans }}</p>
+        <a class="btn btn-primary" href="{{ path('ccm_admin_dashboard') }}">
+            <i class="bi bi-shield-check" aria-hidden="true"></i> {{ 'Open the consent manager'|trans }}
+        </a>
+    </div>
+</div>
+{% endif %}

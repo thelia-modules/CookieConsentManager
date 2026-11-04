@@ -1,0 +1,211 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Appearance and texts'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    <form method="post" action="{{ path('ccm_admin_appearance_save') }}" data-testid="ccm-appearance-form">
+    {{ ccm.csrf() }}
+    <p class="text-secondary" data-testid="ccm-appearance-one-save">{{ 'Layout, colors and texts are saved together by the single button at the bottom of the page.'|trans }}</p>
+    {% if refused %}
+        <div class="alert alert-danger" role="alert" data-testid="ccm-appearance-refused">
+            <strong>{{ 'Nothing was saved.'|trans }}</strong>
+            {% if refused_for_contrast %}{{ 'The colors you entered do not make the banner readable enough (WCAG 2.2 accessibility rules). Fix them below, then save again.'|trans }}{% endif %}
+            {% if refused_for_fields %}{{ 'Some texts you entered are refused (see the list above). Fix them below, then save again.'|trans }}{% endif %}
+        </div>
+    {% endif %}
+    <div class="card mb-3" data-testid="ccm-appearance-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Layout and colors'|trans }}</h2></div>
+        <div class="card-body">
+            <div>
+                <div class="mb-3">
+                    <span class="form-label d-block">{{ 'Layout'|trans }}</span>
+                    {% for code, label in {bar: 'Bar at the bottom of the page', modal: 'Modal dialog'} %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="layout" id="layout_{{ code }}" value="{{ code }}" {{ draft.general.layout == code ? 'checked' : '' }}>
+                            <label class="form-check-label" for="layout_{{ code }}">{{ label|trans }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="row g-3 mb-3">
+                    {% for name, label in {primary: 'Buttons (Accept and Reject)', surface: 'Banner background', text: 'Text'} %}
+                        <div class="col-md-4">
+                            <label class="form-label" for="color_{{ name }}">{{ label|trans }}</label>
+                            <div class="input-group">
+                                <input class="form-control form-control-color ccm-swatch" type="color" id="color_{{ name }}_picker" value="{{ draft.appearance.colors[name] }}" data-ccm-sync="color_{{ name }}" aria-label="{{ label|trans }}">
+                                <input class="form-control font-monospace" type="text" id="color_{{ name }}" name="colors[{{ name }}]" value="{{ draft.appearance.colors[name] }}" pattern="#[0-9a-fA-F]{6}" data-testid="ccm-color-{{ name }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div id="ccm-live-contrast" class="mb-3" aria-live="polite" data-testid="ccm-live-contrast"></div>
+                <h3 class="h6">{{ 'Contrast check'|trans }} {{ ccm.hint('Blocking: text on background 4.5:1, buttons on background 3:1, white label on button 4.5:1 (WCAG 2.2). Accept and Reject share one color on purpose.'|trans) }}</h3>
+                <div class="table-responsive"><table class="table table-sm align-middle w-100" data-testid="ccm-contrast">
+                    <thead><tr><th>{{ 'Pair'|trans }}</th><th>{{ 'Ratio'|trans }}</th><th>{{ 'Required'|trans }}</th><th></th></tr></thead>
+                    <tbody>
+                        {% for finding in contrast %}
+                            <tr data-testid="ccm-contrast-{{ finding.id }}" class="{{ finding.passes ? '' : 'table-danger' }}">
+                                <td>
+                                    {% if finding.id == 'text_on_surface' %}{{ 'Text on background'|trans }}
+                                    {% elseif finding.id == 'button_on_surface' %}{{ 'Button on background'|trans }}
+                                    {% else %}{{ 'Button text (white) on the button color'|trans }}{% endif %}
+                                    <span class="d-inline-block border align-middle" style="width:1rem;height:1rem;background:{{ finding.foreground }}"></span>
+                                    <span class="d-inline-block border align-middle" style="width:1rem;height:1rem;background:{{ finding.background }}"></span>
+                                </td>
+                                <td data-testid="ccm-ratio-{{ finding.id }}">{{ finding.ratio|ccm_number(2) }}:1</td>
+                                <td>{{ finding.minimum|ccm_number(1) }}:1</td>
+                                <td>
+                                    {% if finding.passes %}
+                                        <span class="badge text-bg-success">{{ 'OK'|trans }}</span>
+                                    {% else %}
+                                        <span class="badge text-bg-danger">{{ 'Too low'|trans }}</span>
+                                        <span class="small d-block text-danger" data-testid="ccm-contrast-why-{{ finding.id }}">{{ 'Contrast %ratio%:1, at least %minimum%:1 is required.'|trans({'%ratio%': finding.ratio|ccm_number(2), '%minimum%': finding.minimum|ccm_number(1)}) }}</span>
+                                        {% if finding.suggestion %}
+                                            <div class="d-flex flex-wrap align-items-center gap-2 small">
+                                            <span>{{ 'Closest compliant color (same hue, lightness adjusted)'|trans }}:</span>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" data-ccm-use="color_{{ finding.field }}" data-value="{{ finding.suggestion }}" data-testid="ccm-suggest-{{ finding.field }}">
+                                                <span class="d-inline-block border align-middle" style="width:.8rem;height:.8rem;background:{{ finding.suggestion }}"></span> {{ finding.suggestion }}
+                                            </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3" data-testid="ccm-texts-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Texts by language'|trans }}</h2></div>
+        <div class="card-body">
+            <p class="text-secondary">{{ 'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch and Spanish are provided, any other language shows English.'|trans }}</p>
+            <div data-testid="ccm-texts-form">
+                {% set fields = {title: 'Title', body: 'Message', accept: 'Accept button', reject: 'Reject button', customize: 'Customize button', close: 'Close link', allow: 'Placeholder "Allow" button', preferences: 'Open preferences link', free_text: 'Free text (optional)'} %}
+                {% for locale in locales %}
+                    {% set row = draft.texts[locale]|default({}) %}
+                                        <fieldset class="border rounded p-3 mb-3" data-testid="ccm-texts-{{ locale }}">
+                        <legend class="h6 float-none w-auto px-2 mb-0">
+                            {{ locale|upper }}
+                            {% if locale not in active_locales %}<span class="badge text-bg-secondary">{{ 'language not active'|trans }}</span>{% endif %}
+                            {% if draft.texts[locale] is not defined %}<span class="badge text-bg-warning">{{ (locale in default_languages ? 'no text yet (default text shown)' : 'no text yet (English shown)')|trans }}</span>{% endif %}
+                        </legend>
+                        {% for warning in text_warnings[locale]|default([]) %}
+                            <div class="alert alert-warning py-2" data-testid="ccm-text-warning">{{ warning }}</div>
+                        {% endfor %}
+                        <div class="row g-2">
+                            {% for field, label in fields %}
+                                <div class="{{ field in ['body', 'free_text'] ? 'col-12' : 'col-md-6' }}">
+                                    <label class="form-label" for="text_{{ locale }}_{{ field }}">{{ label|trans }}</label>
+                                    {% if field in ['body', 'free_text'] %}
+                                        <textarea class="form-control" rows="2" id="text_{{ locale }}_{{ field }}" name="texts[{{ locale }}][{{ field }}]" maxlength="{{ text_limits[field]|default(200) }}" placeholder="{{ defaults[locale][field] }}">{{ row[field]|default('') }}</textarea>
+                                    {% else %}
+                                        <input class="form-control" type="text" id="text_{{ locale }}_{{ field }}" name="texts[{{ locale }}][{{ field }}]" maxlength="{{ text_limits[field]|default(200) }}" value="{{ row[field]|default('') }}" placeholder="{{ defaults[locale][field] }}">
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if can.update %}
+                            <button type="submit" name="reset" value="{{ locale }}" class="btn btn-sm btn-outline-secondary mt-2" formnovalidate data-testid="ccm-texts-reset-{{ locale }}"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ 'Restore default texts'|trans }}</button>
+                        {% endif %}
+                    </fieldset>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% if can.update %}<button type="submit" class="btn btn-primary mb-3" data-testid="ccm-appearance-save">{{ 'Save in the draft'|trans }}</button>{% endif %}
+    </form>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script>
+        document.querySelectorAll('[data-ccm-sync]').forEach(function (picker) {
+            var text = document.getElementById(picker.dataset.ccmSync);
+            picker.addEventListener('input', function () { text.value = picker.value; });
+            text.addEventListener('input', function () { if (/^#[0-9a-fA-F]{6}$/.test(text.value)) { picker.value = text.value; } });
+        });
+        (function () {
+            var cfg = {{ {
+                text: 'Text on background'|trans, button: 'Button on background'|trans, label: 'Button text (white) on the button color'|trans,
+                ok: 'OK: %ratio%:1 (at least %min%:1)'|trans, ko: 'Too low: %ratio%:1, at least %min%:1 is required'|trans,
+                use: 'Use %color%'|trans, none: 'No compliant color keeps this hue'|trans
+            }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }};
+            var comma = {{ (app.request.locale|slice(0, 2) == 'fr') ? 'true' : 'false' }};
+            function decimal(text) { return comma ? text.replace('.', ',') : text; }
+            var live = document.getElementById('ccm-live-contrast');
+            var inputs = {primary: document.getElementById('color_primary'), surface: document.getElementById('color_surface'), text: document.getElementById('color_text')};
+            function rgb(hex) { return [1, 3, 5].map(function (i) { return parseInt(hex.substr(i, 2), 16); }); }
+            function lum(hex) { var c = rgb(hex).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+            function ratio(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+            function toHsl(hex) {
+                var c = rgb(hex).map(function (v) { return v / 255; }), max = Math.max.apply(null, c), min = Math.min.apply(null, c), l = (max + min) / 2, d = max - min, h = 0, s = 0;
+                if (d !== 0) {
+                    s = d / (1 - Math.abs(2 * l - 1));
+                    h = max === c[0] ? 60 * (((c[1] - c[2]) / d) % 6) : (max === c[1] ? 60 * ((c[2] - c[0]) / d + 2) : 60 * ((c[0] - c[1]) / d + 4));
+                    if (h < 0) { h += 360; }
+                }
+                return [h, s, l];
+            }
+            function fromHsl(h, s, l) {
+                var ch = (1 - Math.abs(2 * l - 1)) * s, x = ch * (1 - Math.abs((h / 60) % 2 - 1)), m = l - ch / 2, v;
+                if (h < 60) { v = [ch, x, 0]; } else if (h < 120) { v = [x, ch, 0]; } else if (h < 180) { v = [0, ch, x]; } else if (h < 240) { v = [0, x, ch]; } else if (h < 300) { v = [x, 0, ch]; } else { v = [ch, 0, x]; }
+                return '#' + v.map(function (n) { return ('0' + Math.round((n + m) * 255).toString(16)).slice(-2); }).join('');
+            }
+            function suggest(hex, accepts) {
+                if (accepts(hex)) { return null; }
+                var hsl = toHsl(hex);
+                for (var step = 1; step <= 200; step++) {
+                    var dirs = [-1, 1];
+                    for (var i = 0; i < 2; i++) {
+                        var l = hsl[2] + dirs[i] * step * 0.005;
+                        if (l < 0 || l > 1) { continue; }
+                        var candidate = fromHsl(hsl[0], hsl[1], l);
+                        if (accepts(candidate)) { return candidate; }
+                    }
+                }
+                return undefined;
+            }
+            function line(label, value, min, suggestion, target) {
+                var row = document.createElement('div');
+                var good = value >= min;
+                row.className = 'small ' + (good ? 'text-success' : 'text-danger');
+                var text = label + ' - ' + (good ? cfg.ok : cfg.ko).replace('%ratio%', decimal(value.toFixed(2))).replace('%min%', decimal(min.toFixed(1)));
+                row.appendChild(document.createTextNode(text + ' '));
+                if (!good) {
+                    if (suggestion) {
+                        var button = document.createElement('button');
+                        button.type = 'button'; button.className = 'btn btn-sm btn-outline-secondary font-monospace';
+                        button.textContent = cfg.use.replace('%color%', suggestion);
+                        button.addEventListener('click', function () { target.value = suggestion; target.dispatchEvent(new Event('input')); });
+                        row.appendChild(button);
+                    } else { row.appendChild(document.createTextNode('(' + cfg.none + ')')); }
+                }
+                live.appendChild(row);
+            }
+            function refresh() {
+                var v = {}; var valid = true;
+                Object.keys(inputs).forEach(function (k) { v[k] = inputs[k].value.trim().toLowerCase(); if (!/^#[0-9a-f]{6}$/.test(v[k])) { valid = false; } });
+                live.textContent = '';
+                if (!valid) { return; }
+                var textOk = function (c) { return ratio(c, v.surface) >= 4.5; };
+                var buttonOk = function (c) { return ratio(c, v.surface) >= 3 && ratio('#ffffff', c) >= 4.5; };
+                line(cfg.text, ratio(v.text, v.surface), 4.5, suggest(v.text, textOk), inputs.text);
+                line(cfg.button, ratio(v.primary, v.surface), 3, suggest(v.primary, buttonOk), inputs.primary);
+                line(cfg.label, ratio('#ffffff', v.primary), 4.5, suggest(v.primary, buttonOk), inputs.primary);
+            }
+            Object.keys(inputs).forEach(function (k) { inputs[k].addEventListener('input', refresh); });
+            refresh();
+        })();
+        document.querySelectorAll('[data-ccm-use]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var text = document.getElementById(button.dataset.ccmUse);
+                text.value = button.dataset.value;
+                text.dispatchEvent(new Event('input'));
+            });
+        });
+    </script>
+{% endblock %}

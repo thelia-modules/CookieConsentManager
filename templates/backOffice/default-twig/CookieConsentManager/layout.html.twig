@@ -1,0 +1,83 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block title %}{{ 'Cookie consent'|trans }}{% endblock %}
+{% block body_testid %}ccm-{{ tab }}-page{% endblock %}
+
+{% block head_extra %}
+    <style>
+        .ccm-swatch { width: 3rem; height: 2.4rem; padding: 0.15rem; }
+        .ccm-pre { max-height: 22rem; overflow: auto; }
+        @media print {
+            .bo-side-nav, .bo-top-nav, .ccm-tabs, .ccm-no-print, footer, .breadcrumb, .alert-dismissible { display: none !important; }
+            .bo-layout { display: block !important; }
+            body { background: #fff !important; }
+        }
+    </style>
+{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-3 ccm-no-print">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('ccm_admin_dashboard') }}">{{ 'Cookie consent'|trans }}</a></li>
+            {% block ccm_crumb %}{% endblock %}
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {% set tabs = {
+        dashboard: ['ccm_admin_dashboard', 'Dashboard', 'bi-speedometer2'],
+        appearance: ['ccm_admin_appearance', 'Appearance and texts', 'bi-palette'],
+        services: ['ccm_admin_services', 'Purposes and services', 'bi-puzzle'],
+        consent_mode: ['ccm_admin_consent_mode', 'Consent Mode', 'bi-google'],
+        presets: ['ccm_admin_presets', 'Presets', 'bi-globe2'],
+        registry: ['ccm_admin_registry', 'Registry', 'bi-journal-check'],
+        versions: ['ccm_admin_versions', 'Versions and verification', 'bi-clock-history'],
+    } %}
+    <div class="container-fluid" data-testid="ccm-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h1 class="h3 mb-0">{{ 'Cookie consent'|trans }}</h1>
+            <div class="d-flex flex-wrap align-items-center gap-2" data-testid="ccm-status">
+                {% if published %}
+                    <span class="badge text-bg-success" data-testid="ccm-status-published">{{ 'Published: version %version%'|trans({'%version%': published.version}) }}</span>
+                {% else %}
+                    <span class="badge text-bg-secondary" data-testid="ccm-status-published">{{ 'Nothing published yet'|trans }}</span>
+                {% endif %}
+                {% if unpublished_changes is null or unpublished_changes > 0 %}
+                    <span class="badge text-bg-warning" data-testid="ccm-status-draft">{{ 'Draft ahead of the published version'|trans }}</span>
+                {% else %}
+                    <span class="badge text-bg-light border" data-testid="ccm-status-draft">{{ 'Draft equals the published version'|trans }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-3 ccm-tabs" data-testid="ccm-tabs">
+            {% for code, tabInfo in tabs %}
+                <li class="nav-item">
+                    <a class="nav-link {{ tab == code ? 'active' : '' }}" {{ tab == code ? 'aria-current="page"' : '' }} href="{{ path(tabInfo[0]) }}" data-testid="ccm-tab-{{ code }}">
+                        <i class="bi {{ tabInfo[2] }} me-1" aria-hidden="true"></i>{{ tabInfo[1]|trans }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if not can.update %}
+            <div class="alert alert-secondary" role="status" data-testid="ccm-readonly-banner"><i class="bi bi-lock me-1" aria-hidden="true"></i>{{ 'Read-only access: you can consult every screen, but not change anything. Modifying needs the UPDATE right, publishing the CREATE right, purging the DELETE right.'|trans }}</div>
+        {% endif %}
+
+        {% if issues is defined %}{{ ccm.issues(issues, '') }}{% endif %}
+
+        {% block ccm_content %}{% endblock %}
+    </div>
+    {% if not can.update %}
+        <script>
+            document.querySelectorAll('.container-fluid form[method="post"]:not([data-ccm-read])').forEach(function (form) {
+                form.querySelectorAll('input:not([type="hidden"]), select, textarea, button').forEach(function (field) { field.disabled = true; });
+                form.querySelectorAll('button[type="submit"]').forEach(function (button) { button.hidden = true; });
+            });
+        </script>
+    {% endif %}
+{% endblock %}

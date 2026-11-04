@@ -1,0 +1,108 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Registry'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    <div class="card mb-3" data-testid="ccm-registry-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">{{ 'Consent entries'|trans }} <span class="badge text-bg-secondary" data-testid="ccm-registry-total">{{ total }}</span></h2>
+            <a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_export', query) }}" data-testid="ccm-registry-export"><i class="bi bi-download" aria-hidden="true"></i> {{ 'Export CSV'|trans }}</a>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-2 mb-3" data-testid="ccm-registry-filters">
+                <div class="col-md-3"><label class="form-label" for="r_q">{{ 'Consent identifier (start)'|trans }}</label><input class="form-control" id="r_q" name="q" value="{{ filters.search }}" placeholder="4f1c2b9e" data-testid="ccm-registry-search"></div>
+                <div class="col-md-2"><label class="form-label" for="r_action">{{ 'Action'|trans }}</label><select class="form-select" id="r_action" name="action"><option value="">{{ 'All'|trans }}</option>{% for a in actions %}<option value="{{ a }}" {{ filters.action == a ? 'selected' : '' }}>{{ a|ccm_code('action') }}</option>{% endfor %}</select></div>
+                <div class="col-md-2"><label class="form-label" for="r_source">{{ 'Source'|trans }}</label><select class="form-select" id="r_source" name="source"><option value="">{{ 'All'|trans }}</option>{% for a in sources %}<option value="{{ a }}" {{ filters.source == a ? 'selected' : '' }}>{{ a|ccm_code('source') }}</option>{% endfor %}</select></div>
+                <div class="col-md-1"><label class="form-label" for="r_version">{{ 'Version'|trans }}</label><select class="form-select" id="r_version" name="version"><option value="">-</option>{% for v in published_versions %}<option value="{{ v }}" {{ filters.version == v ? 'selected' : '' }}>{{ v }}</option>{% endfor %}</select></div>
+                <div class="col-md-2"><label class="form-label" for="r_from">{{ 'From'|trans }}</label><input class="form-control" type="date" id="r_from" name="from" value="{{ filters.from ? filters.from|date('Y-m-d') : '' }}"></div>
+                <div class="col-md-2"><label class="form-label" for="r_to">{{ 'To'|trans }}</label><input class="form-control" type="date" id="r_to" name="to" value="{{ filters.to ? filters.to|date('Y-m-d') : '' }}"></div>
+                <div class="col-12"><button class="btn btn-outline-primary" type="submit">{{ 'Filter'|trans }}</button> <a class="btn btn-link" href="{{ path('ccm_admin_registry') }}">{{ 'Reset'|trans }}</a></div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle" data-testid="ccm-registry-table">
+                    <thead><tr><th>#</th><th>{{ 'Recorded (UTC)'|trans }}</th><th>{{ 'Identifier'|trans }}</th><th>{{ 'Action'|trans }}</th><th>{{ 'Source'|trans }}</th><th>{{ 'Version'|trans }}</th><th>{{ 'Hash'|trans }}</th><th>{{ 'Language'|trans }}</th><th>{{ 'Page'|trans }}</th><th>{{ 'Browser'|trans }}</th><th></th></tr></thead>
+                    <tbody>
+                        {% for entry in rows %}
+                            <tr data-testid="ccm-registry-row">
+                                <td>{{ entry.id }}</td>
+                                <td>{{ entry.recordedAt|date('Y-m-d H:i:s') }}</td>
+                                <td><a href="{{ path('ccm_admin_registry_consent', {consentId: entry.consentId}) }}"><code>{{ entry.consentId|slice(0, 8) }}</code></a></td>
+                                <td title="{{ entry.action }}">{{ entry.action|ccm_code('action') }}</td>
+                                <td title="{{ entry.source }}">{{ entry.source|ccm_code('source') }}</td>
+                                <td>{{ entry.version }}</td>
+                                <td><code>{{ entry.versionHash }}</code></td>
+                                <td>{{ entry.locale }}</td>
+                                <td class="text-truncate" style="max-width:12rem">{{ entry.path }}</td>
+                                <td>{{ entry.browser }}</td>
+                                <td><a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_proof', {id: entry.id}) }}" data-testid="ccm-registry-proof-link">{{ 'Proof sheet'|trans }}</a></td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="11" class="text-secondary text-center" data-testid="ccm-registry-empty">{{ 'No entry matches.'|trans }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pages > 1 %}
+                <nav aria-label="{{ 'Pagination'|trans }}"><ul class="pagination pagination-sm mb-0">
+                    {% for number in 1..pages %}
+                        <li class="page-item {{ number == page ? 'active' : '' }}"><a class="page-link" href="{{ path('ccm_admin_registry', query|merge({page: number})) }}">{{ number }}</a></li>
+                    {% endfor %}
+                </ul></nav>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-3" data-testid="ccm-stats-card">{% include 'CookieConsentManager/include/stats.html.twig' %}</div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100" data-testid="ccm-registry-options-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Retention and options'|trans }}</h2></div>
+                <div class="card-body">
+                    {{ ccm.issues(issues, 'registry.') }}
+                    <form method="post" action="{{ path('ccm_admin_registry_options_save') }}">
+                        {{ ccm.csrf() }}
+                        <label class="form-label" for="reg_retention">{{ 'Retention (months)'|trans }} {{ ccm.hint('Default 5 years: validity of the choice plus a reasonable control delay. No legal duration is set.'|trans) }}</label>
+                        <input class="form-control mb-1" type="number" min="1" max="60" id="reg_retention" name="registry[retention_months]" value="{{ draft.registry.retention_months }}">
+                        <div class="form-text mb-2" data-testid="ccm-retention-in-force">{{ 'In force (published version): %months% months. The purge and the export follow it; a change applies from the next publication. Maximum 60 months.'|trans({'%months%': in_force.retention_months}) }}</div>
+                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="reg_ip" name="registry[ip_truncated]" value="1" {{ draft.registry.ip_mode == 'truncated' ? 'checked' : '' }}><label class="form-check-label" for="reg_ip">{{ 'Store the truncated IP (/24 for IPv4, /48 for IPv6)'|trans }}</label></div>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" role="switch" id="reg_customer" name="registry[link_customer]" value="1" {{ draft.registry.link_customer ? 'checked' : '' }}><label class="form-check-label" for="reg_customer">{{ 'Link the Thelia customer identifier'|trans }}</label></div>
+                        <p class="small text-secondary">{{ 'Both options condition the proof and must be announced in your privacy policy. They apply from the next publication.'|trans }}</p>
+                        {% if can.update %}<button class="btn btn-primary" type="submit" data-testid="ccm-registry-options-save">{{ 'Save in the draft'|trans }}</button>{% endif %}
+                    </form>
+                    <hr>
+                    <h3 class="h6">{{ 'Purge'|trans }}</h3>
+                    <p class="small mb-2" data-testid="ccm-purge-info">
+                        {{ 'Entries recorded before %date% are past the retention: %count% to delete.'|trans({'%date%': cutoff|date('Y-m-d'), '%count%': purgeable}) }}<br>
+                        {% if last_purge %}{{ 'Last purge: %date%.'|trans({'%date%': last_purge|date('Y-m-d H:i')}) }}{% else %}{{ 'The registry was never purged.'|trans }}{% endif %}
+                        {% if purge_late %}<span class="badge text-bg-danger">{{ 'purge overdue'|trans }}</span>{% endif %}
+                    </p>
+                    {% if can.delete %}
+                        <form method="post" action="{{ path('ccm_admin_registry_purge') }}" onsubmit="return confirm('{{ 'Delete the entries past the retention? This cannot be undone.'|trans|e('js') }}')">
+                            {{ ccm.csrf() }}<button class="btn btn-outline-danger" type="submit" data-testid="ccm-registry-purge"><i class="bi bi-trash" aria-hidden="true"></i> {{ 'Purge now'|trans }}</button>
+                        </form>
+                    {% else %}<p class="small text-secondary mb-0">{{ 'Purging needs the DELETE right.'|trans }}</p>{% endif %}
+                    <p class="small text-secondary mt-2 mb-0">{{ 'Automatic purge: cron "ccm:registry:purge" (or the Thelia scheduler from 3.3).'|trans }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100" data-testid="ccm-registry-help-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Find a visitor'|trans }}</h2></div>
+                <div class="card-body">
+                    <ol class="ps-3">
+                        <li>{{ 'Ask the visitor for the consent identifier shown at the bottom of the "Manage my cookies" panel.'|trans }}</li>
+                        <li>{{ 'Type its first characters in the search above.'|trans }}</li>
+                        <li>{{ 'Open the proof sheet: entry, the version the visitor saw and the hashes. Print it from the browser.'|trans }}</li>
+                    </ol>
+                    <p class="small text-secondary">{{ 'Without the identifier, the search relies on the truncated IP or the customer identifier options.'|trans }}</p>
+                    <h3 class="h6">{{ 'Sample text for your privacy policy'|trans }}</h3>
+                    <blockquote class="small border-start ps-3 text-secondary mb-0" data-testid="ccm-policy-sample">{{ 'To prove the consent you give, we keep a record of your choices: a random identifier, the date, your choices, the banner version, the language, the page, your browser family and, if enabled, a truncated IP address or your customer identifier. These data are kept for %months% months and are used only as proof of consent.'|trans({'%months%': in_force.retention_months}) }}</blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

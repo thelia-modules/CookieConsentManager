@@ -1,0 +1,26 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% block ccm_crumb %}
+    <li class="breadcrumb-item"><a href="{{ path('ccm_admin_registry') }}">{{ 'Registry'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><code>{{ consent_id|slice(0, 8) }}</code></li>
+{% endblock %}
+
+{% block ccm_content %}
+    <div class="card" data-testid="ccm-consent-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Entries of identifier'|trans }} <code>{{ consent_id }}</code></h2></div>
+        <div class="card-body">
+            <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>#</th><th>{{ 'Recorded (UTC)'|trans }}</th><th>{{ 'Action'|trans }}</th><th>{{ 'Source'|trans }}</th><th>{{ 'Version'|trans }}</th><th>{{ 'Hash'|trans }}</th><th></th></tr></thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.id }}</td><td>{{ entry.recordedAt|date('Y-m-d H:i:s') }}</td><td>{{ entry.action }}</td><td>{{ entry.source }}</td><td>{{ entry.version }}</td><td><code>{{ entry.versionHash }}</code></td>
+                            <td><a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_registry_proof', {id: entry.id}) }}">{{ 'Proof sheet'|trans }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

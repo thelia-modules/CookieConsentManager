@@ -1,0 +1,39 @@
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+<div class="card-header d-flex justify-content-between align-items-center">
+    <h2 class="h5 mb-0">{{ 'First choices over %days% days'|trans({'%days%': stats.days}) }}
+        {{ ccm.hint('A first choice is the first entry of a consent identifier in the registry, counted on the day it was recorded. A visitor changing their mind later is not counted again. Robots are excluded.'|trans) }}
+    </h2>
+    <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Period'|trans }}">
+        {% for period in periods %}
+            <a class="btn btn-outline-secondary {{ period == stats.days ? 'active' : '' }}" href="?days={{ period }}">{{ period }} {{ 'days'|trans }}</a>
+        {% endfor %}
+    </div>
+</div>
+<div class="card-body" data-testid="ccm-stats">
+    {% if stats.total == 0 %}
+        <p class="text-secondary mb-0" data-testid="ccm-stats-empty">{{ 'No first choice recorded over this period.'|trans }}</p>
+    {% else %}
+        <div class="row text-center g-2 mb-3">
+            <div class="col"><div class="fs-4" data-testid="ccm-stat-total">{{ stats.total|ccm_number(0) }}</div><div class="small text-secondary">{{ 'first choices'|trans }}</div></div>
+            <div class="col"><div class="fs-4">{{ stats.rates.accept_all|ccm_number }} %</div><div class="small text-secondary">{{ 'accept all'|trans }} {{ ccm.hint('Share of first choices that accepted every purpose.'|trans) }}</div></div>
+            <div class="col"><div class="fs-4">{{ stats.rates.reject_all|ccm_number }} %</div><div class="small text-secondary">{{ 'reject all'|trans }} {{ ccm.hint('Share of first choices that refused everything, including closing the banner without accepting.'|trans) }}</div></div>
+            <div class="col"><div class="fs-4" data-testid="ccm-stat-reject-panel">{{ stats.rates.reject_panel|ccm_number }} %</div><div class="small text-secondary">{{ 'refused via the panel'|trans }} {{ ccm.hint('Share of first choices saved from the panel with every switch off: counted as a refusal.'|trans) }}</div></div>
+            <div class="col"><div class="fs-4">{{ stats.rates.custom|ccm_number }} %</div><div class="small text-secondary">{{ 'customized'|trans }} {{ ccm.hint('Share of first choices made purpose by purpose or service by service.'|trans) }}</div></div>
+        </div>
+        <p class="small mb-3" data-testid="ccm-stat-refusal">{{ 'Refusals in total (reject all and panel with nothing granted): %rate% %'|trans({'%rate%': stats.rates.refusal|ccm_number}) }}</p>
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="h6">{{ 'Granted by purpose'|trans }} {{ ccm.hint('Share of first choices that granted the purpose entirely.'|trans) }}</h3>
+                <ul class="list-unstyled small">{% for code, row in stats.purposes %}<li>{{ ccm_purpose(code) }}{{ ': '|trans }}{{ row.rate|ccm_number }} % ({{ row.count|ccm_number(0) }})</li>{% endfor %}</ul>
+            </div>
+            <div class="col-md-6">
+                <h3 class="h6">{{ 'Granted by service'|trans }}</h3>
+                <ul class="list-unstyled small">{% for key, row in stats.services %}<li>{{ ccm_field('services.' ~ key) }}{{ ': '|trans }}{{ row.rate|ccm_number }} % ({{ row.count|ccm_number(0) }})</li>{% endfor %}</ul>
+            </div>
+        </div>
+    {% endif %}
+    {% if stats.robots > 0 %}
+        <p class="small text-secondary mt-2 mb-0" data-testid="ccm-stats-robots">{{ '%count% first choice(s) from robots, left out of these figures.'|trans({'%count%': stats.robots}) }}</p>
+    {% endif %}
+</div>

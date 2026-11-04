@@ -1,0 +1,92 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Consent Mode'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    {% set cm = draft.consent_mode %}
+    <div class="card mb-3" data-testid="ccm-consent-mode-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Google Consent Mode v2'|trans }}</h2></div>
+        <div class="card-body">
+            <form method="post" action="{{ path('ccm_admin_consent_mode_save') }}" data-testid="ccm-consent-mode-form">
+                {{ ccm.csrf() }}
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="cm_enabled" name="consent_mode[enabled]" value="1" {{ cm.enabled ? 'checked' : '' }}>
+                    <label class="form-check-label" for="cm_enabled">{{ 'Send the Consent Mode signals (default then update)'|trans }}</label>
+                </div>
+
+                <span class="form-label d-block">{{ 'Mode'|trans }}</span>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="consent_mode[mode]" id="cm_basic" value="basic" {{ cm.mode == 'basic' ? 'checked' : '' }} data-ccm-mode>
+                    <label class="form-check-label" for="cm_basic"><strong>{{ 'Basic'|trans }}</strong> - {{ 'no Google tag is loaded before the visitor consents to a purpose carrying an analytics or ads signal (recommended).'|trans }}</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="consent_mode[mode]" id="cm_advanced" value="advanced" {{ cm.mode == 'advanced' ? 'checked' : '' }} data-ccm-mode data-testid="ccm-mode-advanced">
+                    <label class="form-check-label" for="cm_advanced"><strong>{{ 'Advanced'|trans }}</strong> - {{ 'Google tags load before any choice and send cookieless pings.'|trans }}</label>
+                </div>
+                <div class="alert alert-danger" id="cm_advanced_warning" {{ cm.mode == 'advanced' ? '' : 'hidden' }} data-testid="ccm-advanced-warning">
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                    {{ 'Advanced mode contacts Google before the visitor chooses, and keeps doing so after a refusal. No authority has validated it for visitors in France. The dashboard shows a red alert as long as it is active.'|trans }}
+                    {% if stored_mode != 'advanced' %}
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="cm_advanced_confirm" name="advanced_confirm" value="1" data-testid="ccm-advanced-confirm">
+                            <label class="form-check-label" for="cm_advanced_confirm">{{ 'I understand and I have my legal contact\'s written agreement to switch to the advanced mode.'|trans }}</label>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div id="cm_advanced_fields" {{ cm.mode == 'advanced' ? '' : 'hidden' }} data-testid="ccm-advanced-fields">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="cm_wait">{{ 'Wait for update (ms)'|trans }} (<code>wait_for_update</code>) {{ ccm.hint('How long Google tags wait for the stored choice before firing. Effective in advanced mode only.'|trans) }}</label>
+                            <input class="form-control" type="number" min="0" step="100" id="cm_wait" name="consent_mode[wait_for_update_ms]" value="{{ cm.wait_for_update_ms }}">
+                        </div>
+                    </div>
+                    <h3 class="h6">{{ 'Defaults by region'|trans }} {{ ccm.hint('ISO 3166-1 / 3166-2 codes separated by commas (FR, ES-CT). A region overrides the global default; the last, region-less default always stays. Effective in advanced mode only.'|trans) }}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle" data-testid="ccm-regions">
+                            <thead><tr><th>{{ 'Regions'|trans }}</th>{% for signal in signals %}<th class="small">{{ signal|ccm_code('signal') }}<br><code>{{ signal }}</code></th>{% endfor %}</tr></thead>
+                            <tbody>
+                                {% for region in region_rows %}
+                                    {% set index = loop.index0 %}
+                                    <tr>
+                                        <td><input class="form-control form-control-sm" name="regions[{{ index }}][iso]" value="{{ region.iso|join(', ') }}" placeholder="FR, ES-CT" aria-label="{{ 'Regions'|trans }}"></td>
+                                        {% for signal in signals %}
+                                            <td>
+                                                <select class="form-select form-select-sm" name="regions[{{ index }}][signals][{{ signal }}]" aria-label="{{ signal|ccm_code('signal') }}">
+                                                    <option value="">-</option>
+                                                    <option value="denied" {{ region.default[signal]|default('') == 'denied' ? 'selected' : '' }}>{{ 'denied'|ccm_code('signal_state') }}</option>
+                                                    <option value="granted" {{ region.default[signal]|default('') == 'granted' ? 'selected' : '' }}>{{ 'granted'|ccm_code('signal_state') }}</option>
+                                                </select>
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="h6">{{ 'Options'|trans }}</h3>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="cm_redaction" name="consent_mode[ads_data_redaction]" value="1" {{ cm.ads_data_redaction ? 'checked' : '' }}><label class="form-check-label" for="cm_redaction">{{ 'Ads data redaction'|trans }} (<code>ads_data_redaction</code>) {{ ccm.hint('Redacts advertising identifiers in Google requests while ad_storage is denied.'|trans) }}</label></div>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="cm_passthrough" name="consent_mode[url_passthrough]" value="1" {{ cm.url_passthrough ? 'checked' : '' }}><label class="form-check-label" for="cm_passthrough">{{ 'URL passthrough'|trans }} (<code>url_passthrough</code>) {{ ccm.hint('Keeps the ad click identifiers in the URL while ad_storage is denied.'|trans) }}</label></div>
+                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" role="switch" id="cm_uet" name="consent_mode[uet]" value="1" {{ cm.uet.enabled ? 'checked' : '' }}><label class="form-check-label" for="cm_uet">Microsoft UET {{ ccm.hint('Sends the ad_storage signal to Microsoft Advertising with the same rules.'|trans) }}</label></div>
+
+                {% if can.update %}<button class="btn btn-primary" type="submit" data-testid="ccm-consent-mode-save">{{ 'Save in the draft'|trans }}</button>{% endif %}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script>
+        document.querySelectorAll('[data-ccm-mode]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var advanced = document.getElementById('cm_advanced').checked;
+                document.getElementById('cm_advanced_warning').hidden = !advanced;
+                document.getElementById('cm_advanced_fields').hidden = !advanced;
+            });
+        });
+    </script>
+{% endblock %}

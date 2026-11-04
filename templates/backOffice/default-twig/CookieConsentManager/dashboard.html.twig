@@ -1,0 +1,156 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Dashboard'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    <div class="row g-3">
+        <div class="col-xl-8">
+            <div class="card mb-3" data-testid="ccm-state-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'State'|trans }}</h2></div>
+                <div class="card-body">
+                    {% if published %}
+                        <p class="mb-2" data-testid="ccm-state-published">
+                            {{ 'Live version %version%, published on %date% by %author%.'|trans({'%version%': published.version, '%date%': published.createdAt|date('Y-m-d H:i', false) ~ ' UTC', '%author%': published.author|default('-')}) }}
+                            <code title="{{ 'Hash of the rendering served to visitors'|trans }}">{{ published.servedHash }}</code>
+                        </p>
+                    {% else %}
+                        <p class="mb-2" data-testid="ccm-state-published">{{ 'Nothing is published: the banner is not shown to visitors.'|trans }}</p>
+                    {% endif %}
+                    <p class="mb-3">
+                        {% if unpublished_changes is null or unpublished_changes > 0 %}
+                            {{ 'The draft holds changes that visitors do not see yet.'|trans }}
+                        {% else %}
+                            {{ 'The draft equals the published version.'|trans }}
+                        {% endif %}
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-primary" href="{{ path('ccm_admin_wizard') }}" data-testid="ccm-wizard-link"><i class="bi bi-magic" aria-hidden="true"></i> {{ 'Setup assistant'|trans }}</a>
+                        <a class="btn btn-outline-secondary" href="{{ path('ccm_admin_preview') }}" target="_blank" rel="noopener" data-testid="ccm-preview-link"><i class="bi bi-eye" aria-hidden="true"></i> {{ 'Preview the draft on the shop'|trans }}</a>
+                        <a class="btn btn-outline-secondary" href="{{ path('ccm_admin_versions') }}"><i class="bi bi-cloud-upload" aria-hidden="true"></i> {{ 'Publish'|trans }}</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3" data-testid="ccm-alerts-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Alerts'|trans }} <span class="badge text-bg-secondary">{{ alerts|length }}</span></h2></div>
+                <div class="card-body">
+                    {% for alert in alerts %}
+                        <div class="alert alert-{{ alert.severity }} d-flex justify-content-between align-items-start gap-3 py-2" role="alert" data-testid="ccm-alert-{{ alert.code }}">
+                            <span>
+                                {{ alert.message }}
+                                {% if alert.details|length %}<details class="small mt-1"><summary style="cursor:pointer">{{ 'Technical details'|trans }}</summary><ul class="mb-0">{% for detail in alert.details %}<li class="font-monospace">{{ detail }}</li>{% endfor %}</ul></details>{% endif %}
+                            </span>
+                            {% if alert.route %}<a class="alert-link text-nowrap" data-testid="ccm-alert-fix-{{ alert.code }}" href="{{ path(alert.route, alert.routeParameters) }}{{ alert.fragment ? '#' ~ alert.fragment : '' }}">{{ 'Fix'|trans }}</a>{% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-success mb-0" data-testid="ccm-no-alert"><i class="bi bi-check-circle" aria-hidden="true"></i> {{ 'No alert.'|trans }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card mb-3" data-testid="ccm-stats-card">
+                {% include 'CookieConsentManager/include/stats.html.twig' %}
+            </div>
+
+            <div class="card mb-3" data-testid="ccm-general-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'General settings'|trans }}</h2></div>
+                <div class="card-body">
+                    {% set g = draft.general %}
+                    <form method="post" action="{{ path('ccm_admin_general_save') }}" data-testid="ccm-general-form">
+                        {{ ccm.csrf() }}
+                        <div class="row g-3">
+                            {% for flag, label in {
+                                close_button: 'Close button (continue without accepting)',
+                                floating_button: 'Floating "Manage my cookies" button',
+                                reload_on_script_withdraw: 'Reload the page when a script consent is withdrawn',
+                                block_embedded_iframes: 'Automatically block embedded iframes (YouTube, Vimeo, Maps...)',
+                                experimental_services: 'Experimental services (imported catalogue, untested)',
+                            } %}
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="general_{{ flag }}" name="general[{{ flag }}]" value="1" {{ g[flag] ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="general_{{ flag }}">{{ label|trans }}</label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="col-md-4">
+                                <label class="form-label" for="general_renewal">{{ 'Ask again after (months, 1 to 13)'|trans }}</label>
+                                <input class="form-control" type="number" min="1" max="13" id="general_renewal" name="general[renewal_months]" value="{{ g.renewal_months }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="policy_url">{{ 'Cookie policy URL'|trans }} {{ ccm.hint('Shown to every visitor whose language has no address of its own below. A path of the shop (/page) or an https:// address. It must be a page about cookies and privacy, not your terms of sale.'|trans) }}</label>
+                                <input class="form-control" type="text" id="policy_url" name="policy[url]" value="{{ draft.policy.url }}" placeholder="/politique-de-cookies" data-testid="ccm-policy-url">
+                                <a class="small" href="{{ path('ccm_admin_policy_template') }}" data-testid="ccm-policy-template-link">{{ 'Generate a model of the cookie policy page'|trans }}</a>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="policy_title">{{ 'Cookie policy page title'|trans }}</label>
+                                <input class="form-control" type="text" id="policy_title" name="policy[page_title]" value="{{ draft.policy.page_title }}">
+                            </div>
+                            <div class="col-12">
+                                <span class="form-label d-block">{{ 'Cookie policy URL by language (optional)'|trans }}</span>
+                                <div class="row g-2">
+                                    {% for code in policy_languages %}
+                                        <div class="col-md-3"><div class="input-group input-group-sm"><span class="input-group-text">{{ code|upper }}</span><input class="form-control" type="text" id="policy_url_{{ code }}" name="policy[urls][{{ code }}]" value="{{ draft.policy.urls[code]|default('') }}" aria-label="{{ 'Cookie policy URL'|trans }} {{ code|upper }}" data-testid="ccm-policy-url-{{ code }}"></div></div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% if can.update %}
+                            <button type="submit" class="btn btn-primary mt-3" data-testid="ccm-general-save">{{ 'Save in the draft'|trans }}</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card mb-3" data-testid="ccm-help-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Quick help'|trans }}</h2></div>
+                <div class="card-body">
+                    <ol class="ps-3 mb-3">
+                        <li>{{ 'Pick your services and fill their identifiers (assistant or "Purposes and services").'|trans }}</li>
+                        <li>{{ 'Check the banner on the shop with the preview: nothing is public yet.'|trans }}</li>
+                        <li>{{ 'Publish: a numbered, immutable version goes live and the shared cache is purged.'|trans }}</li>
+                        <li>{{ 'Run the verification (versions screen) before and after "Reject all".'|trans }}</li>
+                    </ol>
+                    <p class="small text-secondary">{{ 'The draft is never served to visitors. Every consent is recorded with the version and the rendering hash it was given on.'|trans }}</p>
+                    <p class="mb-0"><a class="btn btn-outline-primary btn-sm" href="{{ path('ccm_admin_help') }}" data-testid="ccm-help-link"><i class="bi bi-life-preserver" aria-hidden="true"></i> {{ 'Need help? Open the administrator guide'|trans }}</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row"><div class="col-12">
+            <div class="card mb-3" data-testid="ccm-rights-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Rights by profile'|trans }}</h2></div>
+                <div class="card-body">
+                    <ul class="small ps-3">
+                        <li><strong>VIEW</strong>: {{ 'consult every screen, export, preview and verification'|trans }}</li>
+                        <li><strong>UPDATE</strong>: {{ 'edit the draft, the custom code, import a configuration'|trans }}</li>
+                        <li><strong>CREATE</strong>: {{ 'publish a version'|trans }}</li>
+                        <li><strong>DELETE</strong>: {{ 'purge the registry'|trans }}</li>
+                    </ul>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-2" data-testid="ccm-rights-table">
+                            <thead><tr><th>{{ 'Profile'|trans }}</th><th>VIEW</th><th>UPDATE</th><th>CREATE</th><th>DELETE</th></tr></thead>
+                            <tbody>
+                                {% for row in rights %}
+                                    <tr>
+                                        <td>{% if row.unrestricted %}{{ 'Administrators without profile (full access)'|trans }}{% else %}{{ row.title }}{% endif %}</td>
+                                        {% for access in ['VIEW', 'UPDATE', 'CREATE', 'DELETE'] %}
+                                            <td>{% if row.grants[access] %}<i class="bi bi-check-lg text-success" aria-label="{{ 'Granted'|trans }}"></i>{% else %}<i class="bi bi-dash text-secondary" aria-label="{{ 'Not granted'|trans }}"></i>{% endif %}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="small mb-0">{{ 'Your rights here'|trans }}:
+                        {% for access, granted in can %}<span class="badge text-bg-{{ granted ? 'success' : 'secondary' }}">{{ access|upper }}</span> {% endfor %}
+                    </p>
+                    <p class="small text-secondary mt-2 mb-0">{{ 'Rights are set per profile in Configuration > Administration profiles, module "CookieConsentManager".'|trans }}</p>
+                </div>
+            </div>
+    </div></div>
+{% endblock %}
