@@ -81,6 +81,23 @@ final class RegistryPurgeTest extends CcmTestCase
         self::assertTrue($purger->isLate($now), 'an entry past the retention is waiting for a purge');
     }
 
+    public function testTheCutoffStaysOnTheRetentionBoundaryAtAMonthEnd(): void
+    {
+        $draft = $this->ccm->drafts->load();
+        $draft['registry']['retention_months'] = 13;
+        $this->ccm->drafts->replace($draft, 'alice');
+        ConsentEntryQuery::create()->deleteAll();
+        $this->entry('kept-1', '2025-03-01 12:00:00');
+        $purger = new RegistryPurger(new RegistryOptions($this->ccm->drafts, $this->ccm->versions), $this->ccm->entries, new LastPurgeStore());
+        $now = new \DateTimeImmutable('2026-03-31 12:00:00', new \DateTimeZone('UTC'));
+
+        self::assertSame('2025-02-28 12:00:00', $purger->cutoff($now)->format('Y-m-d H:i:s'), 'thirteen months before March 31 is the last day of February, not March 3');
+        self::assertSame('2024-02-29 12:00:00', $purger->cutoff(new \DateTimeImmutable('2025-03-31 12:00:00', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'), 'a leap February ends on the 29th');
+        self::assertSame('2025-09-15 12:00:00', $purger->cutoff(new \DateTimeImmutable('2026-10-15 12:00:00', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'), 'mid-month, the day is kept');
+        self::assertSame(0, $purger->purge($now), 'an entry recorded 12 months and 30 days ago is within a 13-month retention');
+        self::assertSame(['kept-1'], $this->ids());
+    }
+
     public function testTheCsvHasTheColumnsOfAnnexBInOrderAndNeutralisesFormulas(): void
     {
         $this->entry('csv-1', '2026-10-30 10:00:00', '/p', '=1+1');

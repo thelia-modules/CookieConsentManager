@@ -16,8 +16,13 @@ final readonly class RegistryPurger
     public function cutoff(?\DateTimeImmutable $now = null): \DateTimeImmutable
     {
         $months = $this->options->current()['retention_months'];
+        $now ??= new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
-        return ($now ?? new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->modify(\sprintf('-%d months', $months));
+        // "-N months" overflows on a month end (March 31 minus one month is March 3): clamp to the last day of the target month.
+        $targetMonth = $now->modify('first day of this month')->modify(\sprintf('-%d months', $months));
+        $day = min((int) $now->format('j'), (int) $targetMonth->format('t'));
+
+        return $targetMonth->setDate((int) $targetMonth->format('Y'), (int) $targetMonth->format('n'), $day);
     }
 
     /** @return int number of entries deleted */
