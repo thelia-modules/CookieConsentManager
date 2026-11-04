@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Démo moteur CookieConsentManager</title>
+<!-- Vérification manuelle. Mode "audit" : aucun cookie lu ni écrit, aucun appel réseau.
+     Passer "mode" à "live" pour tester le registre : le POST /ccm/consent échoue sur un serveur statique
+     et déclenche le repli cookie pd:1. Console : inspecter window.dataLayer. -->
+<script type="application/json" id="ccm-config">
+{
+  "format": 1,
+  "version": 12,
+  "hash": "9b2e4f0c1a7d",
+  "locale": "fr_FR",
+  "mode": "audit",
+  "endpoint": "/ccm/consent",
+  "script": "/ccm/12-9b2e4f0c1a7d.js",
+  "repromptDays": 182,
+  "options": {
+    "layout": "bar",
+    "closeButton": false,
+    "floatingButton": false,
+    "reloadOnWithdraw": true,
+    "blockEmbeds": true,
+    "experimental": false
+  },
+  "gcm": {
+    "enabled": true,
+    "mode": "basic",
+    "defaults": [
+      {
+        "region": [
+          "FR",
+          "DE"
+        ],
+        "ad_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied",
+        "analytics_storage": "denied",
+        "functionality_storage": "denied",
+        "personalization_storage": "denied",
+        "security_storage": "granted"
+      },
+      {
+        "region": [],
+        "ad_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied",
+        "analytics_storage": "denied",
+        "functionality_storage": "denied",
+        "personalization_storage": "denied",
+        "security_storage": "granted"
+      }
+    ],
+    "waitForUpdate": 0,
+    "adsDataRedaction": false,
+    "urlPassthrough": false,
+    "uet": false
+  },
+  "purposes": [
+    {
+      "code": "analytics",
+      "signals": [
+        "analytics_storage"
+      ]
+    },
+    {
+      "code": "ads",
+      "signals": [
+        "ad_storage",
+        "ad_user_data",
+        "ad_personalization"
+      ]
+    },
+    {
+      "code": "media",
+      "signals": []
+    },
+    {
+      "code": "personalization",
+      "signals": [
+        "functionality_storage",
+        "personalization_storage"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "key": "gtag",
+      "purpose": "analytics",
+      "kind": "script",
+      "googleTag": true,
+      "user": {
+        "gtagUa": "G-ABC123XYZ"
+      },
+      "cookies": [
+        "_ga",
+        "_ga_*",
+        "_gid"
+      ],
+      "storage": []
+    },
+    {
+      "key": "googletagmanager",
+      "purpose": "ads",
+      "kind": "script",
+      "googleTag": true,
+      "user": {
+        "googletagmanagerId": "GTM-ABCD12"
+      },
+      "cookies": [],
+      "storage": []
+    },
+    {
+      "key": "youtube",
+      "purpose": "media",
+      "kind": "media",
+      "googleTag": false,
+      "user": {},
+      "cookies": [
+        "VISITOR_INFO1_LIVE",
+        "YSC",
+        "PREF"
+      ],
+      "storage": [],
+      "name": "YouTube"
+    },
+    {
+      "key": "acme-widget",
+      "purpose": "support",
+      "kind": "custom",
+      "googleTag": false,
+      "user": {},
+      "cookies": [
+        "acme_*"
+      ],
+      "storage": [
+        "acme.session"
+      ],
+      "name": "Acme Chat"
+    },
+    {
+      "key": "tiktok-via-gtm",
+      "purpose": "ads",
+      "kind": "declarative",
+      "googleTag": false,
+      "user": {},
+      "cookies": [
+        "_ttp"
+      ],
+      "storage": [],
+      "name": "TikTok Pixel (via GTM)"
+    }
+  ],
+  "exempt": [
+    {
+      "key": "matomo",
+      "cookies": [
+        "_pk_id.*",
+        "_pk_ses.*"
+      ]
+    }
+  ]
+}
+</script>
+<script src="../../../assets/js/head.js"></script>
+<style>
+  body{font:16px/1.5 system-ui,sans-serif;margin:2rem;max-width:60rem}
+  [data-ccm-banner]{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid #333;padding:1rem;z-index:10}
+  [data-ccm-panel]{position:fixed;inset:10% 20%;background:#fff;border:2px solid #333;padding:1rem;overflow:auto;z-index:20}
+  [data-ccm-panel][hidden]{display:none}
+  button{min-height:44px;padding:0 1rem}
+  [role=switch][aria-checked=true]::after{content:" ON"} [role=switch][aria-checked=false]::after{content:" off"}
+  [data-ccm-placeholder]{border:1px dashed #888;padding:1rem;margin:1rem 0}
+</style>
+</head>
+<body>
+<h1>Démo moteur</h1>
+<p><a href="#ccm-preferences">Gérer mes cookies</a> · <button type="button" data-ccm-open>Ouvrir les préférences</button></p>
+
+<div data-ccm-placeholder="youtube" data-ccm-src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" data-ccm-attr-width="560" data-ccm-attr-height="315" data-ccm-attr-title="Vidéo de démo" data-ccm-attr-allowfullscreen=""></div>
+
+<script type="text/plain" data-ccm-service="acme-widget">document.body.insertAdjacentHTML('beforeend','<p>Script balisé réactivé (acme-widget).</p>');</script>
+
+<template data-ccm-placeholder-template>
+  <div data-ccm-placeholder-box>
+    <p>Le contenu <strong>{{name}}</strong> est bloqué (finalité : {{purpose}}).</p>
+    <button type="button" data-ccm-action="service_allow" data-ccm-service="{{key}}">Autoriser {{name}}</button>
+    <button type="button" data-ccm-action="open">Préférences</button>
+  </div>
+</template>
+
+<div data-ccm-banner role="dialog" aria-modal="false" aria-labelledby="ccm-t" hidden>
+  <h2 id="ccm-t">Cookies et traceurs</h2>
+  <p>Nous utilisons des traceurs de mesure, de publicité et des contenus tiers. Vous pouvez refuser ou personnaliser.</p>
+  <button type="button" data-ccm-action="accept_all">Tout accepter</button>
+  <button type="button" data-ccm-action="reject_all">Tout refuser</button>
+  <button type="button" data-ccm-action="open">Personnaliser</button>
+</div>
+
+<div data-ccm-panel role="dialog" aria-modal="true" aria-labelledby="ccm-p" hidden>
+  <h2 id="ccm-p">Préférences</h2>
+  <div data-ccm-live role="status" aria-live="polite"></div>
+  <p>Mesure d'audience <button type="button" role="switch" aria-checked="false" data-ccm-purpose="analytics"></button></p>
+  <ul><li>Google Analytics <button type="button" role="switch" aria-checked="false" data-ccm-service="gtag"></button></li></ul>
+  <p>Publicité <button type="button" role="switch" aria-checked="false" data-ccm-purpose="ads"></button></p>
+  <ul><li>Google Tag Manager <button type="button" role="switch" aria-checked="false" data-ccm-service="googletagmanager"></button></li>
+      <li>TikTok Pixel (via GTM) <button type="button" role="switch" aria-checked="false" data-ccm-service="tiktok-via-gtm"></button></li></ul>
+  <p>Contenus tiers <button type="button" role="switch" aria-checked="false" data-ccm-purpose="media"></button></p>
+  <ul><li>YouTube <button type="button" role="switch" aria-checked="false" data-ccm-service="youtube"></button></li></ul>
+  <p>Support <button type="button" role="switch" aria-checked="false" data-ccm-purpose="support"></button></p>
+  <ul><li>Acme Chat <button type="button" role="switch" aria-checked="false" data-ccm-service="acme-widget"></button></li></ul>
+  <p>Mesure exemptée Matomo (actif = mesure en cours) <button type="button" role="switch" aria-checked="true" data-ccm-exempt="matomo"></button></p>
+  <button type="button" data-ccm-action="accept_all">Tout accepter</button>
+  <button type="button" data-ccm-action="reject_all">Tout refuser</button>
+  <button type="button" data-ccm-action="save">Enregistrer mes choix</button>
+  <p>Identifiant : <code data-ccm-consent-id></code></p>
+</div>
+
+<script src="../../../assets/js/engine.js"></script>
+<script>
+  // Double minimal de la couche de compatibilité (le vrai compat.js est servi par le module).
+  window.CCMCompat = window.CCMCompat || { create: function (adapter) { return { adapter: adapter }; } };
+  CookieConsentManager.__boot();
+  ['youtube', 'gtag', 'googletagmanager', 'acme-widget'].forEach(function (k) {
+    tarteaucitron.services[k] = { key: k, js: function () { console.log(k + ' js()'); }, fallback: function () { console.log(k + ' fallback()'); } };
+  });
+  CookieConsentManager.__start();
+</script>
+</body>
+</html>
