@@ -1,0 +1,84 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Setup assistant'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    {% set steps = ['Choose services', 'Identifiers', 'Privacy policy', 'Preview and publish'] %}
+    <ol class="nav nav-pills mb-3" data-testid="ccm-wizard-steps">
+        {% for label in steps %}
+            <li class="nav-item"><span class="nav-link {{ loop.index == step ? 'active' : 'disabled' }}">{{ loop.index }}. {{ label|trans }}</span></li>
+        {% endfor %}
+    </ol>
+
+    <div class="card" data-testid="ccm-wizard-step-{{ step }}">
+        <div class="card-body">
+            {% if step == 1 %}
+                <h2 class="h5">{{ 'Which services does your shop use?'|trans }}</h2>
+                <p class="text-secondary">{{ 'These services are tested and documented. Others stay available later under "Purposes and services" once experimental services are on.'|trans }}</p>
+                <form method="post" action="{{ path('ccm_admin_wizard_save') }}">
+                    {{ ccm.csrf() }}<input type="hidden" name="step" value="1">
+                    <div class="row g-2">
+                        {% for entry in verified %}
+                            <div class="col-md-4 col-lg-3">
+                                <div class="form-check border rounded p-2 ps-4 h-100">
+                                    <input class="form-check-input" type="checkbox" name="keys[]" value="{{ entry.key }}" id="wz_{{ entry.key }}" {{ entry.key in selected ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="wz_{{ entry.key }}">{{ entry.name }}<br><span class="small text-secondary">{{ entry.purpose }}</span></label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="btn btn-primary mt-3" type="submit" data-testid="ccm-wizard-next">{{ 'Next'|trans }}</button>
+                </form>
+            {% elseif step == 2 %}
+                <h2 class="h5">{{ 'Identifiers of your services'|trans }}</h2>
+                <form method="post" action="{{ path('ccm_admin_wizard_save') }}">
+                    {{ ccm.csrf() }}<input type="hidden" name="step" value="2">
+                    {% for entry in chosen %}
+                        <input type="hidden" name="keys[]" value="{{ entry.key }}">
+                        <fieldset class="mb-3" data-testid="ccm-wizard-service-{{ entry.key }}">
+                            <legend class="h6">{{ entry.name }}</legend>
+                            {{ ccm.issues(issues, 'services.' ~ entry.key) }}
+                            {% for param in entry.params %}
+                                <label class="form-label" for="wz_{{ entry.key }}_{{ param.name }}">{{ param.label[ui_locale]|default(param.label.en|default(param.name)) }}{{ param.required ? ' *' : '' }}</label>
+                                <input class="form-control mb-1" type="text" id="wz_{{ entry.key }}_{{ param.name }}" name="services[{{ entry.key }}][parameters][{{ param.name }}]" value="{{ services[entry.key].parameters[param.name]|default('') }}">
+                                <div class="form-text mb-2">{{ param.help[ui_locale]|default(param.help.en|default('')) }}</div>
+                            {% else %}
+                                <p class="text-secondary small">{{ 'No identifier needed.'|trans }}</p>
+                            {% endfor %}
+                        </fieldset>
+                    {% else %}
+                        <p>{{ 'No service chosen.'|trans }} <a href="{{ path('ccm_admin_wizard') }}">{{ 'Back'|trans }}</a></p>
+                    {% endfor %}
+                    <button class="btn btn-primary" type="submit" data-testid="ccm-wizard-next">{{ 'Next'|trans }}</button>
+                </form>
+            {% elseif step == 3 %}
+                <h2 class="h5">{{ 'Privacy policy'|trans }}</h2>
+                <p class="text-secondary">{{ 'The banner links to this page. It must explain the processing, including the consent registry.'|trans }}</p>
+                {{ ccm.issues(issues, 'policy.') }}
+                <form method="post" action="{{ path('ccm_admin_wizard_save') }}">
+                    {{ ccm.csrf() }}<input type="hidden" name="step" value="3">
+                    <label class="form-label" for="wz_policy">{{ 'Privacy policy URL'|trans }}</label>
+                    <input class="form-control mb-2" type="text" id="wz_policy" name="policy[url]" value="{{ draft.policy.url }}" placeholder="/politique-de-confidentialite">
+                    <label class="form-label" for="wz_policy_title">{{ 'Privacy policy page title'|trans }}</label>
+                    <input class="form-control mb-3" type="text" id="wz_policy_title" name="policy[page_title]" value="{{ draft.policy.page_title }}">
+                    <button class="btn btn-primary" type="submit" data-testid="ccm-wizard-next">{{ 'Next'|trans }}</button>
+                </form>
+            {% else %}
+                <h2 class="h5">{{ 'Preview, then publish'|trans }}</h2>
+                <p>{{ 'Open the draft on the real shop: the banner shows with your services, nothing is recorded.'|trans }}</p>
+                <p><a class="btn btn-outline-secondary" href="{{ path('ccm_admin_preview') }}" target="_blank" rel="noopener" data-testid="ccm-wizard-preview"><i class="bi bi-eye" aria-hidden="true"></i> {{ 'Preview the draft on the shop'|trans }}</a></p>
+                {{ ccm.issues(issues, '') }}
+                {% if can.create %}
+                    <form method="post" action="{{ path('ccm_admin_wizard_save') }}">
+                        {{ ccm.csrf() }}<input type="hidden" name="step" value="4">
+                        <button class="btn btn-success" type="submit" data-testid="ccm-wizard-publish"><i class="bi bi-cloud-upload" aria-hidden="true"></i> {{ 'Publish'|trans }}</button>
+                    </form>
+                {% else %}
+                    <p class="text-secondary">{{ 'Publishing needs the CREATE right.'|trans }}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

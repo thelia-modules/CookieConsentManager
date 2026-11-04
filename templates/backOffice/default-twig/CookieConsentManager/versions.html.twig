@@ -1,0 +1,132 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Versions and verification'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    {% if env_fields|length %}
+        <div class="alert alert-danger" data-testid="ccm-environment-pending">
+            <h2 class="h6">{{ 'Values imported from another site: to confirm before publishing'|trans }}</h2>
+            <p class="mb-2">{{ 'These values come from the site the configuration was exported from (identifiers, page address, regions). For each one, type the value of this shop, or tick the box to keep the imported value. Nothing is ticked for you.'|trans }}</p>
+            <form method="post" action="{{ path('ccm_admin_versions_environment') }}">
+                {{ ccm.csrf() }}
+                <div class="table-responsive bg-body rounded">
+                    <table class="table table-sm align-middle mb-2" data-testid="ccm-environment-table">
+                        <thead><tr><th>{{ 'Field'|trans }}</th><th>{{ 'Value of the source site (import)'|trans }}</th><th>{{ 'New value for this shop'|trans }}</th><th>{{ 'Keep the imported value'|trans }}</th></tr></thead>
+                        <tbody>
+                            {% for field in env_fields %}
+                                <tr data-testid="ccm-environment-row" data-path="{{ field.path }}">
+                                    <td>{{ ccm_field(field.path) }}</td>
+                                    <td>{% if field.regions is defined %}<ul class="list-unstyled small mb-0" data-testid="ccm-environment-imported">{% for region in field.regions %}<li><strong>{{ region.iso|join(', ') }}</strong> : {% for signal, state in region.default %}{{ signal|ccm_code('signal') }} : {{ state|ccm_code('signal_state')|lower }}{{ loop.last ? '' : ' ; ' }}{% endfor %}</li>{% else %}<li>-</li>{% endfor %}</ul>{% else %}<code class="text-break" data-testid="ccm-environment-imported">{{ field.value|default('-') }}</code>{% endif %}</td>
+                                    <td>{% if field.editable %}<input class="form-control form-control-sm" type="text" name="values[{{ field.path }}]" value="{{ typed[field.path]|default('') }}" aria-label="{{ 'New value for this shop'|trans }}{{ ': '|trans }}{{ ccm_field(field.path) }}" data-testid="ccm-environment-new">{% else %}<span class="text-secondary small">{{ 'Check it in the Consent Mode tab'|trans }}</span>{% endif %}</td>
+                                    <td><div class="form-check"><input class="form-check-input" type="checkbox" name="confirmed[]" value="{{ field.path }}" id="env_{{ loop.index }}" data-testid="ccm-environment-keep"><label class="form-check-label small" for="env_{{ loop.index }}">{{ 'This value is right for this shop'|trans }}</label></div></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if can.update %}<button class="btn btn-danger btn-sm" type="submit" data-testid="ccm-environment-confirm">{{ 'Confirm the ticked fields and the new values'|trans }}</button>{% endif %}
+            </form>
+        </div>
+    {% endif %}
+    {% if import_report is defined %}
+        <div class="alert alert-info" data-testid="ccm-import-report">
+            <strong>{{ 'Import report'|trans }}</strong>
+            <ul class="mb-0">
+                <li>{{ 'Fields to confirm'|trans }}: {{ import_report.environmentPending|length }}</li>
+                {% if import_report.skippedServices|length %}<li>{{ 'Experimental services ignored (the setting is off)'|trans }}: {{ import_report.skippedServices|join(', ') }}</li>{% endif %}
+                {% if import_report.policyResolved is not null %}<li>{{ import_report.policyResolved ? 'The privacy policy page was found on this site.'|trans : 'The privacy policy page was not found on this site.'|trans }}</li>{% endif %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if import_errors is defined %}
+        <div class="alert alert-danger" data-testid="ccm-import-errors"><strong>{{ 'Import refused'|trans }}</strong><ul class="mb-0">{% for error in import_errors %}<li>{{ error }}</li>{% endfor %}</ul></div>
+    {% endif %}
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card h-100" data-testid="ccm-publish-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Publish the draft'|trans }}</h2></div>
+                <div class="card-body">
+                    <p>{{ 'Publishing creates the next immutable version, makes it live and purges the shared cache.'|trans }}</p>
+                    <p class="small" data-testid="ccm-diff-count">{{ 'Changes since the published version'|trans }}{{ ': '|trans }}<strong>{{ diff|length }}</strong></p>
+                    {% if diff|length %}
+                        <details class="mb-3"><summary>{{ 'Show the changed fields'|trans }}</summary>{{ ccm.changes(diff) }}</details>
+                    {% endif %}
+                    {% if can.create %}
+                        <form method="post" action="{{ path('ccm_admin_versions_publish') }}" data-testid="ccm-publish-form">
+                            {{ ccm.csrf() }}
+                            <div class="mb-2"><label class="form-label" for="pub_comment">{{ 'Comment (optional)'|trans }}</label><input class="form-control" id="pub_comment" name="comment" maxlength="255"></div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="pub_substantial" name="substantial" value="1" data-testid="ccm-substantial">
+                                <label class="form-check-label" for="pub_substantial">{{ 'Substantial change'|trans }} {{ ccm.hint('Only for changes of texts or of controllers. It brings the banner back for every visitor, even those who already chose.'|trans) }}</label>
+                                <div class="form-text" data-testid="ccm-substantial-help">{{ 'Tick it only when the texts or the data controllers change in a way visitors should know about: the banner then comes back for every visitor, even those who already chose. Leave it unticked for a correction or an added service that changes nothing for those who consented: their choices stay valid.'|trans }}</div>
+                            </div>
+                            <button class="btn btn-success" type="submit" data-testid="ccm-publish"><i class="bi bi-cloud-upload" aria-hidden="true"></i> {{ 'Publish'|trans }}</button>
+                        </form>
+                    {% else %}
+                        <p class="text-secondary mb-0">{{ 'Publishing needs the CREATE right.'|trans }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100" data-testid="ccm-tools-card">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Preview, verification, transfer'|trans }}</h2></div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <a class="btn btn-outline-secondary" href="{{ path('ccm_admin_preview') }}" target="_blank" rel="noopener"><i class="bi bi-eye" aria-hidden="true"></i> {{ 'Preview the draft on the shop'|trans }}</a>
+                        <a class="btn btn-outline-primary" href="{{ path('ccm_admin_verification') }}" data-testid="ccm-verification-link"><i class="bi bi-clipboard-check" aria-hidden="true"></i> {{ 'Verification'|trans }}</a>
+                        <a class="btn btn-outline-secondary" href="{{ path('ccm_admin_versions_export') }}" data-testid="ccm-export-draft"><i class="bi bi-download" aria-hidden="true"></i> {{ 'Export the draft (JSON)'|trans }}</a>
+                    </div>
+                    <h3 class="h6">{{ 'Import a configuration (JSON)'|trans }}</h3>
+                    <p class="small text-secondary">{{ 'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.'|trans }}</p>
+                    {% if can.update %}
+                        <form method="post" action="{{ path('ccm_admin_versions_import') }}" enctype="multipart/form-data" data-testid="ccm-import-form">
+                            {{ ccm.csrf() }}
+                            <input class="form-control mb-2" type="file" name="config_file" accept="application/json,.json" aria-label="{{ 'JSON file'|trans }}" data-testid="ccm-import-file">
+                            <button class="btn btn-outline-primary" type="submit" data-testid="ccm-import">{{ 'Import into the draft'|trans }}</button>
+                        </form>
+                    {% else %}<p class="text-secondary mb-0">{{ 'Importing needs the UPDATE right.'|trans }}</p>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3" data-testid="ccm-versions-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Published versions'|trans }}</h2></div>
+        <div class="card-body">
+            <table class="table table-sm align-middle mb-0" data-testid="ccm-versions-table">
+                <thead><tr><th>{{ 'Version'|trans }}</th><th>{{ 'Date'|trans }}</th><th>{{ 'Author'|trans }}</th><th>{{ 'Module'|trans }}</th><th>{{ 'Hash'|trans }}</th><th>{{ 'Comment'|trans }}</th><th></th></tr></thead>
+                <tbody>
+                    {% for version in versions_list %}
+                        <tr data-testid="ccm-version-row">
+                            <td><a href="{{ path('ccm_admin_version_show', {number: version.version}) }}"><strong>{{ version.version }}</strong></a>{% if version.substantial %} <span class="badge text-bg-warning">{{ 'substantial'|trans }}</span>{% endif %}</td>
+                            <td>{{ version.createdAt|date('Y-m-d H:i', false) }} UTC</td>
+                            <td>{{ version.author|default('-') }}</td>
+                            <td>{{ version.moduleVersion }}</td>
+                            <td><code>{{ version.servedHash }}</code></td>
+                            <td>{{ version.comment }}</td>
+                            <td class="text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_version_show', {number: version.version}) }}">{{ 'Snapshot'|trans }}</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_versions_export', {version: version.version}) }}">JSON</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="7" class="text-secondary text-center" data-testid="ccm-versions-empty">{{ 'No version published yet.'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if versions_pages > 1 %}
+                <nav class="mt-3" aria-label="{{ 'Pages'|trans }}" data-testid="ccm-versions-pages">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% for number in 1..versions_pages %}
+                            <li class="page-item {{ number == versions_page ? 'active' : '' }}"><a class="page-link" href="{{ path('ccm_admin_versions', {page: number}) }}">{{ number }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

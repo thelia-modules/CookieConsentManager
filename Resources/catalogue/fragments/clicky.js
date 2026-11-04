@@ -1,0 +1,22 @@
+tarteaucitron.services.clicky = {
+    "key": "clicky",
+    "type": "analytic",
+    "name": "Clicky",
+    "uri": "https://clicky.com/terms",
+    "needConsent": true,
+    "cookies": ['_jsuid', '_eventqueue', '_referrer_og', '_utm_og', '_first_pageview', 'clicky_olark', 'no_trackyy_' + tarteaucitron.user.clickyId, 'unpoco_' + tarteaucitron.user.clickyId, 'heatmaps_g2g_' + tarteaucitron.user.clickyId],
+    "js": function () {
+        "use strict";
+        if (tarteaucitron.user.clickyId === undefined) {
+            return;
+        }
+        tarteaucitron.addScript('//static.getclicky.com/js', '', function () {
+            if (typeof clicky.init === 'function') {
+                clicky.init(tarteaucitron.user.clickyId);
+            }
+            if (typeof tarteaucitron.user.clickyMore === 'function') {
+                tarteaucitron.user.clickyMore();
+            }
+        });
+    }
+};

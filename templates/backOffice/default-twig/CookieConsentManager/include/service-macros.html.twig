@@ -1,0 +1,41 @@
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% macro purpose_options(purposes, selected, withEssential, ui) %}
+    {% for purpose in purposes %}
+        <option value="{{ purpose.code }}" {{ purpose.code == selected ? 'selected' : '' }}>{{ purpose.label[ui]|default(purpose.label.en|default(purpose.code)) }}</option>
+    {% endfor %}
+    {% if withEssential %}<option value="essential" {{ selected == 'essential' ? 'selected' : '' }}>{{ 'Essential (strictly necessary)'|trans }}</option>{% endif %}
+{% endmacro %}
+
+
+{% macro custom_form(service, purposes, issues, can, ui) %}
+                {% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+                {% import _self as local %}
+                {% set k = service ? service.key : 'new' %}
+                <form method="post" action="{{ path('ccm_admin_custom_save') }}" class="row g-2" data-testid="ccm-custom-form-{{ k }}">
+                    {{ ccm.csrf() }}
+                    {% if service %}<input type="hidden" name="key" value="{{ service.key }}">{% endif %}
+                    <div class="col-12">{{ ccm.issues(issues, service ? 'services.' ~ service.key : 'services.custom_') }}</div>
+                    <div class="col-md-4"><label class="form-label" for="c_{{ k }}_name">{{ 'Name'|trans }} *</label><input class="form-control" id="c_{{ k }}_name" name="name" value="{{ service.name|default('') }}" data-testid="ccm-custom-name"></div>
+                    <div class="col-md-4"><label class="form-label" for="c_{{ k }}_controller">{{ 'Controller (responsible)'|trans }} *</label><input class="form-control" id="c_{{ k }}_controller" name="controller" value="{{ service.controller|default('') }}"></div>
+                    <div class="col-md-4"><label class="form-label" for="c_{{ k }}_policy">{{ 'Privacy policy URL'|trans }} *</label><input class="form-control" id="c_{{ k }}_policy" name="policy_url" value="{{ service.policy_url|default('') }}"></div>
+                    <div class="col-md-4"><label class="form-label" for="c_{{ k }}_purpose">{{ 'Purpose'|trans }}</label><select class="form-select" id="c_{{ k }}_purpose" name="purpose">{{ local.purpose_options(purposes, service.purpose|default('support'), false, ui) }}</select></div>
+                    <div class="col-md-4">
+                        <span class="form-label d-block">{{ 'Kind'|trans }}</span>
+                        {% for kind, label in {script: 'Script URL', custom: 'Custom code', declarative: 'Declaration only'} %}
+                            <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="kind" id="c_{{ k }}_kind_{{ kind }}" value="{{ kind }}" {{ service.kind|default('declarative') == kind ? 'checked' : '' }}><label class="form-check-label" for="c_{{ k }}_kind_{{ kind }}">{{ label|trans }}</label></div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="c_{{ k }}_enabled" name="enabled" value="1" {{ service and service.enabled ? 'checked' : '' }}><label class="form-check-label" for="c_{{ k }}_enabled">{{ 'Enabled'|trans }}</label></div></div>
+                    <div class="col-md-6"><label class="form-label" for="c_{{ k }}_script">{{ 'Script URL (https)'|trans }}</label><input class="form-control" id="c_{{ k }}_script" name="script_url" value="{{ service.script_url|default('') }}"></div>
+                    <div class="col-md-6"><label class="form-label" for="c_{{ k }}_cookies">{{ 'Cookies, one per line: name; domain; days; description'|trans }}</label><textarea class="form-control font-monospace" rows="2" id="c_{{ k }}_cookies" name="cookies">{% for cookie in service.cookies|default([]) %}{{ cookie.name }}; {{ cookie.domain|default('') }}; {{ cookie.duration_days|default('') }}; {{ cookie.description|default('') }}
+{% endfor %}</textarea></div>
+                    <div class="col-12"><label class="form-label" for="c_{{ k }}_code">{{ 'Code run once the visitor consents (JavaScript)'|trans }}</label><textarea class="form-control font-monospace" rows="3" id="c_{{ k }}_code" name="code" {{ can.update ? '' : 'readonly' }}>{{ service.code|default('') }}</textarea></div>
+                    <div class="col-12">
+                        {% if can.update %}<button class="btn btn-primary" type="submit" data-testid="ccm-custom-save">{{ service ? 'Save'|trans : 'Add the service'|trans }}</button>{% endif %}
+                    </div>
+                </form>
+                {% if service and can.update %}
+                    <form method="post" action="{{ path('ccm_admin_custom_delete', {key: service.key}) }}" class="mt-2">{{ ccm.csrf() }}<button class="btn btn-sm btn-outline-danger" type="submit">{{ 'Remove this service'|trans }}</button></form>
+                {% endif %}
+{% endmacro %}

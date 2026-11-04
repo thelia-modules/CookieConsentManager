@@ -1,0 +1,42 @@
+{# ccm-templates:1 #}
+{# Standalone page: it does not depend on the layout of any theme, with or without JavaScript. head and body carry the banner machinery for visitors who have JavaScript. #}
+<!doctype html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>{{ texts.preferences }}{% if merchant_name %} - {{ merchant_name }}{% endif %}</title>
+    <script>document.documentElement.classList.add('ccm-js');</script>
+    {{ head|raw }}
+</head>
+<body>
+{{ body|raw }}
+<main class="ccm ccm--flexy ccm-page">
+    <h1 class="ccm-title">{{ texts.preferences }}</h1>
+    <p>{{ texts.page_intro }}</p>
+    <p>{{ texts.page_howto }}</p>
+    <p class="ccm-js-only"><button type="button" class="ccm-btn ccm-btn--choice" data-ccm-open>{{ texts.page_open }}</button></p>
+    <noscript><p><strong>{{ texts.page_no_js }}</strong></p></noscript>
+    <section class="ccm-groups">
+        {% for purpose in purposes %}
+            <section class="ccm-group">
+                <h2 class="ccm-group-title">{{ purpose.label }}</h2>
+                <p class="ccm-group-desc">{{ purpose.description }}</p>
+                <ul>
+                    {% for service in purpose.services %}
+                        <li class="ccm-service">
+                            <span class="ccm-service-name">{{ service.name }}</span>
+                            <span class="ccm-service-meta">{{ texts.controller }}{{ texts.colon }}{{ service.controller }}{% if service.policy_url %} · <a class="ccm-link" href="{{ service.policy_url }}" rel="noopener noreferrer">{{ texts.policy }}</a>{% endif %}</span>
+                            <span class="ccm-service-meta">{{ texts.cookies }}{{ texts.colon }}{% if service.cookie_details|default([]) %}{% for cookie in service.cookie_details %}{{ cookie.name }}{% if cookie.duration %} ({{ cookie.duration }}){% endif %}{{ loop.last ? '' : ', ' }}{% endfor %}{% elseif service.cookies %}{{ service.cookies|join(', ') }}{% else %}{{ texts.none }}{% endif %}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    </section>
+    {% if policy_url %}<p><a class="ccm-link" href="{{ policy_url }}">{{ texts.policy }}</a></p>{% endif %}
+    <p><a class="ccm-link" href="/">{{ texts.page_back }}</a></p>
+</main>
+</body>
+</html>

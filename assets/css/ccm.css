@@ -1,0 +1,196 @@
+/* CookieConsentManager: self-contained stylesheet. Themes compile their own CSS and never scan the templates
+   of a module, so nothing here depends on utility classes. The Flexy variables (variables.css of the theme)
+   are used with fallbacks; colors set in the back-office override them through an inline style. */
+.ccm {
+  --ccm-primary: #1a56db;
+  --ccm-on-primary: #fff;
+  --ccm-surface: #fff;
+  --ccm-text: #111827;
+  --ccm-muted: #4b5563;
+  --ccm-border: #d1d5db;
+  --ccm-box-bg: #f3f4f6;
+  --ccm-focus: #1a56db;
+  --ccm-radius: 8px;
+  --ccm-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  font-family: var(--ccm-font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ccm-text);
+}
+.ccm *, .ccm *::before, .ccm *::after { box-sizing: border-box; }
+.ccm--flexy {
+  --ccm-primary: var(--color-black, #282828);
+  --ccm-on-primary: var(--color-white, #fff);
+  --ccm-surface: var(--color-white, #fff);
+  --ccm-text: var(--color-black, #282828);
+  --ccm-muted: var(--color-grey-dark, #545454);
+  --ccm-border: var(--color-grey-lighter, #d6d6d6);
+  --ccm-box-bg: var(--color-grey-lightest, #f5f5f5);
+  --ccm-focus: var(--color-focus, #ff4822);
+  --ccm-font: var(--font-roboto, Roboto, sans-serif);
+}
+.ccm :focus-visible { outline: 3px solid var(--ccm-focus); outline-offset: 2px; }
+
+.ccm-banner, .ccm-panel { position: fixed; z-index: 2147483000; }
+.ccm-panel { inset: 0; z-index: 2147483001; background: rgba(0, 0, 0, .5); }
+.ccm-panel[hidden] { display: none; }
+/* The panel never exceeds the screen, whatever widens the layout viewport (content of the theme). */
+.ccm-panel { max-width: 100vw; }
+.ccm-dialog { background: var(--ccm-surface); color: var(--ccm-text); padding: 16px; }
+.ccm-title { margin: 0 0 8px; font-size: 18px; font-weight: 700; line-height: 1.3; color: inherit; }
+.ccm-merchant { margin: 0; font-size: 13px; color: var(--ccm-muted); }
+.ccm-text p, .ccm-remembered, .ccm-group-desc { margin: 0 0 8px; }
+.ccm-purposes { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0 0 8px; padding: 0; list-style: none; }
+.ccm-purposes li::before { content: "\2022\00a0"; }
+.ccm-link { color: inherit; text-decoration: underline; }
+.ccm-link-btn { padding: 0; background: none; border: 0; font: inherit; cursor: pointer; min-height: 24px; }
+.ccm-banner:focus { outline: none; }
+.ccm-withdrawn { margin: 0 0 8px; font-size: 13px; color: var(--ccm-muted); }
+.ccm-withdrawn[hidden] { display: none; }
+
+.ccm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ccm-btn {
+  min-height: 44px; min-width: 44px; padding: 0 16px; border: 2px solid var(--ccm-primary);
+  border-radius: var(--ccm-radius); font: 600 15px/1.2 var(--ccm-font); cursor: pointer;
+}
+.ccm-btn--choice { background: var(--ccm-primary); color: var(--ccm-on-primary); }
+.ccm-btn--outline { background: transparent; color: var(--ccm-primary); }
+.ccm-close, .ccm-icon-btn {
+  min-height: 44px; min-width: 44px; padding: 0 8px; background: none; border: 0; color: inherit;
+  font: inherit; text-decoration: underline; cursor: pointer;
+}
+.ccm-icon-btn { font-size: 28px; line-height: 1; text-decoration: none; }
+
+/* The text of the first level scrolls inside a focusable region; the shadows at its edges tell that there is more to read. */
+.ccm-banner .ccm-text {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  background:
+    linear-gradient(var(--ccm-surface) 30%, transparent) center top / 100% 16px no-repeat local,
+    linear-gradient(transparent, var(--ccm-surface) 70%) center bottom / 100% 16px no-repeat local,
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, .3), transparent) center top / 100% 8px no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, .3), transparent) center bottom / 100% 8px no-repeat scroll;
+}
+.ccm-banner .ccm-dialog { display: flex; flex-direction: column; }
+/* Title, buttons and links never scroll: only the text does, so that every action stays inside the window whatever its height. */
+.ccm-banner .ccm-title, .ccm-banner .ccm-merchant { flex: 0 0 auto; }
+.ccm-foot { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; }
+.ccm-foot .ccm-policy { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* Bar and bottom sheet leave the page usable: they stay under the toasts of the theme (z-index 99 in Flexy)
+   and the engine reserves their height at the bottom of the page (--ccm-reserve). */
+html.ccm-reserve body { padding-bottom: var(--ccm-reserve, 0); }
+.ccm-banner--bar { left: 0; right: 0; bottom: 0; z-index: 90; box-shadow: 0 -2px 12px rgba(0, 0, 0, .2); }
+.ccm-banner--bar .ccm-dialog { max-height: max(38vh, 150px); padding: 12px 16px; }
+.ccm-banner--bar .ccm-actions { flex: 0 0 auto; padding-top: 8px; }
+.ccm-banner--bar .ccm-actions .ccm-btn { flex: 1 1 calc(50% - 4px); }
+.ccm-banner--bar .ccm-actions .ccm-btn--outline { flex-basis: 100%; }
+.ccm-banner--bar .ccm-merchant { display: none; }
+.ccm-banner--bar .ccm-title { margin-bottom: 4px; font-size: 16px; }
+@media (max-height: 480px) {
+  .ccm-banner--bar .ccm-actions .ccm-btn--outline, .ccm-banner--modal .ccm-actions .ccm-btn--outline { flex: 1 1 0; }
+}
+@media (min-width: 768px) {
+  .ccm-banner--bar .ccm-dialog {
+    display: grid; grid-template-columns: 1fr auto; grid-template-areas: "m a" "t a" "x a" "c a";
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 0 24px; align-items: center; max-width: 1280px; margin: 0 auto; padding: 16px 24px;
+  }
+  .ccm-banner--bar .ccm-merchant { display: block; grid-area: m; }
+  .ccm-banner--bar .ccm-title { grid-area: t; }
+  .ccm-banner--bar .ccm-text { grid-area: x; }
+  .ccm-banner--bar .ccm-foot { grid-area: c; justify-self: start; }
+  .ccm-banner--bar .ccm-actions { grid-area: a; flex-direction: column; min-width: 220px; padding: 0; }
+  .ccm-banner--bar .ccm-actions .ccm-btn { flex: 0 0 auto; }
+}
+
+/* Modal and panel */
+.ccm-banner--modal { inset: 0; background: rgba(0, 0, 0, .5); }
+.ccm-banner--modal .ccm-dialog, .ccm-panel .ccm-dialog {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(560px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto;
+  border-radius: var(--ccm-radius); padding: 20px;
+}
+.ccm-banner--modal .ccm-dialog { max-height: min(40vh, calc(100% - 32px)); overflow: hidden; }
+.ccm-panel .ccm-dialog { width: min(640px, calc(100% - 32px)); }
+.ccm-banner--modal .ccm-actions { flex: 0 0 auto; padding-top: 8px; }
+.ccm-banner--modal .ccm-actions .ccm-btn { flex: 1 1 140px; }
+.ccm-banner--modal .ccm-title { flex: 0 0 auto; }
+/* Under 768 px the modal is a bottom sheet of the same height as the bar: no overlay, the page stays reachable. */
+@media (max-width: 767px) {
+  .ccm-banner--modal { inset: auto 0 0 0; z-index: 90; background: none; pointer-events: none; }
+  .ccm-banner--modal .ccm-dialog {
+    position: static; transform: none; width: auto; max-height: max(38vh, 150px); padding: 12px 16px; pointer-events: auto;
+    border-radius: var(--ccm-radius) var(--ccm-radius) 0 0; box-shadow: 0 -2px 12px rgba(0, 0, 0, .2);
+  }
+  .ccm-banner--modal .ccm-title { margin-bottom: 4px; font-size: 16px; }
+  .ccm-banner--modal .ccm-merchant { display: none; }
+  .ccm-banner--modal .ccm-actions .ccm-btn { flex: 1 1 calc(50% - 4px); }
+  .ccm-banner--modal .ccm-actions .ccm-btn--outline { flex-basis: 100%; }
+}
+.ccm-panel-head, .ccm-group-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ccm-group { margin: 0 0 12px; padding: 12px 0 0; border-top: 1px solid var(--ccm-border); }
+.ccm-group-title { margin: 0; font-size: 16px; font-weight: 700; color: inherit; }
+.ccm-always-on { font-size: 13px; color: var(--ccm-muted); }
+.ccm-services summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
+.ccm-services ul { margin: 0; padding: 0; list-style: none; }
+.ccm-service { padding: 8px 0; border-top: 1px solid var(--ccm-border); }
+.ccm-service-name { font-weight: 600; }
+.ccm-service-meta { margin: 0 0 4px; font-size: 13px; color: var(--ccm-muted); overflow-wrap: anywhere; }
+.ccm-consent-id { margin: 8px 0 12px; font-size: 13px; color: var(--ccm-muted); }
+.ccm-consent-id:has([data-ccm-consent-id]:empty) { display: none; }
+.ccm-consent-id code { user-select: all; }
+
+/* Switch (WCAG 1.4.11, 3:1 against the surface): off = empty track with a dark outline and a dark knob, on = filled track with a light knob. */
+.ccm-switch { position: relative; flex: 0 0 52px; width: 52px; height: 44px; padding: 0; background: none; border: 0; cursor: pointer; }
+.ccm-switch::before {
+  content: ""; position: absolute; left: 0; top: 8px; width: 52px; height: 28px; border-radius: 14px;
+  background: var(--ccm-surface); border: 2px solid var(--ccm-muted); transition: background-color .15s;
+}
+.ccm-switch[aria-checked="true"]::before { background: var(--ccm-primary); border-color: var(--ccm-primary); }
+.ccm-switch[aria-checked="mixed"]::before { background: linear-gradient(90deg, var(--ccm-primary) 50%, var(--ccm-surface) 50%); border-color: var(--ccm-primary); }
+.ccm-switch-knob {
+  position: absolute; top: 14px; left: 6px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--ccm-muted); transition: transform .15s;
+}
+.ccm-switch[aria-checked="true"] .ccm-switch-knob { transform: translateX(24px); background: var(--ccm-on-primary); }
+.ccm-switch[aria-checked="mixed"] .ccm-switch-knob { transform: translateX(12px); background: var(--ccm-text); box-shadow: 0 0 0 2px var(--ccm-surface); }
+@media (prefers-reduced-motion: reduce) { .ccm-switch::before, .ccm-switch-knob { transition: none; } }
+
+/* Placeholder and restored frame: never wider than their container, the ratio of the embed is kept. */
+.ccm-placeholder { display: block; width: 100%; max-width: 100%; }
+iframe[data-ccm-restored] { max-width: 100%; }
+iframe[data-ccm-restored][style*="--ccm-ar"] { height: auto; aspect-ratio: var(--ccm-ar); }
+.ccm-box {
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; width: 100%; min-height: 200px;
+  padding: 16px; background: var(--ccm-box-bg); border: 1px solid var(--ccm-border); border-radius: var(--ccm-radius);
+}
+.ccm-box-title { display: block; margin: 0 0 4px; font-weight: 700; }
+.ccm-box-meta { display: block; margin: 0 0 8px; font-size: 13px; color: var(--ccm-muted); overflow-wrap: anywhere; }
+.ccm-box .ccm-actions { margin-top: 4px; }
+.ccm-nojs-only { display: inline-flex; align-items: center; text-decoration: none; }
+.ccm-js .ccm-nojs-only { display: none; }
+
+/* Floating button and footer link */
+.ccm-floating {
+  position: fixed; bottom: 16px; left: 16px; z-index: 2147482999; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: var(--ccm-primary); color: var(--ccm-on-primary);
+  font: 600 14px/1.2 var(--ccm-font); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+}
+.ccm-floating--bottom-right { left: auto; right: 16px; }
+.ccm-open-link { color: inherit; text-decoration: underline; display: inline-block; min-height: 44px; line-height: 44px; }
+.ccm-footer-link { text-align: center; padding: 8px 16px; }
+
+/* Page without JavaScript */
+.ccm-page { max-width: 760px; margin: 0 auto; padding: 24px 16px; background: var(--ccm-surface); }
+.ccm-page ul { margin: 0; padding: 0; list-style: none; }
+.ccm-page .ccm-service-meta, .ccm-page .ccm-service-name { display: block; }
+.ccm-js-only { display: none; }
+.ccm-js .ccm-js-only { display: block; }
+.ccm-js .ccm-actions.ccm-js-only { display: flex; }
+
+/* Preview of the draft (back-office) */
+.ccm-preview-note {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 2147483002; padding: 6px 12px; text-align: center;
+  background: #fde68a; color: #1f2937; border-bottom: 1px solid #b45309; font: 600 14px/1.4 var(--ccm-font);
+}

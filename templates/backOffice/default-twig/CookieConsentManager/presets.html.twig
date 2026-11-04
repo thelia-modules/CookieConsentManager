@@ -1,0 +1,88 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Presets'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    <p class="text-secondary" data-testid="ccm-presets-intro">{{ 'A preset fills the texts of one language of the shop. The legal settings shared by every language (renewal delay, Consent Mode, registry, layout) follow the preset of the main language. A preset is imported into the draft: nothing is published until you publish, and the version history lets you go back.'|trans }}</p>
+
+    {% if preview is defined %}
+        <div class="card mb-3 border-primary" data-testid="ccm-preset-preview">
+            <div class="card-header"><h2 class="h5 mb-0">{{ 'Preset "%preset%" applied to the language "%language%"'|trans({'%preset%': preview.label, '%language%': preview_language|upper}) }}</h2></div>
+            <div class="card-body">
+                {% if preview.language != preview_language %}
+                    <div class="alert alert-warning" data-testid="ccm-preset-foreign-texts">{{ 'The texts of this preset are written in "%source%": they are copied as they are into the language "%language%". Translate them afterwards.'|trans({'%source%': preview.language|upper, '%language%': preview_language|upper}) }}</div>
+                {% endif %}
+                {% if preview_main %}
+                    <div class="alert alert-info" data-testid="ccm-preset-common-applied">{{ 'This is the main language of the shop: the settings shared by every language are applied too.'|trans }}</div>
+                {% else %}
+                    <div class="alert alert-info" data-testid="ccm-preset-common-kept">{{ 'The main language of the shop is "%main%": the settings shared by every language follow its preset, this import leaves them unchanged.'|trans({'%main%': main_language|upper}) }}</div>
+                {% endif %}
+                {% if preview_rows|length %}
+                    <div class="table-responsive" data-testid="ccm-preset-changes">{{ ccm.changes(preview_rows) }}</div>
+                {% else %}
+                    <p class="mb-0" data-testid="ccm-preset-nothing">{{ 'No difference: the draft already holds these values.'|trans }}</p>
+                {% endif %}
+                {% if can.update %}
+                    <form method="post" action="{{ path('ccm_admin_presets_import') }}" class="mt-3">
+                        {{ ccm.csrf() }}
+                        <input type="hidden" name="preset" value="{{ preview.code }}">
+                        <input type="hidden" name="language" value="{{ preview_language }}">
+                        <button class="btn btn-primary" type="submit" data-testid="ccm-preset-import">{{ 'Import into the draft'|trans }}</button>
+                        <a class="btn btn-link" href="{{ path('ccm_admin_presets') }}">{{ 'Cancel'|trans }}</a>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card mb-3" data-testid="ccm-preset-languages-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Languages of the shop'|trans }}</h2></div>
+        <div class="card-body">
+            <div class="table-responsive"><table class="table table-sm align-middle mb-0" data-testid="ccm-preset-languages">
+                <thead><tr><th>{{ 'Language'|trans }}</th><th>{{ 'Attached preset'|trans }}</th></tr></thead>
+                <tbody>
+                    {% for language in languages %}
+                        <tr data-testid="ccm-preset-language-{{ language }}">
+                            <td>{{ language|upper }} {% if language == main_language %}<span class="badge text-bg-primary">{{ 'main language'|trans }}</span>{% endif %}</td>
+                            <td>
+                                {% if draft.presets[language] is defined %}
+                                    <span data-testid="ccm-preset-attached-{{ language }}">{{ attached[language] ? attached[language].label : draft.presets[language] }} <code>{{ draft.presets[language] }}</code></span>
+                                {% else %}
+                                    <span class="text-secondary" data-testid="ccm-preset-attached-{{ language }}">{{ 'No preset'|trans }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table></div>
+        </div>
+    </div>
+
+    <div class="card mb-3" data-testid="ccm-preset-list-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Available presets'|trans }}</h2></div>
+        <div class="card-body">
+            {% for preset in presets %}
+                <div class="border rounded p-3 mb-3" data-testid="ccm-preset-{{ preset.code }}">
+                    <h3 class="h6">{{ preset.label }} <code>{{ preset.code }}</code></h3>
+                    <p class="small text-secondary mb-2">{{ 'Legal basis'|trans }}{{ ': '|trans }}{{ preset.legalBasis|join(', ') }}.</p>
+                    <form method="get" action="{{ path('ccm_admin_presets_preview') }}" class="row g-2 align-items-end" data-ccm-read>
+                        <input type="hidden" name="preset" value="{{ preset.code }}">
+                        <div class="col-auto">
+                            <label class="form-label" for="preset_language_{{ preset.code }}">{{ 'Language to apply it to'|trans }}</label>
+                            <select class="form-select" id="preset_language_{{ preset.code }}" name="language" data-testid="ccm-preset-language-select-{{ preset.code }}">
+                                {% for language in languages %}
+                                    <option value="{{ language }}" {{ language == (preset.language in languages ? preset.language : main_language) ? 'selected' : '' }}>{{ language|upper }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" type="submit" data-testid="ccm-preset-preview-{{ preset.code }}">{{ 'See what will change'|trans }}</button></div>
+                    </form>
+                </div>
+            {% else %}
+                <p class="mb-0">{{ 'No preset is provided.'|trans }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

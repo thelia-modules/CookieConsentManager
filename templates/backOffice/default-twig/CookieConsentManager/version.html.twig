@@ -1,0 +1,41 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}
+    <li class="breadcrumb-item"><a href="{{ path('ccm_admin_versions') }}">{{ 'Versions and verification'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Version %version%'|trans({'%version%': version.version}) }}</li>
+{% endblock %}
+
+{% block ccm_content %}
+    <div class="card mb-3" data-testid="ccm-version-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">{{ 'Version %version%'|trans({'%version%': version.version}) }}</h2>
+            <div class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ path('ccm_admin_versions_export', {version: version.version}) }}">{{ 'Export (JSON)'|trans }}</a>
+                {% if can.update %}
+                    <form method="post" action="{{ path('ccm_admin_version_restore', {number: version.version}) }}" onsubmit="return confirm('{{ 'Replace the draft with this version?'|trans|e('js') }}')">
+                        {{ ccm.csrf() }}<button class="btn btn-sm btn-outline-primary" type="submit" data-testid="ccm-restore"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> {{ 'Restore as the draft'|trans }}</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <dl class="row small mb-3">
+                <dt class="col-sm-3">{{ 'Date'|trans }}</dt><dd class="col-sm-9">{{ version.createdAt|date('Y-m-d H:i:s', false) }} UTC</dd>
+                <dt class="col-sm-3">{{ 'Author'|trans }}</dt><dd class="col-sm-9">{{ version.author|default('-') }}</dd>
+                <dt class="col-sm-3">{{ 'Module'|trans }}</dt><dd class="col-sm-9">{{ version.moduleVersion }}</dd>
+                <dt class="col-sm-3">{{ 'Served hash'|trans }}</dt><dd class="col-sm-9"><code>{{ version.servedHash }}</code></dd>
+                <dt class="col-sm-3">{{ 'Configuration hash'|trans }}</dt><dd class="col-sm-9"><code class="text-break">{{ version.configHash }}</code></dd>
+                <dt class="col-sm-3">{{ 'Script hash'|trans }}</dt><dd class="col-sm-9"><code class="text-break">{{ version.jsHash }}</code></dd>
+                <dt class="col-sm-3">{{ 'Comment'|trans }}</dt><dd class="col-sm-9">{{ version.comment }}{% if version.substantial %} <span class="badge text-bg-warning">{{ 'substantial change'|trans }}</span>{% endif %}</dd>
+            </dl>
+            <h3 class="h6">{{ 'Changes from the previous version'|trans }}</h3>
+            {% if not has_previous %}<p class="text-secondary">{{ 'First version.'|trans }}</p>
+            {% elseif diff|length == 0 %}<p class="text-secondary">{{ 'No change in the configuration.'|trans }}</p>
+            {% else %}<div data-testid="ccm-version-diff">{{ ccm.changes(diff) }}</div>{% endif %}
+            <h3 class="h6">{{ 'Snapshot (what the visitor depended on)'|trans }}</h3>
+            <pre class="border rounded p-2 bg-body-tertiary small ccm-pre" data-testid="ccm-snapshot"><code>{{ snapshot_json }}</code></pre>
+        </div>
+    </div>
+{% endblock %}

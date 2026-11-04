@@ -1,0 +1,31 @@
+tarteaucitron.services.canalu = {
+    "key": "canalu",
+    "type": "video",
+    "name": "Canal-U.tv",
+    "uri": "https://www.canal-u.tv/conditions-generales-utilisations",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['canalu_player'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'Canal-u.tv iframe',
+                video_title = tarteaucitron.getElemAttr(x, "videoTitle"),
+                frame_url = 'https://www.canal-u.tv/embed/' + video_title,
+                width = tarteaucitron.getElemAttr(x, 'width'),
+                height = tarteaucitron.getElemAttr(x, 'height');
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return '<iframe title="' + frame_title + '" src="' + frame_url + '?width=100%&amp;height=100%" ' +
+                'style="' + styleAttr + '" ' +
+                'allowfullscreen>' +
+                '</iframe>';
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        tarteaucitron.fallback(['canalu_player'], function (elem) {
+            return tarteaucitron.engage('canalu');
+        });
+    }
+};

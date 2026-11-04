@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
+    <fullnamespace>CookieConsentManager\CookieConsentManager</fullnamespace>
+    <descriptive locale="en_US">
+        <title>Cookie consent manager</title>
+        <subtitle>Consent banner, registry and Google Consent Mode v2</subtitle>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Gestion du consentement aux cookies</title>
+        <subtitle>Bannière, registre de consentement et Google Consent Mode v2</subtitle>
+    </descriptive>
+    <languages>
+        <language>en_US</language>
+        <language>fr_FR</language>
+        <language>de_DE</language>
+        <language>es_ES</language>
+        <language>nl_NL</language>
+    </languages>
+    <version>1.0.0</version>
+    <authors>
+        <author>
+            <name>OpenStudio</name>
+            <email>dev@openstudio.fr</email>
+        </author>
+    </authors>
+    <type>classic</type>
+    <thelia>3.0.0</thelia>
+    <stability>prod</stability>
+    <mandatory>0</mandatory>
+    <hidden>0</hidden>
+</module>

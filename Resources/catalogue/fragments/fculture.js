@@ -1,0 +1,26 @@
+tarteaucitron.services.fculture = {
+    "key": "fculture",
+    "type": "video",
+    "name": "France Culture",
+    "needConsent": true,
+    "cookies": ["_gid", "didomi_token", "outbrain_cid_fetch", "xtvrn", "xtant", "YSC", "ABTasty", "xtan", "ABTastySession", "xtidc", "_ga", "VISITOR_INFO1_LIVE", "euconsent-v2", "v1st", "dmvk", "ts", "VISITOR_INFO1_LIVE", "YSC"],
+    "uri": "https://www.radiofrance.com/politique-d-utilisation-des-cookies-sur-les-sites-internet-du-groupe-radio-france",
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['fculture_embed'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'France culture iframe',
+                id = tarteaucitron.getElemAttr(x, 'id'),
+                width = tarteaucitron.getElemAttr(x, 'width'),
+                height = tarteaucitron.getElemAttr(x, 'height');
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return "<iframe title=\"" + frame_title + "\" src=\"https://www.franceculture.fr/player/export-reecouter?content=" + id + "\" style=\"" + styleAttr + "\"></iframe>"
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = "fculture";
+        tarteaucitron.fallback(["fculture_embed"], tarteaucitron.engage(id));
+    }
+};

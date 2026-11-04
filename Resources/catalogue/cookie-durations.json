@@ -1,0 +1,9 @@
+{
+  "gtag": [ {"name": "_ga", "duration_days": 396}, {"name": "_ga_*", "duration_days": 396} ],
+  "googleads": [ {"name": "_ga", "duration_days": 396}, {"name": "_ga_*", "duration_days": 396}, {"name": "_gcl_au", "duration_days": 90} ],
+  "googletagmanager": [ {"name": "_ga", "duration_days": 730}, {"name": "_ga_*", "duration_days": 730}, {"name": "_gcl_au", "duration_days": 90} ],
+  "youtube": [ {"name": "VISITOR_INFO1_LIVE", "duration_days": 182}, {"name": "YSC", "duration_days": 0}, {"name": "PREF", "duration_days": 243}, {"name": "__Secure-YNID", "duration_days": 182}, {"name": "__Secure-ROLLOUT_TOKEN", "duration_days": 182} ],
+  "matomo": [ {"name": "_pk_id", "duration_days": 396}, {"name": "_pk_ses", "duration_minutes": 30}, {"name": "_pk_ref", "duration_days": 182}, {"name": "_pk_cvar", "duration_minutes": 30} ],
+  "matomotm": [ {"name": "_pk_id", "duration_days": 396}, {"name": "_pk_ses", "duration_minutes": 30}, {"name": "_pk_ref", "duration_days": 182}, {"name": "_pk_cvar", "duration_minutes": 30} ],
+  "matomocloud": [ {"name": "_pk_id", "duration_days": 396}, {"name": "_pk_ses", "duration_minutes": 30}, {"name": "_pk_ref", "duration_days": 182}, {"name": "_pk_cvar", "duration_minutes": 30}, {"name": "_pk_hsr", "duration_minutes": 30}, {"name": "matomo_sessid", "duration_days": 14} ]
+}

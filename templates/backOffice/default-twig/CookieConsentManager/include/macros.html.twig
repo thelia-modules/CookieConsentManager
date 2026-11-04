@@ -1,0 +1,36 @@
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% macro csrf() %}<input type="hidden" name="_token" value="{{ assignToken() }}">{% endmacro %}
+
+{# Badge of a catalogue service that is not verified; nothing for a verified, custom or proposed one. #}
+{% macro experimental(key) %}{% if ccm_is_experimental(key) %}<span class="badge text-bg-warning" data-testid="ccm-experimental-badge">{{ 'experimental'|trans }}</span>{% endif %}{% endmacro %}
+
+{% macro hint(text) %}
+    <i class="bi bi-info-circle ms-1 text-secondary" tabindex="0" role="img" data-bs-toggle="tooltip" title="{{ text }}" aria-label="{{ text }}"></i>
+{% endmacro %}
+
+{# Issues of one saved section: errors block the save, warnings do not. #}
+{% macro issues(list, prefix) %}
+    {% set shown = list|filter(i => prefix is empty or i.field starts with prefix) %}
+    {% if shown|length %}
+        <div class="alert alert-{{ shown|filter(i => i.severity == 'error')|length ? 'danger' : 'warning' }}" role="alert" data-testid="ccm-issues">
+            <ul class="mb-0">
+                {% for issue in shown %}
+                    <li data-testid="ccm-issue-{{ issue.code }}" data-field="{{ issue.field }}"><strong>{{ ccm_field(issue.field) }}</strong> : {{ issue.code == 'environment_unconfirmed' ? 'Imported from another site: check it, then confirm it.'|trans : issue.message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{# Changes between two configurations: label, previous value, new value. #}
+{% macro changes(rows) %}
+    <table class="table table-sm small mt-2 mb-0" data-testid="ccm-changes">
+        <thead><tr><th>{{ 'Field'|trans }}</th><th>{{ 'Before'|trans }}</th><th>{{ 'After'|trans }}</th></tr></thead>
+        <tbody>
+            {% for row in rows %}
+                <tr title="{{ row.path }}"><td>{{ row.label }}</td><td class="text-break">{{ row.before }}</td><td class="text-break">{{ row.after }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

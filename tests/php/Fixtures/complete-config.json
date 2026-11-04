@@ -1,0 +1,51 @@
+{
+  "schema": "ccm-config/1",
+  "exported_at": "2026-10-31T10:12:00Z",
+  "module_version": "1.0.0",
+  "source_version": 7,
+  "environment": ["services[*].parameters", "policy.url", "consent_mode.regions"],
+  "general": {
+    "enabled": true, "layout": "modal", "close_button": true, "floating_button": true,
+    "reload_on_script_withdraw": false, "block_embedded_iframes": false, "experimental_services": true, "renewal_months": 9
+  },
+  "policy": { "url": "/politique-de-confidentialite", "page_title": "Politique de confidentialité" },
+  "texts": {
+    "fr": { "title": "Titre FR", "body": "Corps FR", "accept": "Accepter", "reject": "Refuser", "customize": "Choisir", "close": "Continuer sans accepter", "allow": "Autoriser", "preferences": "Gérer mes cookies", "free_text": "Texte libre FR" },
+    "en": { "title": "Title EN", "body": "Body EN", "accept": "Accept", "reject": "Reject", "customize": "Choose", "close": "Continue without accepting", "allow": "Allow", "preferences": "Manage my cookies", "free_text": "Free text EN" },
+    "de": { "title": "Titel DE", "body": "Text DE", "accept": "Alle akzeptieren", "reject": "Alle ablehnen", "customize": "Anpassen", "close": "Ohne Zustimmung fortfahren", "allow": "Erlauben", "preferences": "Cookies verwalten", "free_text": "" }
+  },
+  "appearance": { "colors": { "primary": "#0b5fff", "surface": "#fafafa", "text": "#101010" } },
+  "purposes": [
+    { "code": "analytics", "order": 1, "consent_mode": ["analytics_storage"], "label": { "fr": "Mesure", "en": "Measurement" }, "description": { "fr": "Mesurer.", "en": "Measure." } },
+    { "code": "ads", "order": 2, "consent_mode": ["ad_storage", "ad_user_data", "ad_personalization"], "label": { "fr": "Pub", "en": "Ads" }, "description": { "fr": "Pub.", "en": "Ads." } },
+    { "code": "media", "order": 3, "consent_mode": [], "label": { "fr": "Médias", "en": "Media" }, "description": { "fr": "Médias.", "en": "Media." } },
+    { "code": "support", "order": 4, "consent_mode": [], "label": { "fr": "Support", "en": "Support" }, "description": { "fr": "Chat.", "en": "Chat." } },
+    { "code": "personalization", "order": 5, "consent_mode": ["functionality_storage", "personalization_storage"], "label": { "fr": "Préférences", "en": "Preferences" }, "description": { "fr": "Préférences.", "en": "Preferences." } },
+    { "code": "reviews", "order": 6, "consent_mode": [], "label": { "fr": "Avis", "en": "Reviews" }, "description": { "fr": "Avis clients.", "en": "Customer reviews." } }
+  ],
+  "services": [
+    { "key": "gtag", "verified": true, "purpose": "analytics", "enabled": true, "parameters": { "gtagUa": "G-ABC123XYZ" } },
+    { "key": "googletagmanager", "verified": true, "purpose": "ads", "enabled": false, "parameters": { "googletagmanagerId": "GTM-ABCD12" } },
+    { "key": "youtube", "verified": true, "purpose": "media", "enabled": true, "parameters": {}, "cookie_durations": { "VISITOR_PRIVACY_METADATA": 180 } },
+    { "key": "matomo", "verified": true, "purpose": "analytics", "enabled": true, "parameters": { "matomoId": "3", "matomoHost": "https://stats.example.com" }, "controller": "Exemple SAS", "cookie_durations": { "_pk_id.*": 395, "_pk_ses.*": 1 } },
+    { "key": "obscure", "verified": false, "purpose": "personalization", "enabled": true, "parameters": {}, "controller": "Exemple SAS" },
+    { "key": "chat_maison", "custom": true, "kind": "declarative", "purpose": "support", "enabled": true, "name": "Chat maison", "controller": "Exemple SAS", "policy_url": "https://example.com/privacy", "cookies": [ { "name": "chat_id", "domain": ".example.com", "duration_days": 365, "description": "Identifiant de conversation" } ] },
+    { "key": "avis", "custom": true, "kind": "script", "purpose": "reviews", "enabled": true, "name": "Avis", "controller": "Avis SA", "policy_url": "https://avis.example.com/privacy", "cookies": [], "script_url": "https://avis.example.com/widget.js" },
+    { "key": "pixel_maison", "custom": true, "kind": "custom", "purpose": "ads", "enabled": false, "name": "Pixel maison", "controller": "Maison SARL", "policy_url": "https://maison.example.com/privacy", "cookies": [ { "name": "px_*" } ], "code": "window.px=1;" },
+    { "key": "payzen_antifraud", "module": true, "proposed": false, "kind": "declarative", "purpose": "essential", "enabled": true, "name": "Payzen anti-fraude", "controller": "Lyra Network", "policy_url": "https://payzen.eu/privacy", "cookies": [ { "name": "payzen_fp", "domain": ".payzen.eu", "duration_days": 1 } ], "strictly_necessary": true, "justification": "Cookie de sécurité du paiement." },
+    { "key": "payzen_tracking", "module": true, "proposed": true, "kind": "script", "purpose": "analytics", "enabled": false, "name": "Payzen suivi", "controller": "Lyra Network", "policy_url": "https://payzen.eu/privacy", "cookies": [ { "name": "payzen_conv", "domain": ".payzen.eu", "duration_days": 90 } ], "script_url": "https://static.payzen.eu/track.js", "strictly_necessary": false }
+  ],
+  "consent_mode": {
+    "enabled": true, "mode": "advanced", "ads_data_redaction": true, "url_passthrough": true, "wait_for_update_ms": 800,
+    "regions": [
+      { "iso": ["FR", "ES-CT"], "default": { "analytics_storage": "denied", "ad_storage": "denied" } },
+      { "iso": ["US-CA"], "default": { "analytics_storage": "granted" } }
+    ],
+    "uet": { "enabled": true }
+  },
+  "exempt_measurement": [
+    { "service": "matomo", "conditions": { "audience_measurement_only": true, "no_cross_site_tracking": true, "no_third_party_sharing": true, "limited_retention": true, "opposition_offered": true } }
+  ],
+  "registry": { "retention_months": 36, "ip_mode": "truncated", "link_customer": true },
+  "presets": { "fr": "fr-FR", "de": "de-DE" }
+}

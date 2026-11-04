@@ -11,3 +11,4 @@
 /.idea/
 /.vscode/
 .DS_Store
+/.phpstan.cache/

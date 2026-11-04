@@ -1,0 +1,31 @@
+tarteaucitron.services.slideshare = {
+    "key": "slideshare",
+    "type": "video",
+    "name": "SlideShare",
+    "uri": "https://www.linkedin.com/legal/privacy-policy",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['slideshare-canvas'], function (x) {
+            var frame_title = tarteaucitron.getElemAttr(x, "title") || 'Slideshare iframe',
+                id = tarteaucitron.getElemAttr(x, "data-id"),
+                width = tarteaucitron.getElemAttr(x, "width"),
+                height = tarteaucitron.getElemAttr(x, "height"),
+                url = '//www.slideshare.net/slideshow/embed_code/key/' + id;
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return '<iframe title="' + frame_title + '" src="' + url + '" style="' + styleAttr + '" allowtransparency allowfullscreen></iframe>';
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'slideshare';
+        tarteaucitron.fallback(['slideshare-canvas'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'width'));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'height'));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

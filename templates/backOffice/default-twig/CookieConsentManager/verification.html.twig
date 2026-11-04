@@ -1,0 +1,224 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+
+{% block ccm_crumb %}
+    <li class="breadcrumb-item"><a href="{{ path('ccm_admin_versions') }}">{{ 'Versions and verification'|trans }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ 'Verification'|trans }}</li>
+{% endblock %}
+
+{% block ccm_content %}
+    <div class="card mb-3" data-testid="ccm-verification-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Verification of the published version'|trans }}</h2></div>
+        <div class="card-body">
+            {% if not published %}
+                <div class="alert alert-warning" data-testid="ccm-verification-nopublication">{{ 'Nothing is published: publish a version first, the verification audits what visitors get.'|trans }}</div>
+            {% endif %}
+            <p class="text-secondary">{{ 'Each page is loaded in audit mode (no choice read, nothing written), first before any choice, then as if the visitor had pressed "Reject all". Third-party domains contacted and readable cookies are listed with a verdict.'|trans }}</p>
+
+            <form id="ccm-audit-form" class="mb-3" data-testid="ccm-audit-form">
+                <div class="row g-2">
+                    {% for label, url in presets %}
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" checked aria-label="{{ label|trans }}" data-ccm-run></div>
+                                <span class="input-group-text" style="min-width:6rem">{{ label|trans }}</span>
+                                <input class="form-control" type="text" value="{{ url }}" data-ccm-url aria-label="URL {{ label|trans }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <div class="input-group-text"><input class="form-check-input mt-0" type="checkbox" aria-label="{{ 'Other page'|trans }}" data-ccm-run></div>
+                            <span class="input-group-text" style="min-width:6rem">{{ 'Other page'|trans }}</span>
+                            <input class="form-control" type="text" placeholder="/ma-page" data-ccm-url aria-label="URL {{ 'Other page'|trans }}">
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-secondary mt-2">{{ 'Same-origin pages only (this shop).'|trans }}</p>
+                <button class="btn btn-primary" type="submit" id="ccm-audit-start" data-testid="ccm-audit-start" {{ published ? '' : 'disabled' }}><i class="bi bi-play-fill" aria-hidden="true"></i> {{ 'Run the verification'|trans }}</button>
+                <span class="ms-2 small text-secondary" id="ccm-audit-progress" aria-live="polite" data-testid="ccm-audit-progress"></span>
+            </form>
+
+            <div id="ccm-audit-frame-wrap" class="border rounded mb-3" hidden>
+                <iframe id="ccm-audit-frame" title="{{ 'Audited page'|trans }}" style="width:100%;height:260px;border:0" referrerpolicy="same-origin"></iframe>
+            </div>
+
+            <div id="ccm-audit-result" hidden data-testid="ccm-audit-result">
+                <h3 class="h6">{{ 'Result'|trans }}</h3>
+                <p id="ccm-audit-summary" class="mb-2" data-testid="ccm-audit-summary"></p>
+                <div id="ccm-audit-alerts"></div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle" data-testid="ccm-audit-domains">
+                        <thead><tr><th>{{ 'Third-party domain'|trans }}</th><th>{{ 'Origin'|trans }}</th><th>{{ 'Verdict'|trans }}</th><th>{{ 'Seen'|trans }}</th></tr></thead>
+                        <tbody id="ccm-audit-domains"></tbody>
+                    </table>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle" data-testid="ccm-audit-cookies">
+                        <thead><tr><th>{{ 'Cookie readable by the page'|trans }}</th><th>{{ 'Service'|trans }}</th><th>{{ 'Verdict'|trans }}</th><th>{{ 'Seen'|trans }}</th></tr></thead>
+                        <tbody id="ccm-audit-cookies"></tbody>
+                    </table>
+                </div>
+                <form method="post" action="{{ path('ccm_admin_verification_report') }}" id="ccm-audit-export" data-ccm-read>
+                    {{ ccm.csrf() }}<input type="hidden" name="reports" value="[]">
+                    <button class="btn btn-primary" type="submit" name="format" value="html" formtarget="_blank" data-testid="ccm-audit-export"><i class="bi bi-printer" aria-hidden="true"></i> {{ 'Open the report (printable)'|trans }}</button>
+                    <button class="btn btn-outline-secondary" type="submit" name="format" value="json" data-testid="ccm-audit-export-json"><i class="bi bi-download" aria-hidden="true"></i> {{ 'Download the report (JSON)'|trans }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100" data-testid="ccm-verification-limits">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Limits of this check'|trans }}</h2></div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>{{ 'Cookies flagged HttpOnly are invisible to the page: they are not listed.'|trans }}</li>
+                        <li>{{ 'Requests made inside third-party iframes are not visible: only the iframe domain is.'|trans }}</li>
+                        <li>{{ 'The domains come from Resource Timing: a request blocked by the browser or made after the reading delay is not seen.'|trans }}</li>
+                        <li>{{ 'The rest (Tag Assistant, keyboard, screen reader, mobile) stays on the project manager checklist.'|trans }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100" data-testid="ccm-verification-services">
+                <div class="card-header"><h2 class="h5 mb-0">{{ 'Services of the published version'|trans }}</h2></div>
+                <div class="card-body">
+                    <ul class="small mb-0">{% for service in services %}<li>{{ service.name }} {{ ccm.experimental(service.key) }} ({{ ccm_purpose(service.purpose) }}) : {{ service.domains|join(', ')|default('-') }}</li>{% else %}<li class="text-secondary">{{ 'None.'|trans }}</li>{% endfor %}</ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_extra %}
+    {% set ccm_i18n = {
+        sep: ': '|trans,
+        before: 'before any choice'|trans,
+        after_reject: 'after "Reject all"'|trans,
+        ko: 'Contacted without consent: to fix'|trans,
+        todo: 'To handle'|trans,
+        origin_managed: 'Managed service'|trans,
+        origin_outside: 'Loaded outside the module (theme or hard-coded)'|trans,
+        origin_fonts: 'Theme fonts'|trans,
+        warn: 'expected in advanced mode'|trans,
+        ok: 'allowed'|trans,
+        timeout: 'no reading received (timeout)'|trans,
+        running: 'Auditing %url% (%phase%)...'|trans,
+        done: 'Done: %ko% to fix, %todo% to handle, %warn% to confirm, %ok% allowed.'|trans,
+        none: 'No third-party domain contacted.'|trans,
+        none_cookies: 'No cookie other than the technical ones.'|trans,
+        pages: '%count% page(s)'|trans,
+        examples: 'Examples'|trans,
+        foreign: 'Only same-origin pages can be audited.'|trans,
+        gtag_twice: 'gtag.js and Tag Manager are both loaded on %url%.'|trans,
+        gtag_theme_and_module: 'Google Tag Manager is hard-coded in the theme (%url%) while the module also runs %services%: after consent Google is loaded twice. Keep only one of the two.'|trans,
+        origins: 'Of which %outside% loaded outside the module (theme or hard-coded) and %fonts% theme fonts.'|trans,
+        version_mismatch: 'The page %url% was served version %served%, the published one is %published%.'|trans,
+        failed: 'The analysis failed.'|trans,
+    } %}
+    <script>
+        (function () {
+            var cfg = {{ {token: audit_token, csrf: assignToken(), analyse: path('ccm_admin_verification_analyse'), i18n: ccm_i18n}|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }};
+            var form = document.getElementById('ccm-audit-form');
+            var frame = document.getElementById('ccm-audit-frame');
+            var progress = document.getElementById('ccm-audit-progress');
+            var reports = [];
+
+            function el(tag, text, cls) { var e = document.createElement(tag); if (text !== undefined) { e.textContent = text; } if (cls) { e.className = cls; } return e; }
+            function tpl(text, vars) { return text.replace(/%(\w+)%/g, function (m, k) { return vars[k] !== undefined ? vars[k] : m; }); }
+            function auditUrl(raw, phase) {
+                var url = new URL(raw, window.location.origin);
+                if (url.origin !== window.location.origin) { return null; }
+                url.searchParams.set('ccm_audit', cfg.token);
+                url.searchParams.set('ccm_audit_phase', phase);
+                return url.toString();
+            }
+            function readPage(url, phase) {
+                return new Promise(function (resolve) {
+                    var done = false;
+                    function finish(report) { if (done) { return; } done = true; window.removeEventListener('message', onMessage); clearTimeout(timer); resolve(report); }
+                    function onMessage(event) {
+                        var data = event.data;
+                        if (event.origin !== window.location.origin || event.source !== frame.contentWindow) { return; }
+                        if (data && data.source === 'ccm-audit' && data.phase === phase) { data.url = data.url || url; finish(data); }
+                    }
+                    var timer = setTimeout(function () { finish({source: 'ccm-audit', phase: phase, url: url, error: 'timeout', hosts: [], cookies: []}); }, 25000);
+                    window.addEventListener('message', onMessage);
+                    frame.src = auditUrl(url, phase);
+                });
+            }
+            function seenCell(item) {
+                var td = el('td', undefined, 'small');
+                ['before', 'after_reject'].forEach(function (phase) {
+                    var info = item.pages[phase];
+                    if (!info.count) { return; }
+                    var line = el('div');
+                    line.appendChild(document.createTextNode(cfg.i18n[phase] + cfg.i18n.sep + tpl(cfg.i18n.pages, {count: info.count}) + ' '));
+                    var details = el('details', undefined, 'd-inline');
+                    details.appendChild(el('summary', cfg.i18n.examples, 'd-inline'));
+                    var list = el('ul', undefined, 'mb-0');
+                    info.examples.forEach(function (example) { list.appendChild(el('li', example, 'font-monospace')); });
+                    details.appendChild(list);
+                    line.appendChild(details);
+                    td.appendChild(line);
+                });
+                return td;
+            }
+            function render(result) {
+                document.getElementById('ccm-audit-result').hidden = false;
+                var s = result.summary;
+                document.getElementById('ccm-audit-summary').textContent = tpl(cfg.i18n.done, {ko: s.ko, todo: s.todo, warn: s.warn, ok: s.ok}) + ' ' + tpl(cfg.i18n.origins, {outside: result.origins.outside, fonts: result.origins.fonts});
+                var alerts = document.getElementById('ccm-audit-alerts'); alerts.textContent = '';
+                result.alerts.forEach(function (a) { alerts.appendChild(el('div', tpl(cfg.i18n[a.code] || a.code, a), 'alert alert-danger py-2')); });
+                reports.filter(function (r) { return r.error; }).forEach(function (r) { alerts.appendChild(el('div', r.url + ' - ' + cfg.i18n.timeout, 'alert alert-warning py-2')); });
+                [['ccm-audit-domains', result.domains, 'host'], ['ccm-audit-cookies', result.cookies, 'name']].forEach(function (spec) {
+                    var body = document.getElementById(spec[0]); body.textContent = '';
+                    if (!spec[1].length) { var tr = el('tr'); var td = el('td', spec[0] === 'ccm-audit-cookies' ? cfg.i18n.none_cookies : cfg.i18n.none, 'text-secondary'); td.colSpan = 4; tr.appendChild(td); body.appendChild(tr); return; }
+                    spec[1].forEach(function (item) {
+                        var tr = el('tr'); tr.dataset.testid = 'ccm-audit-row-' + item.verdict;
+                        tr.appendChild(el('td', item[spec[2]], 'font-monospace'));
+                        tr.appendChild(el('td', item.origin ? cfg.i18n['origin_' + item.origin] + (item.name ? cfg.i18n.sep + item.name : '') : (item.service || '-')));
+                        var badge = el('span', cfg.i18n[item.verdict], 'badge text-bg-' + ({ko: 'danger', todo: 'warning', warn: 'info', ok: 'success'}[item.verdict]));
+                        var verdict = el('td'); verdict.appendChild(badge); tr.appendChild(verdict);
+                        tr.appendChild(seenCell(item));
+                        body.appendChild(tr);
+                    });
+                });
+                document.querySelector('#ccm-audit-export [name=reports]').value = JSON.stringify(reports);
+            }
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                var urls = [];
+                form.querySelectorAll('.input-group').forEach(function (group) {
+                    var run = group.querySelector('[data-ccm-run]'); var input = group.querySelector('[data-ccm-url]');
+                    if (run && run.checked && input.value.trim() !== '') { urls.push(input.value.trim()); }
+                });
+                if (urls.some(function (u) { return auditUrl(u, 'before') === null; })) { progress.textContent = cfg.i18n.foreign; return; }
+                document.getElementById('ccm-audit-start').disabled = true;
+                document.getElementById('ccm-audit-frame-wrap').hidden = false;
+                reports = [];
+                for (var i = 0; i < urls.length; i++) {
+                    for (var p = 0; p < 2; p++) {
+                        var phase = p === 0 ? 'before' : 'after_reject';
+                        progress.textContent = tpl(cfg.i18n.running, {url: urls[i], phase: cfg.i18n[phase]});
+                        reports.push(await readPage(urls[i], phase));
+                    }
+                }
+                progress.textContent = '';
+                var body = new URLSearchParams({_token: cfg.csrf, reports: JSON.stringify(reports)});
+                try {
+                    var response = await fetch(cfg.analyse, {method: 'POST', body: body, credentials: 'same-origin'});
+                    if (!response.ok) { throw new Error(String(response.status)); }
+                    render(await response.json());
+                } catch (error) { progress.textContent = cfg.i18n.failed + ' ' + error.message; }
+                document.getElementById('ccm-audit-frame-wrap').hidden = true;
+                document.getElementById('ccm-audit-start').disabled = false;
+            });
+        })();
+    </script>
+{% endblock %}

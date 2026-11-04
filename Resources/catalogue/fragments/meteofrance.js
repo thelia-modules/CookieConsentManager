@@ -1,0 +1,31 @@
+tarteaucitron.services.meteofrance = {
+    "key": "meteofrance",
+    "type": "api",
+    "name": "Météo France",
+    "uri": "https://meteofrance.com/politique-de-confidentialite",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['tac_meteofrance'], function (x) {
+            var frame_title = tarteaucitron.getElemAttr(x, "title") || 'Météo France iframe',
+                width = tarteaucitron.getElemAttr(x, "width"),
+                height = tarteaucitron.getElemAttr(x, "height"),
+                insee = tarteaucitron.getElemAttr(x, "data-insee"),
+                allowfullscreen = tarteaucitron.getElemAttr(x, "allowfullscreen");
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return '<iframe title="' + frame_title + '" src="https://meteofrance.com/widget/prevision/' + insee + '" style="' + styleAttr + '" allowtransparency ' + (allowfullscreen == '0' ? '' : ' webkitallowfullscreen mozallowfullscreen allowfullscreen') + '></iframe>';
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'meteofrance';
+        tarteaucitron.fallback(['tac_meteofrance'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'width'));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'height'));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

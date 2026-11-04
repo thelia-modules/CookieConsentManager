@@ -1,0 +1,876 @@
+{
+  "gtag": {
+    "name": "Google Analytics 4",
+    "purpose": "analytics",
+    "kind": "script",
+    "googleTag": true,
+    "domains": [
+      "www.googletagmanager.com",
+      "www.google-analytics.com",
+      "region1.google-analytics.com"
+    ],
+    "cookies": [
+      "_ga",
+      "_ga_*"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "gtagUa": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant de mesure GA4",
+          "en": "GA4 measurement ID"
+        },
+        "help": {
+          "fr": "Identifiant de la forme G-XXXXXXXXXX, visible dans Google Analytics > Administration > Flux de données.",
+          "en": "ID in the form G-XXXXXXXXXX, shown in Google Analytics > Admin > Data streams."
+        },
+        "pattern": "^(G|GT)-[A-Z0-9]+$"
+      },
+      "gtagCustomDomain": {
+        "required": false,
+        "label": {
+          "fr": "Domaine de chargement personnalisé",
+          "en": "Custom loading domain"
+        },
+        "help": {
+          "fr": "Laisser vide pour www.googletagmanager.com. Sinon, domaine d'un serveur de balisage (sans https://).",
+          "en": "Leave empty for www.googletagmanager.com. Otherwise the domain of a tagging server (without https://)."
+        },
+        "pattern": "^[A-Za-z0-9.-]+$"
+      },
+      "gtagCrossdomain": {
+        "required": false,
+        "label": {
+          "fr": "Domaines de suivi inter-sites",
+          "en": "Cross-domain tracking domains"
+        },
+        "help": {
+          "fr": "Domaines à relier au suivi (laisser vide si un seul domaine).",
+          "en": "Domains to link in tracking (leave empty for a single domain)."
+        },
+        "pattern": null
+      }
+    }
+  },
+  "googletagmanager": {
+    "name": "Google Tag Manager",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": true,
+    "domains": [
+      "www.googletagmanager.com"
+    ],
+    "cookies": [
+      "_ga",
+      "_ga_*",
+      "_gcl_au"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "googletagmanagerId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du conteneur",
+          "en": "Container ID"
+        },
+        "help": {
+          "fr": "Identifiant de la forme GTM-XXXXXXX, visible dans l'interface Google Tag Manager.",
+          "en": "ID in the form GTM-XXXXXXX, shown in the Google Tag Manager interface."
+        },
+        "pattern": "^GTM-[A-Z0-9]+$"
+      },
+      "googletagmanagerCustomDomain": {
+        "required": false,
+        "label": {
+          "fr": "Domaine de chargement personnalisé",
+          "en": "Custom loading domain"
+        },
+        "help": {
+          "fr": "Laisser vide pour www.googletagmanager.com. Sinon, domaine d'un serveur de balisage (sans https://).",
+          "en": "Leave empty for www.googletagmanager.com. Otherwise the domain of a tagging server (without https://)."
+        },
+        "pattern": "^[A-Za-z0-9.-]+$"
+      }
+    }
+  },
+  "googleads": {
+    "name": "Google Ads",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": true,
+    "domains": [
+      "www.googletagmanager.com",
+      "www.googleadservices.com",
+      "googleads.g.doubleclick.net"
+    ],
+    "cookies": [
+      "_ga",
+      "_ga_*",
+      "_gcl_au"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "googleadsId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant Google Ads",
+          "en": "Google Ads ID"
+        },
+        "help": {
+          "fr": "Identifiant de la forme AW-1234567890, visible dans Google Ads > Outils > Balise Google.",
+          "en": "ID in the form AW-1234567890, shown in Google Ads > Tools > Google tag."
+        },
+        "pattern": "^AW-[0-9]+$"
+      },
+      "googleadsCustomDomain": {
+        "required": false,
+        "label": {
+          "fr": "Domaine de chargement personnalisé",
+          "en": "Custom loading domain"
+        },
+        "help": {
+          "fr": "Laisser vide pour www.googletagmanager.com.",
+          "en": "Leave empty for www.googletagmanager.com."
+        },
+        "pattern": "^[A-Za-z0-9.-]+$"
+      }
+    }
+  },
+  "googleadwordsconversion": {
+    "name": "Google Ads (conversion)",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "www.googleadservices.com",
+      "googleads.g.doubleclick.net"
+    ],
+    "cookies": [],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "adwordsconversionId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant de conversion",
+          "en": "Conversion ID"
+        },
+        "help": {
+          "fr": "Numéro de conversion Google Ads (chiffres seuls, sans AW-).",
+          "en": "Google Ads conversion number (digits only, without AW-)."
+        },
+        "pattern": "^[0-9]+$"
+      },
+      "adwordsconversionLabel": {
+        "required": false,
+        "label": {
+          "fr": "Libellé de conversion",
+          "en": "Conversion label"
+        },
+        "help": {
+          "fr": "Libellé de l'action de conversion.",
+          "en": "Label of the conversion action."
+        },
+        "pattern": null
+      },
+      "adwordsconversionLanguage": {
+        "required": false,
+        "label": {
+          "fr": "Langue",
+          "en": "Language"
+        },
+        "help": {
+          "fr": "Code langue (ex. fr).",
+          "en": "Language code (e.g. fr)."
+        },
+        "pattern": null
+      },
+      "adwordsconversionFormat": {
+        "required": false,
+        "label": {
+          "fr": "Format",
+          "en": "Format"
+        },
+        "help": {
+          "fr": "Format de la balise (ex. 3).",
+          "en": "Tag format (e.g. 3)."
+        },
+        "pattern": null
+      },
+      "adwordsconversionColor": {
+        "required": false,
+        "label": {
+          "fr": "Couleur",
+          "en": "Color"
+        },
+        "help": {
+          "fr": "Couleur de fond du badge (ex. ffffff).",
+          "en": "Badge background color (e.g. ffffff)."
+        },
+        "pattern": null
+      },
+      "adwordsconversionValue": {
+        "required": false,
+        "label": {
+          "fr": "Valeur",
+          "en": "Value"
+        },
+        "help": {
+          "fr": "Valeur de la conversion.",
+          "en": "Conversion value."
+        },
+        "pattern": null
+      },
+      "adwordsconversionCurrency": {
+        "required": false,
+        "label": {
+          "fr": "Devise",
+          "en": "Currency"
+        },
+        "help": {
+          "fr": "Code devise ISO (ex. EUR).",
+          "en": "ISO currency code (e.g. EUR)."
+        },
+        "pattern": "^[A-Z]{3}$"
+      },
+      "adwordsconversionCustom1": {
+        "required": false,
+        "label": {
+          "fr": "Paramètre personnalisé 1",
+          "en": "Custom parameter 1"
+        },
+        "help": {
+          "fr": "Valeur transmise telle quelle.",
+          "en": "Value passed as is."
+        },
+        "pattern": null
+      },
+      "adwordsconversionCustom2": {
+        "required": false,
+        "label": {
+          "fr": "Paramètre personnalisé 2",
+          "en": "Custom parameter 2"
+        },
+        "help": {
+          "fr": "Valeur transmise telle quelle.",
+          "en": "Value passed as is."
+        },
+        "pattern": null
+      }
+    }
+  },
+  "googleadwordsremarketing": {
+    "name": "Google Ads (remarketing)",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "www.googleadservices.com",
+      "googleads.g.doubleclick.net"
+    ],
+    "cookies": [],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "adwordsremarketingId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant de remarketing",
+          "en": "Remarketing ID"
+        },
+        "help": {
+          "fr": "Numéro de conversion Google Ads (chiffres seuls, sans AW-).",
+          "en": "Google Ads conversion number (digits only, without AW-)."
+        },
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "facebookpixel": {
+    "name": "Meta Pixel",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "connect.facebook.net",
+      "www.facebook.com"
+    ],
+    "cookies": [
+      "_fbp",
+      "_fbc",
+      "fr",
+      "datr",
+      "sb",
+      "wd",
+      "reg_ext_ref",
+      "reg_fb_gate",
+      "reg_fb_ref",
+      "x-src"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "facebookpixelId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du pixel",
+          "en": "Pixel ID"
+        },
+        "help": {
+          "fr": "Numéro du pixel, visible dans le Gestionnaire d'événements Meta.",
+          "en": "Pixel number, shown in Meta Events Manager."
+        },
+        "pattern": "^[0-9]{6,20}$"
+      }
+    }
+  },
+  "bingads": {
+    "name": "Microsoft Advertising (UET)",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "bat.bing.com",
+      "bat.r.msn.com"
+    ],
+    "cookies": [
+      "_uetmsclkid",
+      "_uetvid",
+      "_uetsid"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "bingadsID": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant de balise UET",
+          "en": "UET tag ID"
+        },
+        "help": {
+          "fr": "Identifiant numérique de la balise UET, visible dans Microsoft Advertising > Suivi des conversions.",
+          "en": "Numeric UET tag ID, shown in Microsoft Advertising > Conversion tracking."
+        },
+        "pattern": "^[0-9]{5,12}$"
+      },
+      "bingadsStoreCookies": {
+        "required": false,
+        "label": {
+          "fr": "Cookies de conversion (valeur)",
+          "en": "Conversion cookies (value)"
+        },
+        "help": {
+          "fr": "Valeur transmise à storeConvTrackCookies : true ou false. Laisser vide pour le comportement par défaut.",
+          "en": "Value passed to storeConvTrackCookies: true or false. Leave empty for the default."
+        },
+        "pattern": "^(true|false)?$"
+      }
+    }
+  },
+  "linkedininsighttag": {
+    "name": "LinkedIn Insight Tag",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "snap.licdn.com",
+      "px.ads.linkedin.com"
+    ],
+    "cookies": [
+      "li_fat_id",
+      "bcookie",
+      "lidc",
+      "UserMatchHistory"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "linkedininsighttag": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant de partenaire",
+          "en": "Partner ID"
+        },
+        "help": {
+          "fr": "Identifiant numérique, visible dans LinkedIn Campaign Manager > Insight Tag.",
+          "en": "Numeric ID, shown in LinkedIn Campaign Manager > Insight Tag."
+        },
+        "pattern": "^[0-9]{4,12}$"
+      }
+    }
+  },
+  "tiktok": {
+    "name": "TikTok Pixel",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "analytics.tiktok.com"
+    ],
+    "cookies": [
+      "_ttp",
+      "_tt_enable_cookie"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "tiktokId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du pixel",
+          "en": "Pixel ID"
+        },
+        "help": {
+          "fr": "Identifiant alphanumérique, visible dans TikTok Ads Manager > Événements.",
+          "en": "Alphanumeric ID, shown in TikTok Ads Manager > Events."
+        },
+        "pattern": "^[A-Z0-9]{10,30}$"
+      }
+    }
+  },
+  "pinterestpixel": {
+    "name": "Pinterest Tag",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "s.pinimg.com",
+      "ct.pinterest.com"
+    ],
+    "cookies": [
+      "_pinterest_sess",
+      "_pinterest_ct",
+      "_pinterest_ct_mw",
+      "_pinterest_ct_rt",
+      "_epik",
+      "_derived_epik",
+      "_pin_unauth",
+      "_pinterest_ct_ua"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "pinterestpixelId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant de la balise",
+          "en": "Tag ID"
+        },
+        "help": {
+          "fr": "Identifiant numérique, visible dans Pinterest Ads > Conversions.",
+          "en": "Numeric ID, shown in Pinterest Ads > Conversions."
+        },
+        "pattern": "^[0-9]{8,20}$"
+      }
+    }
+  },
+  "matomo": {
+    "name": "Matomo",
+    "purpose": "analytics",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [],
+    "cookies": [
+      "_pk_*",
+      "piwik_ignore"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "matomoHost": {
+        "required": true,
+        "label": {
+          "fr": "URL de l'instance Matomo",
+          "en": "Matomo instance URL"
+        },
+        "help": {
+          "fr": "Adresse complète avec https:// et la barre finale, ex. https://stats.example.com/.",
+          "en": "Full address with https:// and the trailing slash, e.g. https://stats.example.com/."
+        },
+        "pattern": "^(https?:)?//[^\\s/]+(/[^\\s]*)?/$"
+      },
+      "matomoId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du site",
+          "en": "Site ID"
+        },
+        "help": {
+          "fr": "Numéro du site dans Matomo.",
+          "en": "Site number in Matomo."
+        },
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "matomotm": {
+    "name": "Matomo Tag Manager",
+    "purpose": "analytics",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [],
+    "cookies": [
+      "_pk_*",
+      "_pk.id*",
+      "_pk.sess*"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "matomotmUrl": {
+        "required": true,
+        "label": {
+          "fr": "URL du conteneur",
+          "en": "Container URL"
+        },
+        "help": {
+          "fr": "Adresse du fichier conteneur, ex. https://stats.example.com/js/container_XXXXXXXX.js.",
+          "en": "Address of the container file, e.g. https://stats.example.com/js/container_XXXXXXXX.js."
+        },
+        "pattern": "^https://[^\\s]+\\.js$"
+      }
+    }
+  },
+  "hotjar": {
+    "name": "Hotjar",
+    "purpose": "analytics",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "static.hotjar.com",
+      "script.hotjar.com",
+      "vars.hotjar.com"
+    ],
+    "cookies": [
+      "_hj*",
+      "hjClosedSurveyInvites"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "hotjarId": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du site",
+          "en": "Site ID"
+        },
+        "help": {
+          "fr": "Numéro du site Hotjar.",
+          "en": "Hotjar site number."
+        },
+        "pattern": "^[0-9]+$"
+      },
+      "HotjarSv": {
+        "required": true,
+        "label": {
+          "fr": "Version du snippet",
+          "en": "Snippet version"
+        },
+        "help": {
+          "fr": "Numéro de version du code de suivi (en général 6).",
+          "en": "Tracking code version number (usually 6)."
+        },
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "clarity": {
+    "name": "Microsoft Clarity",
+    "purpose": "analytics",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "www.clarity.ms",
+      "c.clarity.ms"
+    ],
+    "cookies": [
+      "_clck",
+      "_clsk",
+      "CLID",
+      "ANONCHK",
+      "MR",
+      "MUID",
+      "SM"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "clarity": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du projet",
+          "en": "Project ID"
+        },
+        "help": {
+          "fr": "Identifiant du projet Clarity (lettres minuscules et chiffres).",
+          "en": "Clarity project ID (lowercase letters and digits)."
+        },
+        "pattern": "^[a-z0-9]{6,16}$"
+      }
+    }
+  },
+  "youtube": {
+    "name": "YouTube",
+    "purpose": "media",
+    "kind": "media",
+    "googleTag": false,
+    "domains": [
+      "www.youtube.com",
+      "www.youtube-nocookie.com",
+      "i.ytimg.com"
+    ],
+    "cookies": [
+      "VISITOR_INFO1_LIVE",
+      "YSC",
+      "PREF",
+      "__Secure-YNID",
+      "__Secure-ROLLOUT_TOKEN",
+      "VISITOR_PRIVACY_METADATA"
+    ],
+    "storage": [
+      "ytidb::LAST_RESULT_ENTRY_KEY",
+      "yt-player-caption-persistence",
+      "yt-icons-last-purged"
+    ],
+    "ignoreParams": [],
+    "params": {}
+  },
+  "vimeo": {
+    "name": "Vimeo",
+    "purpose": "media",
+    "kind": "media",
+    "googleTag": false,
+    "domains": [
+      "player.vimeo.com",
+      "f.vimeocdn.com",
+      "i.vimeocdn.com"
+    ],
+    "cookies": [
+      "vuid",
+      "player",
+      "__utma",
+      "__utmb",
+      "__utmc",
+      "__utmt",
+      "__utmv",
+      "__utmz",
+      "__utmt_player"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {}
+  },
+  "dailymotion": {
+    "name": "Dailymotion",
+    "purpose": "media",
+    "kind": "media",
+    "googleTag": false,
+    "domains": [
+      "www.dailymotion.com",
+      "static1.dmcdn.net"
+    ],
+    "cookies": [
+      "ts",
+      "dmvk",
+      "hist",
+      "v1st",
+      "s_vi"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {}
+  },
+  "googlemaps": {
+    "name": "Google Maps (API JavaScript)",
+    "purpose": "media",
+    "kind": "media",
+    "googleTag": false,
+    "domains": [
+      "maps.googleapis.com",
+      "maps.gstatic.com"
+    ],
+    "cookies": [],
+    "storage": [],
+    "ignoreParams": [
+      "mapscallback"
+    ],
+    "params": {
+      "googlemapsKey": {
+        "required": true,
+        "label": {
+          "fr": "Clé d'API Google Maps",
+          "en": "Google Maps API key"
+        },
+        "help": {
+          "fr": "Clé d'API de la console Google Cloud, restreinte à votre domaine.",
+          "en": "API key from Google Cloud console, restricted to your domain."
+        },
+        "pattern": "^AIza[0-9A-Za-z_-]{35}$"
+      },
+      "googlemapsLibraries": {
+        "required": false,
+        "label": {
+          "fr": "Bibliothèques",
+          "en": "Libraries"
+        },
+        "help": {
+          "fr": "Liste séparée par des virgules (ex. places,geometry). Laisser vide si inutile.",
+          "en": "Comma-separated list (e.g. places,geometry). Leave empty if unused."
+        },
+        "pattern": "^[a-z,]*$"
+      }
+    }
+  },
+  "maps_noapi": {
+    "name": "Google Maps (intégration)",
+    "purpose": "media",
+    "kind": "media",
+    "googleTag": false,
+    "domains": [
+      "www.google.com",
+      "maps.gstatic.com"
+    ],
+    "cookies": [
+      "NID",
+      "OGPC",
+      "1P_JAR",
+      "CONSENT"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {}
+  },
+  "recaptcha": {
+    "name": "reCAPTCHA",
+    "purpose": "media",
+    "kind": "media",
+    "googleTag": false,
+    "domains": [
+      "www.google.com",
+      "www.gstatic.com"
+    ],
+    "cookies": [
+      "nid"
+    ],
+    "storage": [],
+    "ignoreParams": [
+      "recaptchaOnLoad"
+    ],
+    "params": {
+      "recaptchaapi": {
+        "required": false,
+        "label": {
+          "fr": "Clé de site (reCAPTCHA v3)",
+          "en": "Site key (reCAPTCHA v3)"
+        },
+        "help": {
+          "fr": "À renseigner pour reCAPTCHA v3 (paramètre render). Laisser vide en v2.",
+          "en": "Fill in for reCAPTCHA v3 (render parameter). Leave empty for v2."
+        },
+        "pattern": "^6L[0-9A-Za-z_-]{38}$"
+      },
+      "recaptcha_hl": {
+        "required": false,
+        "label": {
+          "fr": "Langue",
+          "en": "Language"
+        },
+        "help": {
+          "fr": "Code langue du widget (ex. fr). Laisser vide pour la langue du navigateur.",
+          "en": "Widget language code (e.g. fr). Leave empty for the browser language."
+        },
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      }
+    }
+  },
+  "crisp": {
+    "name": "Crisp",
+    "purpose": "support",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "client.crisp.chat",
+      "settings.crisp.chat"
+    ],
+    "cookies": [
+      "crisp-client*"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "crispID": {
+        "required": true,
+        "label": {
+          "fr": "Identifiant du site Crisp",
+          "en": "Crisp website ID"
+        },
+        "help": {
+          "fr": "Identifiant de la forme xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, visible dans Crisp > Paramètres > Installation.",
+          "en": "ID in the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, shown in Crisp > Settings > Setup."
+        },
+        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+      }
+    }
+  },
+  "zopim": {
+    "name": "Zendesk Chat (Zopim)",
+    "purpose": "support",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "v2.zopim.com"
+    ],
+    "cookies": [
+      "__zlcid",
+      "__zprivacy"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "zopimID": {
+        "required": true,
+        "label": {
+          "fr": "Clé du widget",
+          "en": "Widget key"
+        },
+        "help": {
+          "fr": "Clé alphanumérique du widget Zendesk Chat.",
+          "en": "Alphanumeric key of the Zendesk Chat widget."
+        },
+        "pattern": "^[A-Za-z0-9]{20,40}$"
+      }
+    }
+  },
+  "sendinblue": {
+    "name": "Brevo",
+    "purpose": "ads",
+    "kind": "script",
+    "googleTag": false,
+    "domains": [
+      "sibautomation.com"
+    ],
+    "cookies": [
+      "sib_cuid"
+    ],
+    "storage": [],
+    "ignoreParams": [],
+    "params": {
+      "sendinblueKey": {
+        "required": true,
+        "label": {
+          "fr": "Clé client Brevo",
+          "en": "Brevo client key"
+        },
+        "help": {
+          "fr": "Clé du suivi Marketing Automation, visible dans Brevo > Automatisation > Paramètres.",
+          "en": "Marketing Automation tracking key, shown in Brevo > Automation > Settings."
+        },
+        "pattern": null
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "comment": "Shared by tests/php/Unit/ConsentStalenessTest.php and tests/js/engine/staleness.test.mjs: a choice is stale when it is older than repromptDays or older than the last substantial version. ageSeconds is the age of the choice when it is read.",
+  "cases": [
+    { "name": "valid choice", "repromptDays": 182, "substantialVersion": 0, "choiceVersion": 12, "ageSeconds": 86400, "stale": false },
+    { "name": "valid choice of the last substantial version", "repromptDays": 182, "substantialVersion": 12, "choiceVersion": 12, "ageSeconds": 86400, "stale": false },
+    { "name": "valid choice newer than the last substantial version", "repromptDays": 182, "substantialVersion": 10, "choiceVersion": 12, "ageSeconds": 86400, "stale": false },
+    { "name": "one minute before the expiry", "repromptDays": 182, "substantialVersion": 0, "choiceVersion": 12, "ageSeconds": 15724740, "stale": false },
+    { "name": "exactly at the expiry", "repromptDays": 182, "substantialVersion": 0, "choiceVersion": 12, "ageSeconds": 15724800, "stale": true },
+    { "name": "expired choice", "repromptDays": 182, "substantialVersion": 0, "choiceVersion": 12, "ageSeconds": 15811200, "stale": true },
+    { "name": "choice older than a newer substantial version", "repromptDays": 182, "substantialVersion": 13, "choiceVersion": 12, "ageSeconds": 86400, "stale": true },
+    { "name": "choice without version after a substantial version", "repromptDays": 182, "substantialVersion": 5, "choiceVersion": null, "ageSeconds": 86400, "stale": true },
+    { "name": "choice without version, no substantial version", "repromptDays": 182, "substantialVersion": 0, "choiceVersion": null, "ageSeconds": 86400, "stale": false },
+    { "name": "shorter renewal", "repromptDays": 30, "substantialVersion": 0, "choiceVersion": 12, "ageSeconds": 2678400, "stale": true }
+  ]
+}

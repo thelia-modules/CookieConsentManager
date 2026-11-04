@@ -1,0 +1,31 @@
+tarteaucitron.services.maps_noapi = {
+    "key": "maps_noapi",
+    "type": "other",
+    "name": "Google Maps",
+    "needConsent": true,
+    "cookies": ["NID", "OGPC", "1P_JAR", "CONSENT"],
+    "uri": "https://policies.google.com/privacy",
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['googlemaps_embed'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'Google maps iframe',
+                id = tarteaucitron.getElemAttr(x, "id"),
+                width = tarteaucitron.getElemAttr(x, "width"),
+                height = tarteaucitron.getElemAttr(x, "height")
+            var widgetURL = "https://www.google.com/maps/embed?pb=" + id;
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return "<iframe title=\"" + frame_title + "\" style=\"" + styleAttr + "border:0;\" src=\"" + widgetURL + "\" allowfullscreen loading=\"lazy\"></iframe>";
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'maps_noapi';
+        tarteaucitron.fallback(['googlemaps_embed'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'width'));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'height'));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

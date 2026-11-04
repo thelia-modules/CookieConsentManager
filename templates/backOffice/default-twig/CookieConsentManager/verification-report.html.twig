@@ -1,0 +1,128 @@
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% set r = result %}
+{% set todo_count = r.summary.todo %}
+{% set ko_count = r.summary.ko %}
+{% set verdict_ok = (ko_count == 0 and todo_count == 0 and r.alerts|length == 0) %}
+{% macro seen_cell(item) %}{% for phase in ['before', 'after_reject'] %}{% set info = item.pages[phase] %}{% if info.count %}<div>{{ (phase == 'before' ? 'before any choice' : 'after "Reject all"')|trans }}{{ ': '|trans }}{{ '%count% page(s)'|trans({'%count%': info.count}) }} <details style="display:inline"><summary style="display:inline">{{ 'Examples'|trans }}</summary><ul>{% for example in info.examples %}<li><code>{{ example }}</code></li>{% endfor %}</ul></details></div>{% endif %}{% endfor %}{% endmacro %}
+{% macro domain_origin(d) %}
+    {%- if d.origin == 'managed' -%}{{ 'Managed service'|trans }}{{ d.name ? ': '|trans ~ d.name : '' }}
+    {%- elseif d.origin == 'fonts' -%}{{ 'Theme fonts'|trans }}
+    {%- else -%}{{ 'Loaded outside the module (theme or hard-coded)'|trans }}{%- endif -%}
+{% endmacro %}
+{% macro verdict_text(v, origin) %}
+    {%- if v == 'ok' -%}{{ 'Allowed'|trans }}
+    {%- elseif v == 'warn' -%}{{ 'Expected in advanced mode'|trans }}
+    {%- elseif v == 'ko' -%}{{ 'Contacted without consent: to fix'|trans }}
+    {%- elseif origin == 'fonts' -%}{{ 'To handle (fonts of the theme)'|trans }}
+    {%- else -%}{{ 'To handle (not managed by the module)'|trans }}{%- endif -%}
+{% endmacro %}
+<!doctype html>
+<html lang="{{ ui_locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>{{ 'Cookie consent verification report'|trans }} - {{ site_host }}</title>
+    <style>
+        body { font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2937; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { font-size: 1.6rem; margin-bottom: .2rem; } h2 { font-size: 1.15rem; margin-top: 2rem; border-bottom: 1px solid #d1d5db; padding-bottom: .25rem; }
+        .meta { color: #4b5563; } .meta dt { float: left; clear: left; width: 12rem; font-weight: 600; } .meta dd { margin: 0 0 .15rem 12rem; }
+        .summary { border: 2px solid; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+        .summary.good { border-color: #15803d; background: #f0fdf4; } .summary.bad { border-color: #b45309; background: #fffbeb; }
+        .summary strong.verdict { font-size: 1.15rem; display: block; margin-bottom: .4rem; }
+        table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; } th, td { border: 1px solid #d1d5db; padding: .35rem .5rem; text-align: left; vertical-align: top; } th { background: #f3f4f6; }
+        td.ok { color: #166534; } td.warn { color: #1e40af; } td.ko { color: #b91c1c; font-weight: 600; } td.todo { color: #92400e; font-weight: 600; }
+        code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9em; word-break: break-all; }
+        .small { font-size: .85rem; color: #4b5563; } button { font: inherit; padding: .5rem 1rem; cursor: pointer; }
+        ul.steps li { margin-bottom: .4rem; }
+        @media print { .no-print { display: none !important; } body { margin: 0; max-width: none; font-size: 12px; } h2 { break-after: avoid; } table, .summary { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align:right"><button type="button" onclick="window.print()" data-testid="ccm-report-print">{{ 'Print or save as PDF'|trans }}</button></div>
+    <h1>{{ 'Cookie consent verification report'|trans }}</h1>
+    <dl class="meta">
+        <dt>{{ 'Site'|trans }}</dt><dd>{{ site_host }}</dd>
+        <dt>{{ 'Report date'|trans }}</dt><dd>{{ generated.utc }} ({{ generated.local }} {{ generated.zone }})</dd>
+        <dt>{{ 'Version audited'|trans }}</dt><dd>{{ version }} <span class="small">({{ 'rendering'|trans }} <code>{{ served_hash }}</code>)</span></dd>
+        <dt>{{ 'Pages audited'|trans }}</dt><dd>{% for page in pages %}<code>{{ page }}</code>{{ loop.last ? '' : ', ' }}{% else %}-{% endfor %}</dd>
+    </dl>
+
+    <div class="summary {{ verdict_ok ? 'good' : 'bad' }}" data-testid="ccm-report-summary">
+        <strong class="verdict">{{ verdict_ok ? 'No third party contacted without consent on the audited pages.'|trans : 'Points to handle on the audited pages.'|trans }}</strong>
+        <ul>
+            <li data-testid="ccm-report-count-ko">{{ 'Managed services contacted without consent (to fix)'|trans }}{{ ': '|trans }}<strong>{{ ko_count }}</strong></li>
+            <li data-testid="ccm-report-count-outside">{{ 'Domains loaded outside the module (theme or hard-coded)'|trans }}{{ ': '|trans }}<strong>{{ r.origins.outside }}</strong></li>
+            <li data-testid="ccm-report-count-fonts">{{ 'Domains of theme fonts'|trans }}{{ ': '|trans }}<strong>{{ r.origins.fonts }}</strong></li>
+            <li>{{ 'Managed services allowed or expected'|trans }}{{ ': '|trans }}<strong>{{ r.summary.ok + r.summary.warn }}</strong></li>
+        </ul>
+        <span class="small">{{ 'Each page was loaded twice: before any choice, then as if the visitor had pressed "Reject all".'|trans }}</span>
+    </div>
+
+    {% if r.alerts|length %}
+        <h2>{{ 'Alerts'|trans }}</h2>
+        <ul>
+            {% for alert in r.alerts %}
+                <li>
+                    {% if alert.code == 'gtag_twice' %}{{ 'gtag.js and Tag Manager are both loaded on %url%.'|trans({'%url%': alert.url}) }}
+                    {% elseif alert.code == 'gtag_theme_and_module' %}{{ 'Google Tag Manager is hard-coded in the theme (%url%) while the module also runs %services%: after consent Google is loaded twice. Keep only one of the two.'|trans({'%url%': alert.url, '%services%': alert.services}) }}
+                    {% elseif alert.code == 'version_mismatch' %}{{ 'The page %url% was served version %served%, the published one is %published%.'|trans({'%url%': alert.url, '%served%': alert.served, '%published%': alert.published}) }}
+                    {% else %}{{ alert.code }}{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>{{ 'Third-party domains contacted'|trans }}</h2>
+    <table data-testid="ccm-report-domains">
+        <thead><tr><th>{{ 'Domain'|trans }}</th><th>{{ 'Origin'|trans }}</th><th>{{ 'Verdict'|trans }}</th><th>{{ 'Seen'|trans }}</th></tr></thead>
+        <tbody>
+            {% for d in r.domains %}
+                <tr>
+                    <td><code>{{ d.host }}</code></td>
+                    <td>{{ _self.domain_origin(d) }}</td>
+                    <td class="{{ d.verdict }}">{{ _self.verdict_text(d.verdict, d.origin) }}</td>
+                    <td class="small">{{ _self.seen_cell(d) }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">{{ 'No third-party domain contacted.'|trans }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>{{ 'Cookies readable by the page'|trans }}</h2>
+    <table data-testid="ccm-report-cookies">
+        <thead><tr><th>{{ 'Cookie'|trans }}</th><th>{{ 'Service'|trans }}</th><th>{{ 'Verdict'|trans }}</th><th>{{ 'Seen'|trans }}</th></tr></thead>
+        <tbody>
+            {% for c in r.cookies %}
+                <tr>
+                    <td><code>{{ c.name }}</code></td>
+                    <td>{{ c.service ?: ('Not managed by the module'|trans) }}</td>
+                    <td class="{{ c.verdict }}">{{ _self.verdict_text(c.verdict, c.service ? 'managed' : 'outside') }}</td>
+                    <td class="small">{{ _self.seen_cell(c) }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">{{ 'No cookie other than the technical ones.'|trans }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if ko_count > 0 or reasons|length %}
+        <h2>{{ 'What to do'|trans }}</h2>
+        <ul class="steps">
+            {% if ko_count > 0 %}<li>{{ 'A managed service contacted before the choice: check that no template of the theme loads it by hand, then run the verification again.'|trans }}</li>{% endif %}
+            {% if 'theme_fonts' in reasons %}<li>{{ 'Theme fonts: the theme loads its fonts from Google. This comes from the theme, not from the module. Host the font files on your own server (or use system fonts), then run the verification again.'|trans }}</li>{% endif %}
+            {% if 'google_tag_hardcoded' in reasons %}<li>{{ 'Google tag hard-coded: remove the Google Tag Manager or gtag snippet written in the theme (and its noscript part), and enable the matching service of the module instead.'|trans }}</li>{% endif %}
+            {% if 'unknown_domain' in reasons %}<li>{{ 'Unknown domain: find which template or script of the theme loads it. Either remove it, or declare it as a service of the module so that it waits for consent.'|trans }}</li>{% endif %}
+        </ul>
+    {% endif %}
+
+    <h2>{{ 'Limits of this check'|trans }}</h2>
+    <ul class="small">
+        <li>{{ 'Cookies flagged HttpOnly are invisible to the page: they are not listed.'|trans }}</li>
+        <li>{{ 'Requests made inside third-party iframes are not visible: only the iframe domain is.'|trans }}</li>
+        <li>{{ 'The domains come from Resource Timing: a request blocked by the browser or made after the reading delay is not seen.'|trans }}</li>
+        <li>{{ 'The rest (Tag Assistant, keyboard, screen reader, mobile) stays on the project manager checklist.'|trans }}</li>
+    </ul>
+</body>
+</html>

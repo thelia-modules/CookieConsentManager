@@ -1,0 +1,15 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% block title %}{{ 'Access denied'|trans }}{% endblock %}
+{% block body_testid %}ccm-forbidden-page{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="alert alert-danger" role="alert" data-testid="ccm-forbidden">
+            <h1 class="h4">{{ 'Access denied'|trans }}</h1>
+            <p class="mb-0">{{ message }}</p>
+        </div>
+        <a class="btn btn-outline-secondary" href="{{ path('admin.home') }}">{{ 'Back to the back-office home'|trans }}</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,47 @@
+[
+  {
+    "key": "gtag", "name": "Google Analytics 4", "upstreamType": "analytic", "purpose": "analytics", "verified": true,
+    "kind": "script", "googleTag": true, "uri": "https://analytics.google.com/",
+    "params": [{"name": "gtagUa", "required": true, "label": {"fr": "Identifiant de mesure", "en": "Measurement ID"}, "help": {"fr": "G-XXXXXXXXXX", "en": "G-XXXXXXXXXX"}, "pattern": "^G-[A-Z0-9]{4,}$"}],
+    "cookies": ["_ga", "_ga_*"], "storage": [], "domains": ["www.googletagmanager.com", "www.google-analytics.com"],
+    "needsMarkup": false, "markup": null, "excluded": null
+  },
+  {
+    "key": "googletagmanager", "name": "Google Tag Manager", "upstreamType": "api", "purpose": "ads", "verified": true,
+    "kind": "script", "googleTag": true, "uri": "https://tagmanager.google.com/",
+    "params": [{"name": "googletagmanagerId", "required": true, "label": {"fr": "Identifiant du conteneur", "en": "Container ID"}, "help": {"fr": "GTM-XXXXXX", "en": "GTM-XXXXXX"}, "pattern": "^GTM-[A-Z0-9]{4,}$"}],
+    "cookies": [], "storage": [], "domains": ["www.googletagmanager.com"],
+    "needsMarkup": false, "markup": null, "excluded": null
+  },
+  {
+    "key": "youtube", "name": "YouTube", "upstreamType": "video", "purpose": "media", "verified": true,
+    "kind": "media", "googleTag": false, "uri": "https://policies.google.com/privacy",
+    "params": [], "cookies": ["VISITOR_INFO1_LIVE", "YSC", "PREF", "__Secure-YNID", "__Secure-ROLLOUT_TOKEN", "VISITOR_PRIVACY_METADATA"], "storage": ["ytidb::LAST_RESULT_ENTRY_KEY", "yt-player-caption-persistence", "yt-icons-last-purged"], "domains": ["www.youtube.com", "www.youtube-nocookie.com"],
+    "needsMarkup": false, "markup": null, "excluded": null
+  },
+  {
+    "key": "matomo", "name": "Matomo", "upstreamType": "analytic", "purpose": "analytics", "verified": true,
+    "kind": "script", "googleTag": false, "uri": "https://matomo.org/privacy-policy/",
+    "params": [{"name": "matomoId", "required": true, "label": {"fr": "Identifiant du site", "en": "Site ID"}, "help": {"fr": "", "en": ""}, "pattern": "^[0-9]+$"}, {"name": "matomoHost", "required": true, "label": {"fr": "URL", "en": "URL"}, "help": {"fr": "", "en": ""}, "pattern": "^https://"}],
+    "cookies": ["_pk_id.*", "_pk_ses.*"], "storage": [], "domains": [],
+    "needsMarkup": false, "markup": null, "excluded": null
+  },
+  {
+    "key": "obscure", "name": "Obscure imported service", "upstreamType": "other", "purpose": "personalization", "verified": false,
+    "kind": "script", "googleTag": false, "uri": "",
+    "params": [], "cookies": [], "storage": [], "domains": [],
+    "needsMarkup": false, "markup": null, "excluded": null
+  },
+  {
+    "key": "evalservice", "name": "Excluded", "upstreamType": "analytic", "purpose": "analytics", "verified": false,
+    "kind": "script", "googleTag": false, "uri": "",
+    "params": [], "cookies": [], "storage": [], "domains": [],
+    "needsMarkup": false, "markup": null, "excluded": "eval"
+  },
+  {
+    "key": "analytics", "name": "Google Analytics (universal)", "upstreamType": "analytic", "purpose": "analytics", "verified": false,
+    "kind": "script", "googleTag": false, "uri": "",
+    "params": [], "cookies": ["_ga"], "storage": [], "domains": [],
+    "needsMarkup": false, "markup": null, "excluded": "universal-analytics"
+  }
+]

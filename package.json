@@ -1,0 +1,15 @@
+{
+  "name": "cookie-consent-manager-module",
+  "private": true,
+  "description": "Front engine, tarteaucitron compatibility layer and maintainer tools for the CookieConsentManager Thelia module",
+  "license": "MIT",
+  "scripts": {
+    "test:js": "node --test tests/js/*/*.test.mjs",
+    "catalogue:build": "node tools/catalogue/build.mjs",
+    "build": "node tools/build/minify.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "jsdom": "^24.1.3"
+  }
+}

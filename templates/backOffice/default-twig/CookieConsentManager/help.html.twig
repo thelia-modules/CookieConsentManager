@@ -1,0 +1,23 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Help'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    <div class="card mb-3" data-testid="ccm-help-guide">
+        <div class="card-header">
+            <ul class="nav nav-pills">
+                {% for name in guides %}
+                    <li class="nav-item"><a class="nav-link {{ name == guide ? 'active' : '' }}" href="{{ path('ccm_admin_help', {guide: name}) }}">{{ (name == 'administrateur' ? 'Administrator guide' : 'Integrator guide')|trans }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card-body">
+            {% if html is null %}
+                <p class="text-danger mb-0">{{ 'This guide is not available in this installation of the module.'|trans }}</p>
+            {% else %}
+                {{ html|raw }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

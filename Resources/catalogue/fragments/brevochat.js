@@ -1,0 +1,22 @@
+tarteaucitron.services.brevochat = {
+    "key": "brevochat",
+    "type": "support",
+    "name": "Brevo Conversations",
+    "uri": "https://help.brevo.com/hc/fr/sections/18503544961042",
+    "needConsent": true,
+    "cookies": [],
+    "js": function () {
+        "use strict";
+
+        if (tarteaucitron.user.brevoConversationsId === undefined) {
+            return;
+        }
+
+        window.BrevoConversationsID = tarteaucitron.user.brevoConversationsId;
+        window['BrevoConversations'] = window['BrevoConversations'] || function() {
+            (window['BrevoConversations'].q = window['BrevoConversations'].q || []).push(arguments);
+        };
+
+        tarteaucitron.addScript('https://conversations-widget.brevo.com/brevo-conversations.js');
+    }
+};

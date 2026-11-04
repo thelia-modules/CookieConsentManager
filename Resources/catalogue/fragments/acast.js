@@ -1,0 +1,29 @@
+tarteaucitron.services.acast = {
+    "key": "acast",
+    "type": "video",
+    "name": "Acast",
+    "needConsent": true,
+    "cookies": ["intercom-id-ayi0335i", "intercom-session-ayi0335i"],
+    "uri": "https://www.acast.com/en/privacy",
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['acast_embed'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'Acast iframe',
+                id = tarteaucitron.getElemAttr(x, 'id1'),
+                id2 = tarteaucitron.getElemAttr(x, 'id2'),
+                width = tarteaucitron.getElemAttr(x, 'width'),
+                height = tarteaucitron.getElemAttr(x, 'height'),
+                seek = tarteaucitron.getElemAttr(x, 'seek');
+            var widgetURL = "https://embed.acast.com/" + id + "/" + id2 + "?seek=" + seek;
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return "<iframe title=\"" + frame_title + "\" src=\"" + widgetURL + "\" style=\"border: none; overflow: hidden;" + styleAttr + "\"></iframe>";
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = "acast";
+        tarteaucitron.fallback(["acast_embed"], tarteaucitron.engage(id));
+    }
+};

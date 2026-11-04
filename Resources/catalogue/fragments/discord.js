@@ -1,0 +1,31 @@
+tarteaucitron.services.discord = {
+    "key": "discord",
+    "type": "social",
+    "name": "Discord (Server Widget)",
+    "needConsent": true,
+    "cookies": ["__cfruid", "__dcfduid", "_ga", "_gcl_au", "OptanonConsent", "locale", "_gid"],
+    "uri": "https://discord.com/privacy",
+    "js": function () {
+        "use strict";
+        tarteaucitron.fallback(['discord_widget'], function (x) {
+            var frame_title = (tarteaucitron.getElemAttr(x,"title")) ? tarteaucitron.getElemAttr(x,"title") : 'Discord iframe',
+                id = tarteaucitron.getElemAttr(x, "guildID"),
+                width = tarteaucitron.getElemAttr(x, "width"),
+                height = tarteaucitron.getElemAttr(x, "height")
+            var widgetURL = "https://discord.com/widget?id=" + id;
+
+            var styleAttr = (width !== "" ? "width:" + tarteaucitron.getStyleSize(width) + ";" : "") + (height !== "" ? "height:" + tarteaucitron.getStyleSize(height) + ";" : "");
+
+            return "<iframe title=\"" + frame_title + "\" style=\"" + styleAttr + "\" src=\"" + widgetURL + "\"></iframe>";
+        });
+    },
+    "fallback": function () {
+        "use strict";
+        var id = 'discord';
+        tarteaucitron.fallback(['discord_widget'], function (elem) {
+            elem.style.width = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'width'));
+            elem.style.height = tarteaucitron.getStyleSize(tarteaucitron.getElemAttr(elem, 'height'));
+            return tarteaucitron.engage(id);
+        });
+    }
+};

@@ -1,0 +1,290 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
+{% import 'CookieConsentManager/include/service-macros.html.twig' as local %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Purposes and services'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    {# ---------------------------------------------------------------- Proposed #}
+    {% if proposed|length %}
+        <div class="card mb-3" id="proposed" data-testid="ccm-proposed-card">
+            <div class="card-header"><h2 class="h5 mb-0">{{ 'Services proposed by other modules'|trans }}</h2></div>
+            <div class="card-body">
+                <p class="text-secondary">{{ 'These services are declared by installed modules. They stay inactive until you enable them and publish.'|trans }}</p>
+                {% for service in proposed %}
+                    <form method="post" action="{{ path('ccm_admin_proposed_save', {key: service.key}) }}" class="border rounded p-3 mb-2" data-testid="ccm-proposed-{{ service.key }}">
+                        {{ ccm.csrf() }}
+                        {{ ccm.issues(issues, 'services.' ~ service.key) }}
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-4"><strong>{{ service.name }}</strong><br><span class="small text-secondary">{{ service.controller }} - <a href="{{ service.policy_url|ccm_safe_url }}" rel="noopener noreferrer">{{ 'privacy policy'|trans }}</a></span></div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="proposed_{{ service.key }}_purpose">{{ 'Purpose'|trans }}</label>
+                                <select class="form-select" id="proposed_{{ service.key }}_purpose" name="purpose">{{ local.purpose_options(purposes, service.purpose, service.strictly_necessary, ui_locale) }}</select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="proposed_{{ service.key }}_enabled" name="enabled" value="1" {{ service.enabled ? 'checked' : '' }}><label class="form-check-label" for="proposed_{{ service.key }}_enabled">{{ 'Enabled'|trans }}</label></div>
+                            </div>
+                            <div class="col-md-2">{% if can.update %}<button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>{% endif %}</div>
+                            {% if service.strictly_necessary %}
+                                <div class="col-12">
+                                    <label class="form-label" for="proposed_{{ service.key }}_justification">{{ 'Justification (strictly necessary service, shown as a permanent alert)'|trans }}</label>
+                                    <textarea class="form-control" rows="2" id="proposed_{{ service.key }}_justification" name="justification">{{ service.justification|default('') }}</textarea>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </form>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {# ---------------------------------------------------------------- Catalogue #}
+    <div class="card mb-3" id="catalogue" data-testid="ccm-catalogue-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Service catalogue'|trans }} <span class="badge text-bg-secondary" data-testid="ccm-catalogue-total">{{ total }}</span></h2></div>
+        <div class="card-body">
+            <form method="get" class="row g-2 mb-3" data-testid="ccm-catalogue-filters">
+                <div class="col-md-3">
+                    <label class="form-label" for="f_status">{{ 'Level'|trans }}</label>
+                    <select class="form-select" id="f_status" name="status" {{ draft.general.experimental_services ? '' : 'disabled' }}>
+                        <option value="verified" {{ filters.status == 'verified' ? 'selected' : '' }}>{{ 'Verified (%count%)'|trans({'%count%': catalogue_count.verified}) }}</option>
+                        <option value="imported" {{ filters.status == 'imported' ? 'selected' : '' }}>{{ 'Imported, experimental'|trans }}</option>
+                        <option value="all" {{ filters.status == 'all' ? 'selected' : '' }}>{{ 'All (%count%)'|trans({'%count%': catalogue_count.all}) }}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="f_purpose">{{ 'Category'|trans }}</label>
+                    <select class="form-select" id="f_purpose" name="purpose">
+                        <option value="">{{ 'All'|trans }}</option>
+                        {% for purpose in purposes %}<option value="{{ purpose.code }}" {{ filters.purpose == purpose.code ? 'selected' : '' }}>{{ purpose.label[ui_locale]|default(purpose.label.en|default(purpose.code)) }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="f_q">{{ 'Search'|trans }}</label>
+                    <input class="form-control" type="search" id="f_q" name="q" value="{{ filters.q }}" data-testid="ccm-catalogue-search">
+                </div>
+                <div class="col-md-2 d-flex align-items-end"><button class="btn btn-outline-primary w-100" type="submit">{{ 'Filter'|trans }}</button></div>
+            </form>
+            {% if draft.general.experimental_services %}
+                <p class="small text-secondary" data-testid="ccm-experimental-note">{{ 'Services marked experimental come from an imported catalogue and are not tested: check each one on your site before publishing.'|trans }}</p>
+            {% endif %}
+            {% if not draft.general.experimental_services %}
+                <p class="small text-secondary">{{ 'Imported services are hidden: turn on "Experimental services" in the general settings of the dashboard to see them.'|trans }}</p>
+            {% endif %}
+
+            {% for row in rows %}
+                {% set entry = row.entry %}
+                {% set service = row.service %}
+                {% set open = failed_anchor == 'service-' ~ entry.key or (service and service.enabled) %}
+                <form method="post" action="{{ path('ccm_admin_service_save', {key: entry.key}) }}" class="border rounded mb-2" id="service-{{ entry.key }}" data-testid="ccm-service-{{ entry.key }}">
+                    {{ ccm.csrf() }}
+                    <div class="d-flex flex-wrap justify-content-between align-items-center p-2 bg-body-tertiary">
+                        <div>
+                            <strong>{{ entry.name }}</strong> <code class="small">{{ entry.key }}</code>
+                            {% if entry.verified %}<span class="badge text-bg-success">{{ 'verified'|trans }}</span>{% else %}{{ ccm.experimental(entry.key) }}{% endif %}
+                            <span class="badge text-bg-light border">{{ ccm_purpose(entry.purpose) }}</span>
+                            {% if entry.googleTag %}<span class="badge text-bg-info">Google tag</span>{% endif %}
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="svc_{{ entry.key }}_enabled" name="enabled" value="1" {{ service and service.enabled ? 'checked' : '' }} data-testid="ccm-service-{{ entry.key }}-enabled">
+                            <label class="form-check-label" for="svc_{{ entry.key }}_enabled">{{ 'Enabled'|trans }}</label>
+                        </div>
+                    </div>
+                    <div class="p-3 {{ open ? '' : 'collapse' }}" id="svc-body-{{ entry.key }}">
+                        {{ ccm.issues(issues, 'services.' ~ entry.key) }}
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <span class="form-label d-block">{{ 'Purpose'|trans }}</span>
+                                <span class="form-control-plaintext" data-testid="ccm-purpose-fixed-{{ entry.key }}">{{ ccm_purpose(entry.purpose) }} {{ ccm.hint('The purpose of a catalogue service is fixed: moving it elsewhere would hide what it does from the visitor.'|trans) }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="svc_{{ entry.key }}_controller">{{ 'Responsible (legal entity)'|trans }}</label>
+                                <input class="form-control" type="text" id="svc_{{ entry.key }}_controller" name="controller" value="{{ row.controller }}" data-testid="ccm-controller-{{ entry.key }}">
+                                <div class="form-text">{{ row.controller_default ? 'Pre-filled with the legal entity of the publisher for European visitors; check it against its privacy policy.'|trans : 'Legal entity that receives the data (see the privacy policy of the publisher). Visitors see the product name while it is empty.'|trans }}</div>
+                            </div>
+                            {% for param in entry.params %}
+                                <div class="col-md-4">
+                                    <label class="form-label" for="svc_{{ entry.key }}_{{ param.name }}">{{ param.label[ui_locale]|default(param.label.en|default(param.name)) }}{{ param.required ? ' *' : '' }}</label>
+                                    <input class="form-control" type="text" id="svc_{{ entry.key }}_{{ param.name }}" name="parameters[{{ param.name }}]" value="{{ service.parameters[param.name]|default('') }}" data-testid="ccm-param-{{ entry.key }}-{{ param.name }}">
+                                    <div class="form-text">{{ param.help[ui_locale]|default(param.help.en|default('')) }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if row.markup %}
+                            <div class="mt-3" data-testid="ccm-markup-{{ entry.key }}">
+                                <span class="form-label d-block fw-semibold">{{ 'HTML to paste in your page'|trans }}</span>
+                                <p class="small text-secondary mb-1">{{ 'This service works on markup: paste this block in the page where the content must appear (editor in HTML mode). Replace each value between quotes (for example video_id, width) by yours and delete the attributes you do not need. It stays inert until the visitor consents.'|trans }}</p>
+                                <textarea class="form-control font-monospace small" rows="{{ min(max(row.markup|split("\n")|length + 1, 3), 12) }}" readonly id="markup_{{ entry.key }}" aria-label="{{ 'HTML to paste in your page'|trans }}" data-testid="ccm-markup-text-{{ entry.key }}" wrap="soft">{{ row.markup }}</textarea>
+                                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-ccm-copy="markup_{{ entry.key }}" data-testid="ccm-markup-copy-{{ entry.key }}"><i class="bi bi-clipboard" aria-hidden="true"></i> <span data-ccm-copy-label>{{ 'Copy'|trans }}</span></button>
+                                {% if row.twig %}
+                                    <span class="form-label d-block fw-semibold mt-3">{{ 'Same block in a Twig template of your theme'|trans }}</span>
+                                    <textarea class="form-control font-monospace small" rows="{{ min(max(row.twig|split("\n")|length + 1, 3), 12) }}" readonly id="markup_twig_{{ entry.key }}" aria-label="{{ 'Same block in a Twig template of your theme'|trans }}" data-testid="ccm-markup-twig-{{ entry.key }}" wrap="soft">{{ row.twig }}</textarea>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-ccm-copy="markup_twig_{{ entry.key }}"><i class="bi bi-clipboard" aria-hidden="true"></i> <span data-ccm-copy-label>{{ 'Copy'|trans }}</span></button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if entry.cookies|length %}
+                            <details class="mt-2" data-testid="ccm-durations-{{ entry.key }}">
+                                <summary class="small fw-semibold">{{ 'Cookie lifetimes'|trans }}</summary>
+                                <p class="small text-secondary mb-1">{{ 'Lifetime of each cookie in days, as documented by the publisher (0 = session). Leave empty to keep the value known to the module, if any; a value typed here replaces it for visitors.'|trans }}</p>
+                                <div class="row g-2">
+                                    {% for cookie in entry.cookies %}
+                                        <div class="col-md-3">
+                                            <label class="form-label small mb-0" for="svc_{{ entry.key }}_dur_{{ loop.index }}"><code>{{ cookie }}</code></label>
+                                            <input class="form-control form-control-sm" type="number" min="0" max="7300" id="svc_{{ entry.key }}_dur_{{ loop.index }}" name="cookie_durations[{{ cookie }}]" value="{{ service.cookie_durations[cookie]|default('') }}" placeholder="{{ row.known_durations[cookie]|default('') }}" data-testid="ccm-duration-{{ entry.key }}-{{ loop.index }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </details>
+                            <div class="small text-secondary mt-2 mb-0" data-testid="ccm-cookies-{{ entry.key }}">
+                                {{ 'Cookies'|trans }} ({{ entry.cookies|length }}) :
+                                {% if entry.cookies|length > 8 %}
+                                    {{ entry.cookies|slice(0, 8)|join(', ') }}
+                                    <details class="d-inline"><summary class="d-inline text-primary" style="cursor:pointer">{{ 'show the %count% others'|trans({'%count%': entry.cookies|length - 8}) }}</summary>{{ entry.cookies|slice(8)|join(', ') }}</details>
+                                {% else %}{{ entry.cookies|join(', ') }}{% endif %}
+                            </div>
+                        {% endif %}
+                        {% if can.update %}<button class="btn btn-primary mt-2" type="submit" data-testid="ccm-service-{{ entry.key }}-save">{{ 'Save'|trans }}</button>{% endif %}
+                    </div>
+                    {% if not open %}
+                        <div class="px-3 pb-2"><button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#svc-body-{{ entry.key }}" aria-expanded="false" aria-controls="svc-body-{{ entry.key }}" data-testid="ccm-service-{{ entry.key }}-toggle">{{ 'Configure'|trans }}</button></div>
+                    {% endif %}
+                </form>
+            {% else %}
+                <p class="text-secondary" data-testid="ccm-catalogue-empty">{{ 'No service matches.'|trans }}</p>
+            {% endfor %}
+
+            {% if pages > 1 %}
+                <nav aria-label="{{ 'Pagination'|trans }}"><ul class="pagination pagination-sm mb-0">
+                    {% for number in 1..pages %}
+                        <li class="page-item {{ number == filters.page ? 'active' : '' }}"><a class="page-link" href="?{{ {status: filters.status, purpose: filters.purpose, q: filters.q, page: number}|url_encode }}#catalogue">{{ number }}</a></li>
+                    {% endfor %}
+                </ul></nav>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ---------------------------------------------------------------- Custom #}
+    <div class="card mb-3" id="custom" data-testid="ccm-custom-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Custom services'|trans }}</h2></div>
+        <div class="card-body">
+            <p class="text-secondary">{{ 'A service of your own: a script URL, your own code (UPDATE right, kept in the version snapshot) or a declaration only (a third party loaded by Google Tag Manager).'|trans }}</p>
+            {% for service in custom %}
+                <details class="border rounded p-3 mb-2" {{ failed_anchor == 'custom' ? 'open' : '' }} data-testid="ccm-custom-{{ service.key }}">
+                    <summary><strong>{{ service.name }}</strong> <code class="small">{{ service.key }}</code> <span class="badge text-bg-{{ service.enabled ? 'success' : 'secondary' }}">{{ service.enabled ? 'enabled'|trans : 'disabled'|trans }}</span> <span class="badge text-bg-light border">{{ service.kind }}</span></summary>
+                    <div class="mt-3">{{ local.custom_form(service, purposes, issues, can, ui_locale) }}</div>
+                </details>
+            {% endfor %}
+            <details class="border rounded p-3" {{ failed_anchor == 'custom' ? 'open' : '' }}>
+                <summary><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ 'Add a custom service'|trans }}</summary>
+                <div class="mt-3">{{ local.custom_form(null, purposes, issues, can, ui_locale) }}</div>
+            </details>
+        </div>
+    </div>
+
+    {# ---------------------------------------------------------------- Purposes #}
+    <div class="card mb-3" id="purposes" data-testid="ccm-purposes-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Purposes'|trans }}</h2></div>
+        <div class="card-body">
+            <p class="text-secondary">{{ 'A purpose with no active service is not shown to visitors. "essential" is implicit and locked.'|trans }}</p>
+            <form method="post" action="{{ path('ccm_admin_purposes_save') }}" data-testid="ccm-purposes-form">
+                {{ ccm.csrf() }}
+                {{ ccm.issues(issues, 'purposes') }}
+                <div class="table-responsive">
+                    <table class="table table-sm align-top">
+                        <thead><tr><th>{{ 'Order'|trans }}</th><th>{{ 'Code'|trans }}</th><th>{{ 'Labels'|trans }}</th><th>{{ 'Descriptions'|trans }}</th><th>{{ 'Consent Mode signals'|trans }}</th></tr></thead>
+                        <tbody>
+                            {% for purpose in purposes %}
+                                <tr data-testid="ccm-purpose-{{ purpose.code }}">
+                                    <td style="width:5rem"><input class="form-control form-control-sm" type="number" name="purposes[{{ purpose.code }}][order]" value="{{ purpose.order }}" aria-label="{{ 'Order'|trans }}"></td>
+                                    <td><code>{{ purpose.code }}</code></td>
+                                    <td>
+                                        {% for locale in purpose_locales %}
+                                            <input class="form-control form-control-sm mb-1" name="purposes[{{ purpose.code }}][label][{{ locale }}]" value="{{ purpose.label[locale]|default('') }}" placeholder="{{ purpose_defaults[purpose.code][locale].label }}" aria-label="{{ locale }}" lang="{{ locale }}">
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for locale in purpose_locales %}
+                                            <textarea class="form-control form-control-sm mb-1" rows="2" name="purposes[{{ purpose.code }}][description][{{ locale }}]" placeholder="{{ purpose_defaults[purpose.code][locale].description }}" aria-label="{{ locale }}" lang="{{ locale }}">{{ purpose.description[locale]|default('') }}</textarea>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for signal in signals %}
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="p_{{ purpose.code }}_{{ signal }}" name="purposes[{{ purpose.code }}][consent_mode][{{ signal }}]" value="1" {{ signal in purpose.consent_mode ? 'checked' : '' }}><label class="form-check-label small" for="p_{{ purpose.code }}_{{ signal }}">{{ signal }}</label></div>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <tr class="table-light">
+                                <td></td>
+                                <td><input class="form-control form-control-sm" name="new_purpose[code]" placeholder="{{ 'new code'|trans }}" aria-label="{{ 'new code'|trans }}"></td>
+                                <td>{% for locale in purpose_locales %}<input class="form-control form-control-sm mb-1" name="new_purpose[label][{{ locale }}]" placeholder="{{ locale }}" aria-label="{{ locale }}">{% endfor %}</td>
+                                <td>{% for locale in purpose_locales %}<input class="form-control form-control-sm mb-1" name="new_purpose[description][{{ locale }}]" placeholder="{{ locale }}" aria-label="{{ locale }}">{% endfor %}</td>
+                                <td class="small text-secondary">{{ 'Add a purpose of your own (no signal)'|trans }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% if can.update %}<button class="btn btn-primary" type="submit" data-testid="ccm-purposes-save">{{ 'Save purposes'|trans }}</button>{% endif %}
+            </form>
+        </div>
+    </div>
+
+    {# ---------------------------------------------------------------- Exempt #}
+    <div class="card mb-3" id="exempt" data-testid="ccm-exempt-card">
+        <div class="card-header"><h2 class="h5 mb-0">{{ 'Exempted audience measurement'|trans }}</h2></div>
+        <div class="card-body">
+            <p class="text-secondary">{{ 'Only for an audience measurement tool that meets every CNIL condition. The tool then runs without consent and the second level shows an opposition switch. Only the tools below can be exempted; Google Analytics and every other tool never can.'|trans }}</p>
+            <ul class="small" data-testid="ccm-exempt-allowed">{% for key, label in exempt_allowed %}<li><strong>{{ ccm_field('services.' ~ key) }}</strong> : {{ label|trans }}</li>{% endfor %}</ul>
+            {% if exempt_candidates|length %}
+                <form method="post" action="{{ path('ccm_admin_exempt_save') }}">
+                    {{ ccm.csrf() }}
+                    {{ ccm.issues(issues, 'exempt_measurement') }}
+                    {% for service in exempt_candidates %}
+                        <fieldset class="border rounded p-2 mb-2">
+                            <legend class="h6 float-none w-auto px-2 mb-0">{{ ccm_field('services.' ~ service.key) }}</legend>
+                            <div class="form-check form-switch mb-1"><input class="form-check-input" type="checkbox" role="switch" id="ex_{{ service.key }}" name="exempt[{{ service.key }}][enabled]" value="1" {{ exempt[service.key] is defined ? 'checked' : '' }}><label class="form-check-label" for="ex_{{ service.key }}">{{ 'Run without consent'|trans }}</label></div>
+                            {% for condition in exempt_conditions %}
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="ex_{{ service.key }}_{{ condition }}" name="exempt[{{ service.key }}][conditions][{{ condition }}]" value="1" {{ exempt[service.key].conditions[condition]|default(false) ? 'checked' : '' }}><label class="form-check-label small" for="ex_{{ service.key }}_{{ condition }}">{{ condition|ccm_code('condition') }}<span class="d-block text-secondary">{{ condition|ccm_code('condition_help') }}</span></label></div>
+                            {% endfor %}
+                        </fieldset>
+                    {% endfor %}
+                    {% if can.update %}<button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>{% endif %}
+                </form>
+            {% else %}
+                <p class="text-secondary mb-0" data-testid="ccm-exempt-none">{{ 'None of these tools is configured yet: enable it in the catalogue above first.'|trans }}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script>
+        {% if failed_anchor %}
+        (function () { var target = document.getElementById({{ failed_anchor|json_encode|raw }}); if (target) { target.scrollIntoView(); } })();
+        {% endif %}
+        document.querySelectorAll('[data-ccm-copy]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var field = document.getElementById(button.dataset.ccmCopy);
+                var label = button.querySelector('[data-ccm-copy-label]');
+                var icon = button.querySelector('.bi');
+                var done = function () {
+                    var previous = label.textContent;
+                    label.textContent = {{ 'Copied'|trans|json_encode|raw }};
+                    button.classList.replace('btn-outline-secondary', 'btn-success');
+                    if (icon) { icon.classList.replace('bi-clipboard', 'bi-check2'); }
+                    button.setAttribute('aria-live', 'polite');
+                    setTimeout(function () {
+                        label.textContent = previous;
+                        button.classList.replace('btn-success', 'btn-outline-secondary');
+                        if (icon) { icon.classList.replace('bi-check2', 'bi-clipboard'); }
+                    }, 2000);
+                };
+                field.focus(); field.select();
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(field.value).then(done, function () { document.execCommand('copy'); done(); });
+                } else { document.execCommand('copy'); done(); }
+            });
+        });
+    </script>
+{% endblock %}

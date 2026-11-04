@@ -1,0 +1,32 @@
+{# ccm-templates:1 #}
+{# ccm-templates/1 (Flexy) : first level (bar or modal). The engine reads data-ccm-* only, never a CSS class. #}
+{% set ccmStyle %}{% if colors %}--ccm-primary:{{ colors.primary }};--ccm-on-primary:{{ colors.on_primary }};--ccm-surface:{{ colors.surface }};--ccm-text:{{ colors.text }};{% endif %}{% endset %}
+<div class="ccm ccm--flexy ccm-banner ccm-banner--{{ layout }}" data-ccm-banner hidden role="dialog" aria-modal="{{ layout == 'modal' ? 'true' : 'false' }}" aria-labelledby="ccm-banner-title" aria-describedby="ccm-banner-body"{% if ccmStyle|trim %} style="{{ ccmStyle|trim }}"{% endif %}>
+    <div class="ccm-dialog">
+        {% if merchant_name %}<p class="ccm-merchant">{{ merchant_name }}</p>{% endif %}
+        <h2 class="ccm-title" id="ccm-banner-title">{{ texts.title }}</h2>
+        <div class="ccm-text" id="ccm-banner-body" role="region" aria-labelledby="ccm-banner-title" data-ccm-scroll>
+            {% if purposes %}
+                <p class="ccm-intro">{{ texts.purposes_intro }}</p>
+                <ul class="ccm-purposes">
+                    {% for purpose in purposes %}<li>{{ purpose.label }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+            <p>{{ texts.body }}</p>
+            {% if texts.free_text %}<p>{{ texts.free_text }}</p>{% endif %}
+            {% if purposes %}<p>{{ texts.third_parties }} {{ texts.how_to_refuse }}</p>{% endif %}
+            {% if exempt_services %}<p class="ccm-exempt">{{ texts.measurement_notice|replace({'%names%': exempt_services|map(service => service.name)|join(', ')}) }} <button type="button" class="ccm-link ccm-link-btn" data-ccm-open data-ccm-open-exempt>{{ texts.measurement_object }}</button></p>{% endif %}
+        </div>
+        <div class="ccm-actions">
+            <button type="button" class="ccm-btn ccm-btn--choice" data-ccm-action="reject_all">{{ texts.reject }}</button>
+            <button type="button" class="ccm-btn ccm-btn--choice" data-ccm-action="accept_all">{{ texts.accept }}</button>
+            <button type="button" class="ccm-btn ccm-btn--outline" data-ccm-action="open">{{ texts.customize }}</button>
+        </div>
+        {% if close_enabled or policy_url %}
+            <div class="ccm-foot">
+                {% if close_enabled %}<button type="button" class="ccm-close" data-ccm-action="close_reject">{{ texts.close }}</button>{% endif %}
+                {% if policy_url %}<a class="ccm-link ccm-policy" href="{{ policy_url }}">{{ texts.policy }}</a>{% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

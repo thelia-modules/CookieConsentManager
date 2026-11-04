@@ -1,0 +1,34 @@
+{% extends 'CookieConsentManager/layout.html.twig' %}
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+
+{% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Cookie policy page model'|trans }}</li>{% endblock %}
+
+{% block ccm_content %}
+    <p class="text-secondary" data-testid="ccm-policy-template-intro">{{ 'A model of the page that the "Cookie policy" link leads to, written from the published version: publisher (read from the shop configuration), roles, duration of the choice, retention of the proofs, rights, and a link to the live list of services, cookies and lifetimes, which therefore needs no update. Paste it in the description of a content of the shop (Folders and Pages menu, HTML mode), publish the page, then enter its address in the "Cookie policy URL" field. Make one page per active language.'|trans }}</p>
+    <ul class="nav nav-pills mb-3">
+        {% for code in languages %}
+            <li class="nav-item"><a class="nav-link {{ code == language ? 'active' : '' }}" href="{{ path('ccm_admin_policy_template', {lang: code}) }}" data-testid="ccm-policy-template-lang-{{ code }}">{{ code|upper }}</a></li>
+        {% endfor %}
+    </ul>
+    {% if identity_missing %}
+        <div class="alert alert-warning" data-testid="ccm-policy-template-identity">{{ 'The shop configuration has no name, address or email for the publisher (Configuration > Store): the model leaves out what is missing. Fill them in, then reload this page.'|trans }}</div>
+    {% endif %}
+    {% if html is null %}
+        <div class="alert alert-warning" data-testid="ccm-policy-template-unpublished">{{ 'No version is published yet: publish one, the model is written from it.'|trans }}</div>
+    {% else %}
+        {% if not supported %}
+            <div class="alert alert-warning" data-testid="ccm-policy-template-english">{{ 'The module ships no catalogue for this language: the fixed sentences of the model are in English. Translate them.'|trans }}</div>
+        {% endif %}
+        <div class="card mb-3">
+            <div class="card-header"><h2 class="h5 mb-0">{{ 'Model of version %version%'|trans({'%version%': published.version}) }}</h2></div>
+            <div class="card-body">
+                <textarea class="form-control font-monospace small" rows="14" readonly id="policy_template_html" aria-label="{{ 'HTML of the model'|trans }}" data-testid="ccm-policy-template-html">{{ html }}</textarea>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-ccm-copy="policy_template_html" data-testid="ccm-policy-template-copy"><i class="bi bi-clipboard" aria-hidden="true"></i> <span data-ccm-copy-label>{{ 'Copy'|trans }}</span></button>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-header"><h2 class="h5 mb-0">{{ 'Preview'|trans }}</h2></div>
+            <div class="card-body" data-testid="ccm-policy-template-preview">{{ html|raw }}</div>
+        </div>
+    {% endif %}
+{% endblock %}
