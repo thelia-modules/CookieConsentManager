@@ -74,12 +74,17 @@ final readonly class DailyStatRepository
         $con->beginTransaction();
 
         try {
-            $delete = $con->prepare('DELETE FROM ccm_daily_stat WHERE day >= :oldest');
+            // The oldest day is usually only partly purged (the cutoff keeps the time of the purge): its figures
+            // are never lowered, only raised when the registry counts more than they hold.
+            $delete = $con->prepare('DELETE FROM ccm_daily_stat WHERE day > :oldest');
             $delete->execute(['oldest' => $oldest]);
-            $insert = $con->prepare('INSERT INTO ccm_daily_stat (day, metric, total) VALUES (:day, :metric, :total)');
+            $insert = $con->prepare(
+                'INSERT INTO ccm_daily_stat (day, metric, total) VALUES (:day, :metric, :total)'
+                .' ON DUPLICATE KEY UPDATE total = GREATEST(total, :kept_total)',
+            );
             foreach ($counts as $day => $metrics) {
                 foreach ($metrics as $metric => $total) {
-                    $insert->execute(['day' => $day, 'metric' => $metric, 'total' => $total]);
+                    $insert->execute(['day' => $day, 'metric' => $metric, 'total' => $total, 'kept_total' => $total]);
                 }
             }
             $con->commit();
