@@ -2,6 +2,12 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-11-04
+
+### Fixed
+
+- A consent cookie whose time is missing or not a whole number is now treated as expired, in the head script, the engine and the PHP helpers. The engine used to keep such a choice forever, so the banner never came back after the renewal delay.
+
 ## [1.0.1] - 2026-11-04
 
 ### Security
