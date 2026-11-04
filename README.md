@@ -1,5 +1,7 @@
 # CookieConsentManager
 
+English | [Français](README.fr.md)
+
 This module helps you collect and prove consent. It does not make a website compliant by itself and is not legal advice.
 
 CookieConsentManager is a cookie and tracker consent module for Thelia 3 (package `thelia/cookie-consent-manager-module`, module code `CookieConsentManager`).
@@ -11,6 +13,20 @@ CookieConsentManager is a cookie and tracker consent module for Thelia 3 (packag
 - The banner, the panel and the back-office are translated into French, English, German, Dutch and Spanish. A France (CNIL) preset provides texts and settings.
 
 It is not an IAB TCF or Google-certified CMP. MIT licence.
+
+## Screenshots
+
+<img src="docs/images/banner-desktop.png" alt="Cookie banner at the bottom of a Thelia shop on desktop, with the buttons Reject all, Accept all and Customize" width="520"> <img src="docs/images/banner-mobile.png" alt="The same banner on a 390 px wide phone screen" width="190">
+
+The banner (bar layout) on desktop and on a phone. "Reject all" is as visible as "Accept all".
+
+<img src="docs/images/preferences-desktop.png" alt="Cookie preferences panel opened as a modal over the shop, with the Essential, Audience measurement, Advertising and Third-party content categories and the buttons Reject all, Accept all and Save my choices" width="520"> <img src="docs/images/preferences-mobile.png" alt="The preferences panel on a phone screen" width="190">
+
+The preferences panel, with one toggle per purpose and the services of each purpose listed under it. Here Google Analytics, Meta Pixel and YouTube are enabled.
+
+<img src="docs/images/dashboard-desktop.png" alt="Cookie consent dashboard in the Thelia back-office, with the published version, the setup assistant and publish buttons, and a list of alerts" width="720">
+
+The back-office dashboard: published version, setup assistant, preview, publish, and alerts about the configuration.
 
 ## Compatibility
 
@@ -70,7 +86,8 @@ php Thelia cache:clear
 
 - `module:refresh` runs `update()`: the schema is applied again (idempotent), then any update scripts shipped in `Config/update/`, and the services declared by other modules are synchronised.
 - The bundled service catalogue follows the module version (tarteaucitron.js v1.37.0 today). There is no catalogue update on its own.
-- A publication is needed after most updates. Visitors are served a versioned script `/ccm/<version>-<hash>.js`, and the hash covers the engine, the compatibility layer, the fragments and the templates. When the served hash differs from the published version, the dashboard shows a red alert "The served rendering (...) differs from version ...". Publish again from the back-office, or from the console:
+- A publication is needed after most updates. Visitors are served a versioned script `/ccm/<version>-<hash>.js`, and the hash covers the engine, the compatibility layer, the fragments and the templates.
+  When the served hash differs from the published version, the dashboard shows a red alert "The served rendering (...) differs from version ...". Publish again from the back-office, or from the console:
 
   ```bash
   php Thelia ccm:config:publish --comment="Module update"
