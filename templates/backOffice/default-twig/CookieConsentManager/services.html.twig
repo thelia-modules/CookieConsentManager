@@ -65,6 +65,9 @@
                 </div>
                 <div class="col-md-2 d-flex align-items-end"><button class="btn btn-outline-primary w-100" type="submit">{{ 'Filter'|trans }}</button></div>
             </form>
+            {% if draft.general.experimental_services %}
+                <p class="small text-secondary" data-testid="ccm-experimental-note">{{ 'Services marked experimental come from an imported catalogue and are not tested: check each one on your site before publishing.'|trans }}</p>
+            {% endif %}
             {% if not draft.general.experimental_services %}
                 <p class="small text-secondary">{{ 'Imported services are hidden: turn on "Experimental services" in the general settings of the dashboard to see them.'|trans }}</p>
             {% endif %}
@@ -78,7 +81,7 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center p-2 bg-body-tertiary">
                         <div>
                             <strong>{{ entry.name }}</strong> <code class="small">{{ entry.key }}</code>
-                            <span class="badge text-bg-{{ entry.verified ? 'success' : 'warning' }}">{{ entry.verified ? 'verified'|trans : 'experimental'|trans }}</span>
+                            {% if entry.verified %}<span class="badge text-bg-success">{{ 'verified'|trans }}</span>{% else %}{{ ccm.experimental(entry.key) }}{% endif %}
                             <span class="badge text-bg-light border">{{ ccm_purpose(entry.purpose) }}</span>
                             {% if entry.googleTag %}<span class="badge text-bg-info">Google tag</span>{% endif %}
                         </div>

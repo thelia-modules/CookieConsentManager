@@ -244,6 +244,7 @@ return [
     'Level' => 'Nivel',
     'Verified (%count%)' => 'Verificados (%count%)',
     'Imported, experimental' => 'Importados, experimentales',
+    'Services marked experimental come from an imported catalogue and are not tested: check each one on your site before publishing.' => 'Los servicios marcados como experimentales proceden de un catálogo importado y no están probados: compruebe cada uno en su sitio antes de publicar.',
     'All (%count%)' => 'Todos (%count%)',
     'Category' => 'Categoría',
     'Search' => 'Buscar',

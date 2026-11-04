@@ -34,7 +34,7 @@ final class BackOfficeLinksTest extends TestCase
 
             public function getFunctions(): array
             {
-                return [new TwigFunction('path', static fn (string $route): string => '/'.$route), new TwigFunction('assignToken', static fn (): string => 't'), new TwigFunction('ccm_field', static fn (string $path): string => $path), new TwigFunction('ccm_purpose', static fn (string $code): string => $code), new TwigFunction('ccm_can', static fn (string $access): bool => true)];
+                return [new TwigFunction('path', static fn (string $route): string => '/'.$route), new TwigFunction('assignToken', static fn (): string => 't'), new TwigFunction('ccm_field', static fn (string $path): string => $path), new TwigFunction('ccm_purpose', static fn (string $code): string => $code), new TwigFunction('ccm_can', static fn (string $access): bool => true), new TwigFunction('ccm_is_experimental', static fn (string $key): bool => false)];
             }
         });
 

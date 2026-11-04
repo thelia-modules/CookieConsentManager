@@ -87,7 +87,7 @@
             <div class="card h-100" data-testid="ccm-verification-services">
                 <div class="card-header"><h2 class="h5 mb-0">{{ 'Services of the published version'|trans }}</h2></div>
                 <div class="card-body">
-                    <ul class="small mb-0">{% for service in services %}<li>{{ service.name }} ({{ ccm_purpose(service.purpose) }}) : {{ service.domains|join(', ')|default('-') }}</li>{% else %}<li class="text-secondary">{{ 'None.'|trans }}</li>{% endfor %}</ul>
+                    <ul class="small mb-0">{% for service in services %}<li>{{ service.name }} {{ ccm.experimental(service.key) }} ({{ ccm_purpose(service.purpose) }}) : {{ service.domains|join(', ')|default('-') }}</li>{% else %}<li class="text-secondary">{{ 'None.'|trans }}</li>{% endfor %}</ul>
                 </div>
             </div>
         </div>

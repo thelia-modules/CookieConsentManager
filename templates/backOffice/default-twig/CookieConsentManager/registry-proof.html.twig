@@ -1,5 +1,6 @@
 {% extends 'CookieConsentManager/layout.html.twig' %}
 {% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{% import 'CookieConsentManager/include/macros.html.twig' as ccm %}
 
 {% block ccm_crumb %}
     <li class="breadcrumb-item"><a href="{{ path('ccm_admin_registry') }}">{{ 'Registry'|trans }}</a></li>
@@ -44,7 +45,7 @@
                 </dl>
                 <p class="small"><strong>{{ 'Cookie policy URL'|trans }}</strong> : {{ proof.policy_url|default('-') }}<br><strong>{{ 'Layout'|trans }}</strong> : {{ proof.layout|default('-') }}</p>
                 <h3 class="h6">{{ 'Services in force'|trans }}</h3>
-                <ul class="small">{% for service in proof.services_resolved %}<li>{{ service.name }}{% if service.controller and service.controller != service.name %} ({{ service.controller }}){% endif %}, {{ ccm_purpose(service.purpose) }}{% if service.cookies|length %}, {{ 'Cookies'|trans }} : {{ service.cookies|join(', ') }}{% endif %}</li>{% endfor %}</ul>
+                <ul class="small">{% for service in proof.services_resolved %}<li>{{ service.name }} {{ ccm.experimental(service.key) }}{% if service.controller and service.controller != service.name %} ({{ service.controller }}){% endif %}, {{ ccm_purpose(service.purpose) }}{% if service.cookies|length %}, {{ 'Cookies'|trans }} : {{ service.cookies|join(', ') }}{% endif %}</li>{% endfor %}</ul>
             {% else %}
                 <p class="text-danger">{{ 'The version of this entry no longer exists.'|trans }}</p>
             {% endif %}

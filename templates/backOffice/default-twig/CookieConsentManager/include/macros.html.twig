@@ -2,6 +2,9 @@
 
 {% macro csrf() %}<input type="hidden" name="_token" value="{{ assignToken() }}">{% endmacro %}
 
+{# Badge of a catalogue service that is not verified; nothing for a verified, custom or proposed one. #}
+{% macro experimental(key) %}{% if ccm_is_experimental(key) %}<span class="badge text-bg-warning" data-testid="ccm-experimental-badge">{{ 'experimental'|trans }}</span>{% endif %}{% endmacro %}
+
 {% macro hint(text) %}
     <i class="bi bi-info-circle ms-1 text-secondary" tabindex="0" role="img" data-bs-toggle="tooltip" title="{{ text }}" aria-label="{{ text }}"></i>
 {% endmacro %}
