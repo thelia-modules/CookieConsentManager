@@ -7,8 +7,8 @@ namespace CookieConsentManager\Tests\Unit;
 use CookieConsentManager\Catalogue\CatalogueReader;
 use CookieConsentManager\Catalogue\CookieDurations;
 use CookieConsentManager\Publication\ModuleVersion;
-use CookieConsentManager\Publication\NoOverriddenTemplates;
 use CookieConsentManager\Publication\SnapshotAssembler;
+use CookieConsentManager\Tests\Support\NoOverriddenTemplates;
 use PHPUnit\Framework\TestCase;
 
 final class CookieDurationsTest extends TestCase

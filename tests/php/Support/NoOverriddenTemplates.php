@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace CookieConsentManager\Publication;
+namespace CookieConsentManager\Tests\Support;
+
+use CookieConsentManager\Publication\OverriddenTemplatesProvider;
 
 final readonly class NoOverriddenTemplates implements OverriddenTemplatesProvider
 {
