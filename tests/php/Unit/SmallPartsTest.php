@@ -41,6 +41,7 @@ final class SmallPartsTest extends TestCase
     public function testIpTruncation(): void
     {
         self::assertSame('203.0.113.0', IpTruncator::truncate('203.0.113.77'));
+        self::assertSame('203.0.113.0', IpTruncator::truncate('::ffff:203.0.113.77'), 'a dual-stack server reports an IPv4 visitor as an IPv4-mapped address');
         self::assertSame('2001:db8:abcd::', IpTruncator::truncate('2001:db8:abcd:1234:5678::1'));
         self::assertNull(IpTruncator::truncate('not an ip'));
         self::assertNull(IpTruncator::truncate(null));
