@@ -62,7 +62,7 @@ final class RegistryController extends AbstractScreenController
     #[Route('/export', name: '_export', methods: ['GET'])]
     public function export(Request $request): Response
     {
-        if (null !== $denied = $this->guardRead()) {
+        if (null !== $denied = $this->guardAccess(AccessManager::UPDATE)) {
             return $denied;
         }
 
@@ -100,7 +100,7 @@ final class RegistryController extends AbstractScreenController
     #[Route('/entry/{id}/proof', name: '_proof', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function proof(int $id, Request $request): Response
     {
-        if (null !== $denied = $this->guardRead()) {
+        if (null !== $denied = $this->guardAccess(AccessManager::UPDATE)) {
             return $denied;
         }
 

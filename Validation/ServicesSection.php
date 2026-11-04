@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace CookieConsentManager\Validation;
 
 use CookieConsentManager\Catalogue\CatalogueReader;
+use CookieConsentManager\CookieConsentManager;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /** Every service of the draft: key, purpose, declared services, catalogue rules and parameters. */
 final readonly class ServicesSection implements SectionValidator
 {
+    /** @param list<array{service_id: string, attributes: array<string, mixed>}> $declared */
     public function __construct(
         private CatalogueReader $catalogue,
         private ConflictingModuleDetector $modules,
         private IssueFactory $issues,
+        #[Autowire(param: CookieConsentManager::PARAMETER_DECLARED_SERVICES)]
+        private array $declared = [],
     ) {
     }
 
@@ -46,6 +51,10 @@ final readonly class ServicesSection implements SectionValidator
 
             $this->essential($service, $field, $issues);
 
+            if (isset($service['module'])) {
+                $this->moduleService($service, $field, $issues);
+            }
+
             if (isset($service['custom']) || isset($service['module'])) {
                 $this->declared($service, $field, $issues);
             } else {
@@ -75,6 +84,43 @@ final readonly class ServicesSection implements SectionValidator
 
         if ('' === trim((string) ($service['justification'] ?? ''))) {
             $issues[] = $this->issues->error('justification_missing', $field.'.justification', 'A strictly necessary service needs a written justification.');
+        }
+    }
+
+    /**
+     * A service flagged "module" must be one a module really declares with the `ccm.service` tag, and may not go beyond the declaration.
+     *
+     * @param array<string, mixed>  $service
+     * @param list<ValidationIssue> $issues
+     */
+    private function moduleService(array $service, string $field, array &$issues): void
+    {
+        $attributes = null;
+        foreach ($this->declared as $declaration) {
+            if (($declaration['attributes']['key'] ?? null) === $service['key']) {
+                $attributes = $declaration['attributes'];
+                break;
+            }
+        }
+
+        if (null === $attributes) {
+            $issues[] = $this->issues->error('module_undeclared', $field, 'The service "%key%" claims to come from a module, but no active module declares it.', ['%key%' => $service['key']]);
+
+            return;
+        }
+
+        if ('' !== trim((string) ($service['code'] ?? ''))) {
+            $issues[] = $this->issues->error('module_code', $field.'.code', 'A service declared by a module cannot carry code.');
+        }
+
+        $declaredUrl = (string) ($attributes['script'] ?? '');
+        if ((string) ($service['script_url'] ?? '') !== $declaredUrl) {
+            $issues[] = $this->issues->error('module_script_url', $field.'.script_url', 'The script address of a service declared by a module must be the declared one.');
+        }
+
+        $declaredNecessary = (bool) ($attributes['strictly_necessary'] ?? false);
+        if (!$declaredNecessary && (true === ($service['strictly_necessary'] ?? false) || 'essential' === $service['purpose'])) {
+            $issues[] = $this->issues->error('module_necessary', $field.'.purpose', 'The module that declares the service "%key%" does not declare it strictly necessary.', ['%key%' => $service['key']]);
         }
     }
 

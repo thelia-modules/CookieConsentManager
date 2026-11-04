@@ -44,6 +44,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /** Object graph on the fixture catalogue, so that the tests do not depend on the container. */
 final class Wiring
 {
+    /** What the modules of the test shop declare with the `ccm.service` tag (the services of complete-config.json). */
+    public const DECLARED_BY_MODULES = [
+        ['service_id' => 'payzen.ccm.antifraud', 'attributes' => [
+            'key' => 'payzen_antifraud', 'name' => 'Payzen anti-fraude', 'controller' => 'Lyra Network',
+            'purpose' => 'essential', 'strictly_necessary' => true, 'justification' => 'Sécurité du paiement.',
+            'policy_url' => 'https://payzen.eu/privacy',
+        ]],
+        ['service_id' => 'payzen.ccm.tracking', 'attributes' => [
+            'key' => 'payzen_tracking', 'name' => 'Payzen suivi', 'controller' => 'Lyra Network',
+            'purpose' => 'analytics', 'policy_url' => 'https://payzen.eu/privacy', 'script' => 'https://static.payzen.eu/track.js',
+        ]],
+    ];
+
     public CatalogueReader $catalogue;
     public DraftNormalizer $normalizer;
     public DraftRepository $drafts;
@@ -105,7 +118,7 @@ final class Wiring
         $issues = new IssueFactory($translator);
         $this->validator = new DraftValidator([
             new GeneralSection($issues),
-            new ServicesSection($this->catalogue, $modules, $issues),
+            new ServicesSection($this->catalogue, $modules, $issues, self::DECLARED_BY_MODULES),
             new ExemptionSection($this->catalogue, $issues),
             new PresetSection(
                 $this->catalogue,

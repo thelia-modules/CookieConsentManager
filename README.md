@@ -120,7 +120,7 @@ php Thelia ccm:config:publish --confirm-environment --comment="Go live"
 
 - Not an IAB TCF 2.2 or Google-certified CMP. Not covered: server-side geolocation, cross-domain consent, CSP nonce, Microsoft Clarity consent signal.
 - The module cannot authenticate an anonymous visitor: the registry proves what the browser sent, not who sent it.
-- The right to publish (CREATE on the module in Configuration, Administrator profiles) lets a user serve JavaScript to all visitors, through custom services. Grant it with care.
+- The right to publish (CREATE on the module in Configuration, Administrator profiles) lets a user serve JavaScript to all visitors, through custom services. The same right is needed to write or change the code or script address of a service, to import a configuration, to restore a version and to switch on experimental services. Grant it with care.
 - Behind a reverse proxy or a CDN, declare the proxy in `framework.trusted_proxies`. The registry endpoint is rate limited to 120 requests per minute per client address, and without it all visitors share one counter.
 - The Flexy theme loads Google fonts before the `layout.head.top` hook. The module cannot prevent it; host the fonts on the site. The dashboard and the Verification report it.
 - The Thelia 3.3 shared cache serves only visitors without a cookie, so a page that calls `ccm_has_consent` must stay out of it.

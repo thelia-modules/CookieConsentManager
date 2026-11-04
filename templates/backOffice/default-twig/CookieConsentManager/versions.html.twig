@@ -82,13 +82,13 @@
                     </div>
                     <h3 class="h6">{{ 'Import a configuration (JSON)'|trans }}</h3>
                     <p class="small text-secondary">{{ 'The import replaces the draft, never the published version. Environment fields must be confirmed before publishing.'|trans }}</p>
-                    {% if can.update %}
+                    {% if can.create %}
                         <form method="post" action="{{ path('ccm_admin_versions_import') }}" enctype="multipart/form-data" data-testid="ccm-import-form">
                             {{ ccm.csrf() }}
                             <input class="form-control mb-2" type="file" name="config_file" accept="application/json,.json" aria-label="{{ 'JSON file'|trans }}" data-testid="ccm-import-file">
                             <button class="btn btn-outline-primary" type="submit" data-testid="ccm-import">{{ 'Import into the draft'|trans }}</button>
                         </form>
-                    {% else %}<p class="text-secondary mb-0">{{ 'Importing needs the UPDATE right.'|trans }}</p>{% endif %}
+                    {% else %}<p class="text-secondary mb-0">{{ 'Importing needs the CREATE right (the right that publishes).'|trans }}</p>{% endif %}
                 </div>
             </div>
         </div>

@@ -107,7 +107,14 @@ final class ServicesController extends AbstractScreenController
             return $denied;
         }
 
-        $result = $this->save($apply($this->drafts->load()), $prefixes);
+        $before = $this->drafts->load();
+        $after = $apply($before);
+        // Script that reaches the storefront: only the right that publishes may add or change it.
+        if ($this->changesExecutable($before, $after) && null !== $denied = $this->guardWrite($request, AccessManager::CREATE)) {
+            return $denied;
+        }
+
+        $result = $this->save($after, $prefixes);
         if (!$result->saved) {
             return $this->screen($request, $result->draft, $result->issues, $anchor, 422);
         }
@@ -115,6 +122,24 @@ final class ServicesController extends AbstractScreenController
         $this->flash($request, 'success', $this->say($success, $parameters));
 
         return new \Symfony\Component\HttpFoundation\RedirectResponse($this->urls->generate('ccm_admin_services').'#'.$anchor);
+    }
+
+    /**
+     * @param array<string, mixed> $before
+     * @param array<string, mixed> $after
+     */
+    private function changesExecutable(array $before, array $after): bool
+    {
+        $known = array_column($before['services'], null, 'key');
+        foreach ($after['services'] as $service) {
+            foreach (['code', 'script_url'] as $field) {
+                if ((string) ($service[$field] ?? '') !== (string) ($known[$service['key']][$field] ?? '')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

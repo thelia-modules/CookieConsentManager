@@ -70,7 +70,7 @@
                             } %}
                                 <div class="col-md-6">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="general_{{ flag }}" name="general[{{ flag }}]" value="1" {{ g[flag] ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" role="switch" id="general_{{ flag }}" name="general[{{ flag }}]" value="1" {{ g[flag] ? 'checked' : '' }} {{ flag == 'experimental_services' and not g[flag] and not can.create ? 'disabled' : '' }}>
                                         <label class="form-check-label" for="general_{{ flag }}">{{ label|trans }}</label>
                                     </div>
                                 </div>

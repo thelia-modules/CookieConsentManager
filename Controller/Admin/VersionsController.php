@@ -29,6 +29,7 @@ use Thelia\Core\Security\AccessManager;
 final class VersionsController extends AbstractScreenController
 {
     private const PAGE_SIZE = 25;
+    private const IMPORT_MAX_BYTES = 1048576;
 
     public function __construct(
         UrlGeneratorInterface $urls,
@@ -101,12 +102,27 @@ final class VersionsController extends AbstractScreenController
     #[Route('/versions/import', name: 'versions_import', methods: ['POST'])]
     public function import(Request $request): Response
     {
-        if (null !== $denied = $this->guardWrite($request, AccessManager::UPDATE)) {
+        // An import can carry the code of a custom service: same right as publishing.
+        if (null !== $denied = $this->guardWrite($request, AccessManager::CREATE)) {
             return $denied;
         }
 
         $file = $request->files->get('config_file');
-        $json = $file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile ? (string) file_get_contents($file->getPathname()) : (string) $request->request->get('config_json', '');
+        if ($file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+            if (!$file->isValid() || (int) $file->getSize() > self::IMPORT_MAX_BYTES) {
+                $this->flash($request, 'error', $this->say('The file could not be read or is larger than 1 MB: nothing was imported.'));
+
+                return $this->redirectTo('ccm_admin_versions');
+            }
+            $json = (string) file_get_contents($file->getPathname());
+        } else {
+            $json = (string) $request->request->get('config_json', '');
+            if (\strlen($json) > self::IMPORT_MAX_BYTES) {
+                $this->flash($request, 'error', $this->say('The file could not be read or is larger than 1 MB: nothing was imported.'));
+
+                return $this->redirectTo('ccm_admin_versions');
+            }
+        }
 
         try {
             $report = $this->importer->import($json, $this->author());
@@ -174,7 +190,8 @@ final class VersionsController extends AbstractScreenController
     #[Route('/versions/{number}/restore', name: 'version_restore', methods: ['POST'], requirements: ['number' => '\d+'])]
     public function restore(Request $request, int $number): Response
     {
-        if (null !== $denied = $this->guardWrite($request, AccessManager::UPDATE)) {
+        // A restored version can bring back the code of a custom service: same right as publishing.
+        if (null !== $denied = $this->guardWrite($request, AccessManager::CREATE)) {
             return $denied;
         }
 

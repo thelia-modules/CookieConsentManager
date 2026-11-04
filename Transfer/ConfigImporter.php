@@ -66,7 +66,7 @@ final readonly class ConfigImporter
 
         $dangerous = array_values(array_filter(
             $this->validator->validate($draft),
-            static fn (ValidationIssue $issue): bool => $issue->isError() && \in_array($issue->code, DraftValidator::URL_ERROR_CODES, true),
+            static fn (ValidationIssue $issue): bool => $issue->isError() && \in_array($issue->code, [...DraftValidator::URL_ERROR_CODES, ...DraftValidator::MODULE_ERROR_CODES], true),
         ));
         if ([] !== $dangerous) {
             throw new ImportRefusedException(array_map(static fn (ValidationIssue $issue): string => $issue->field.': '.$issue->message, $dangerous));

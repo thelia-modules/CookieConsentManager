@@ -45,6 +45,13 @@ final readonly class ChangePresenter
             if ($added || $removed) {
                 $collapsed[$key] = true;
                 $rows[] = ['path' => 'services.'.$key, 'label' => $this->labels->label('services.'.$key, $locale, $after + $before), 'before' => $added ? '-' : $this->t('Service configured'), 'after' => $added ? $this->t('Service added') : $this->t('Service removed')];
+                // What an added service will run on the storefront is shown in full, never folded.
+                foreach (['code', 'script_url'] as $executable) {
+                    $path = 'services.'.$key.'.'.$executable;
+                    if ($added && isset($serviceChanges[$path]) && '' !== (string) $serviceChanges[$path]['after']) {
+                        $rows[] = ['path' => $path, 'label' => $this->labels->label($path, $locale, $after + $before), 'before' => '-', 'after' => (string) $serviceChanges[$path]['after']];
+                    }
+                }
             }
         }
 

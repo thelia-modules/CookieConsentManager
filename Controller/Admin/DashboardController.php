@@ -54,7 +54,14 @@ final class DashboardController extends AbstractScreenController
             return $denied;
         }
 
-        $result = $this->save($this->editor->general($this->drafts->load(), $request->request->all()), ['general.', 'policy.']);
+        $before = $this->drafts->load();
+        $after = $this->editor->general($before, $request->request->all());
+        // Experimental services run scripts nobody reviewed on the storefront: same right as publishing.
+        if ($after['general']['experimental_services'] && !$before['general']['experimental_services'] && null !== $denied = $this->guardAccess(AccessManager::CREATE)) {
+            return $denied;
+        }
+
+        $result = $this->save($after, ['general.', 'policy.']);
         if (!$result->saved) {
             return $this->dashboardView($request, $result->draft, $result->issues, 422);
         }

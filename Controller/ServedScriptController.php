@@ -36,7 +36,7 @@ final readonly class ServedScriptController
     }
 
     // Versioned by number and hash: whoever changes the script changes the URL, so it never expires.
-    #[Route('/ccm/{version}-{hash}.js', name: self::ROUTE_SCRIPT, requirements: ['version' => '\d+', 'hash' => '[0-9a-f]{12}'], methods: ['GET'], stateless: true)]
+    #[Route('/ccm/{version}-{hash}.js', name: self::ROUTE_SCRIPT, requirements: ['version' => '\d{1,9}', 'hash' => '[0-9a-f]{12}'], methods: ['GET'], stateless: true)]
     public function script(int $version, string $hash): Response
     {
         $published = $this->versions->find($version);
