@@ -72,7 +72,7 @@ export const fetchLog = (win, { status = 200, fail = false } = {}) => {
   return calls;
 };
 
-// Charge head + moteur dans un DOM jsdom ; fragments : { cle: { js, fallback } } posés avant __start.
+// Loads head + engine in a jsdom DOM; fragments: { key: { js, fallback } } are set before __start.
 export const boot = ({ config = baseConfig(), cookie, cookies = [], url = 'https://shop.example.com/fr/page.html', fragments = {}, fetchOpts, start = true, beforeHead, messages } = {}) => {
   const dom = new JSDOM(`<!doctype html><html><head><script type="application/json" id="ccm-config">${JSON.stringify(config)}</script></head><body>${BODY}${messages ? `<script type="application/json" id="ccm-messages">${JSON.stringify(messages)}</script>` : ''}</body></html>`, { url, runScripts: 'dangerously', pretendToBeVisual: true });
   const win = dom.window;

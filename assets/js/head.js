@@ -32,7 +32,7 @@
       if (m) {
         var v = m[1].replace(/-/g, '+').replace(/_/g, '/');
         while (v.length % 4) v += '=';
-        j = JSON.parse(decodeURIComponent(escape(atob(v))));
+        j = JSON.parse(decodeURIComponent(atob(v).split('').map(function (c) { return '%' + ('0' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')));
         if (!j || j.f !== 1) j = null;
       }
     } catch (x) { j = null; }

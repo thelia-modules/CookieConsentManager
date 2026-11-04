@@ -45,13 +45,13 @@
     try {
       let b = v.replace(/-/g, '+').replace(/_/g, '/');
       while (b.length % 4) b += '=';
-      const j = JSON.parse(decodeURIComponent(escape(atob(b))));
+      const j = JSON.parse(decodeURIComponent(Array.from(atob(b), (c) => '%' + ('0' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
       if (!j || j.f !== 1) return null;
       j.p = j.p || {}; j.s = j.s || {}; j.x = j.x || {};
       return j;
     } catch (e) { return null; }
   };
-  const encode = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const encode = (o) => btoa(encodeURIComponent(JSON.stringify(o)).replace(/%([0-9A-F]{2})/g, (m, h) => String.fromCharCode(parseInt(h, 16)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   const writeCookie = (st) => {
     if (mode === 'audit') return;
     const v = encode(st);
@@ -72,7 +72,7 @@
     return h.slice(0, 4).join('') + '-' + h.slice(4, 6).join('') + '-' + h.slice(6, 8).join('') + '-' + h.slice(8, 10).join('') + '-' + h.slice(10).join('');
   };
 
-  // ---- résolution ---------------------------------------------------------
+  // ---- resolution ---------------------------------------------------------
   const exemptOn = (st, k) => !st || st.x[k] !== 0;
   const granted = (st, k) => !!st && st.s[k] === 1;
   const gcmOpen = (st) => !!st && !stale(st) && cfg.purposes.some((p) => (p.signals || []).some((g) => ADS_SIGNALS.indexOf(g) >= 0) && st.p[p.code] >= 1);
@@ -95,7 +95,7 @@
     version: cfg.version
   });
 
-  // ---- Consent Mode et dataLayer -----------------------------------------
+  // ---- Consent Mode and dataLayer -----------------------------------------
   const gtag = function () { w.dataLayer.push(arguments); };
   // Every signal the module manages: those of the defaults sent by the head script and those carried by a purpose (security_storage stays granted, never updated).
   const gcmSignals = () => {
@@ -168,7 +168,7 @@
     (cbs[k] || []).slice().forEach((cb) => { try { cb(); } catch (e) { log('onConsent ' + k + ' : ' + e.message); } });
   };
 
-  // ---- DOM : espaces réservés, scripts balisés ---------------------------
+  // ---- DOM: placeholders, tagged scripts ----------------------------------
   // Controller and policy of the services, written next to the placeholder template by the server (the published configuration does not carry them).
   let meta = null;
   const metaOf = (key) => {
@@ -210,7 +210,7 @@
     restored.push({ key: ph.getAttribute('data-ccm-placeholder'), frame: f, ph });
     return f;
   };
-  // Espace réservé sans src : le bloc est vidé, les attributs du thème passent sur l'élément et le fragment amont le rend.
+  // Placeholder without src: the block is emptied, the theme attributes move to the element and the upstream fragment renders it.
   const releasePlaceholder = (ph, k) => {
     Array.from(ph.attributes).forEach((a) => {
       if (a.name.indexOf('data-ccm-attr-') !== 0) return;
@@ -381,7 +381,7 @@
     opener = null;
   };
 
-  // ---- application d'un changement d'état --------------------------------
+  // ---- applying a state change --------------------------------------------
   const apply = (prev, next, user) => {
     cur = next;
     let reload = false;
@@ -412,10 +412,27 @@
     return reload;
   };
 
-  const send = (payload) => {
+  // A choice that could not be recorded is resent with an increasing delay (1 min, doubling each time) and dropped after 8 failed attempts.
+  // The state lives in localStorage, next to the pending choice of the cookie; a request in flight also holds a short grace period, so that a page opened right after a click does not send the same choice twice.
+  const RETRY = { grace: 30, base: 60, max: 8 };
+  const retryKey = () => cname + '_retry';
+  const readRetry = () => {
+    try {
+      const j = JSON.parse(w.localStorage.getItem(retryKey()));
+      return j && typeof j.n === 'number' && typeof j.next === 'number' ? j : null;
+    } catch (e) { return null; }
+  };
+  const writeRetry = (n, next) => { try { w.localStorage.setItem(retryKey(), JSON.stringify({ n, next })); } catch (e) { /* noop */ } };
+  const clearRetry = () => { try { w.localStorage.removeItem(retryKey()); } catch (e) { /* noop */ } };
+
+  const send = (payload, resend) => {
     if (mode !== 'live') return Promise.resolve();
+    const failed = resend ? (readRetry() || { n: 0 }).n : 0;
     const fallback = (pd) => {
       if (!cur) return;
+      if (pd && failed + 1 >= RETRY.max) { log('registry: giving up after ' + RETRY.max + ' attempts'); pd = 0; }
+      if (pd) writeRetry(failed + 1, now() + RETRY.base * Math.pow(2, failed));
+      else clearRetry();
       if (!cur.id) cur.id = uuid();
       cur.pd = pd;
       if (pd) { cur.pa = payload.action; cur.ps = payload.source; } else { delete cur.pa; delete cur.ps; }
@@ -423,6 +440,7 @@
       syncConsentId();
     };
     if (typeof w.fetch !== 'function') { fallback(1); return Promise.resolve(); }
+    writeRetry(failed, now() + RETRY.grace);
     payload.consent_id = cur && cur.id ? cur.id : null;
     return w.fetch(cfg.endpoint, {
       method: 'POST',
@@ -435,6 +453,9 @@
         return Promise.resolve(r.json ? r.json() : {}).catch(() => ({})).then((j) => {
           if (cur && j && j.consent_id) { cur.id = j.consent_id; cur.pd = 0; delete cur.pa; delete cur.ps; }
           raw = getCookie(cname);
+          clearRetry();
+          const written = readState();
+          if (cur && written && written.pd === 1) { cur.pd = 0; delete cur.pa; delete cur.ps; writeCookie(cur); }
           syncConsentId();
         });
       }
@@ -466,6 +487,8 @@
     const reload = apply(prev, next, true);
     mem = next;
     if (mode === 'preview') writeCookie(next);
+    // Live: the choice is written now, as pending, so that a click followed by a quick navigation does not show the banner again; the answer of the server confirms it.
+    else if (mode === 'live') { next.pd = 1; next.pa = action; next.ps = source; writeCookie(next); }
     const back = opener;
     closePanel(false);
     syncUi();
@@ -594,7 +617,7 @@
     }
   };
 
-  // ---- relevé de la page Vérification (mode audit) -----------------------
+  // ---- report of the Verification page (audit mode) -----------------------
   const auditPhase = () => (new URLSearchParams(w.location.search).get('ccm_audit_phase') === 'after_reject' ? 'after_reject' : 'before');
   const seen = [];
   const observe = () => {
@@ -665,7 +688,7 @@
     if (d.readyState === 'complete') go(); else w.addEventListener('load', go, { once: true });
   };
 
-  // ---- cycle de vie -------------------------------------------------------
+  // ---- lifecycle --------------------------------------------------------
   const resync = () => {
     if (!started || mode === 'audit') return;
     const v = getCookie(cname);
@@ -803,7 +826,8 @@
       if (cur && cur.pd === 1 && mode === 'live') {
         const all = codes().every((c) => cur.p[c] === 1), none = codes().every((c) => !cur.p[c]);
         const pl = payloadFor(cur, cur.pa || (all ? 'accept_all' : none ? 'reject_all' : 'custom'), cur.ps || 'preferences');
-        inflight = inflight.then(() => send(pl));
+        const retry = readRetry();
+        if (!retry || retry.next <= now()) inflight = inflight.then(() => send(pl, true));
       }
       ready = true;
       syncUi();

@@ -13,7 +13,7 @@ const counters = () => {
   return { ran, fragments: { gtag: { js: () => { ran.gtag++; } }, youtube: { js: () => { ran.youtube++; } } } };
 };
 
-// ---- Q3 / uti#C1 : un choix périmé est un choix absent -----------------------
+// ---- Q3 / uti#C1: an outdated choice is no choice -----------------------
 
 for (const [name, mutate] of [
   ['choix expiré (repromptDays)', (st) => { st.t = nowSeconds() - 183 * DAY; }],
@@ -104,7 +104,7 @@ test('Q3 head : choix périmé = aucun update Consent Mode et événement ready 
   assert.deepEqual(Object.keys(ready.ccm.services), []);
 });
 
-// ---- jur#C2 : refus et retrait portent sur tous les signaux gérés ----------------
+// ---- jur#C2: refusal and withdrawal cover every managed signal ----------------
 
 test('jur#C2 « Tout refuser » : update de tous les signaux gérés, même ceux d aucune finalité', async () => {
   const config = baseConfig();
@@ -180,7 +180,7 @@ test('uti#C2 la phrase sur les cookies tiers restants apparaît dès qu un servi
   assert.equal(withNote(undefined), true, 'sans choix : rien à dire');
 });
 
-// ---- jur#C13 : l espace réservé nomme le responsable ------------------------------
+// ---- jur#C13: the placeholder names the controller ------------------------------
 
 const withTemplate = (policy) => {
   const ctx = boot({ start: false });
@@ -213,7 +213,7 @@ test('jur#C13 sans entrée de méta : le nom du service tient lieu de responsabl
   assert.equal(ctx.doc.querySelector('#vid .who').textContent, 'YouTube');
 });
 
-// ---- jur#C16 : la modale s ouvre sur le début du message ---------------------------
+// ---- jur#C16: the modal opens on the start of the message ---------------------------
 
 test('jur#C16 modale : le focus initial ne fait pas défiler le texte, la zone est en haut', () => {
   const config = baseConfig();
