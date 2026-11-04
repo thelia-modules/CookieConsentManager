@@ -61,6 +61,18 @@ final class ConsentCookie extends Cookie
         return $payload;
     }
 
+    /**
+     * Same rule as head.js and engine.js: a choice is no consent once it is older than the renewal
+     * or older than the last substantial version.
+     *
+     * @param array<string, mixed> $state
+     */
+    public static function isStale(array $state, int $repromptDays, int $substantialVersion, int $now): bool
+    {
+        return (int) ($state['t'] ?? 0) + $repromptDays * 86400 <= $now
+            || ($substantialVersion > 0 && (int) ($state['ver'] ?? 0) < $substantialVersion);
+    }
+
     public function encodedLength(): int
     {
         return \strlen((string) $this->getValue());

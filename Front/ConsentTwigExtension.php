@@ -56,7 +56,7 @@ final class ConsentTwigExtension extends AbstractExtension implements GlobalsInt
             return 0 !== ($this->reader->state($request)['x'][$service] ?? 1);
         }
 
-        return $this->reader->hasConsent($request, $service);
+        return $this->reader->hasConsent($request, $service, $front->config['repromptDays'], $front->config['substantialVersion']);
     }
 
     public function hasPurposeConsent(string $purpose): bool
@@ -64,7 +64,7 @@ final class ConsentTwigExtension extends AbstractExtension implements GlobalsInt
         $request = $this->requests->getCurrentRequest();
         $front = null === $request ? null : $this->configs->forRequest($request);
 
-        return null !== $request && null !== $front && $front->isLive() && $this->reader->hasPurposeConsent($request, $purpose);
+        return null !== $request && null !== $front && $front->isLive() && $this->reader->hasPurposeConsent($request, $purpose, $front->config['repromptDays'], $front->config['substantialVersion']);
     }
 
     /** @param array<string, scalar> $attributes `src` becomes the source restored once the service is allowed */
