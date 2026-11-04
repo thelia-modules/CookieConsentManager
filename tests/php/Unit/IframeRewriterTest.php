@@ -7,6 +7,7 @@ namespace CookieConsentManager\Tests\Unit;
 use CookieConsentManager\Front\IframeRewriter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 
 final class IframeRewriterTest extends TestCase
 {
@@ -114,5 +115,29 @@ final class IframeRewriterTest extends TestCase
         $html = "<!doctype html>\n<html><head><title>é &amp; à</title></head>\n<body class=\"x\">\t<p>\u{e9}</p></body></html>";
 
         self::assertSame($html, $this->rewriteOne($html)[0]);
+    }
+
+    public function testThePageIsReturnedIntactAndAWarningIsLoggedWhenTheMatchingFails(): void
+    {
+        $html = '<p>before</p><iframe src="https://www.youtube.com/embed/abc">'.str_repeat('<b>long content</b>', 500).'<p>after</p>';
+        $logger = new class extends AbstractLogger {
+            /** @var list<array{string, string}> */
+            public array $records = [];
+
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                $this->records[] = [(string) $level, (string) $message];
+            }
+        };
+        $limit = \ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', '100');
+        try {
+            $out = (new IframeRewriter($logger))->rewrite($html, self::ALL, static fn (): string => '[PH]');
+        } finally {
+            ini_set('pcre.backtrack_limit', (string) $limit);
+        }
+
+        self::assertSame($html, $out);
+        self::assertSame('warning', $logger->records[0][0] ?? null);
     }
 }
