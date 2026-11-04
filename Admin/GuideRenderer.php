@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /** Shows the Markdown guides of the module in the back-office: everything is escaped first, only a few constructs are rendered. */
 final class GuideRenderer
 {
-    public const GUIDES = ['administrateur' => 'guide-administrateur.md', 'integrateur' => 'guide-integrateur.md'];
+    public const GUIDES = ['administrateur' => 'fr/guide-administrateur.md', 'integrateur' => 'fr/guide-integrateur.md'];
 
     public function __construct(
         #[Autowire(value: __DIR__.'/../docs')]
