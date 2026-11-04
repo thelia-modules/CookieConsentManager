@@ -68,7 +68,7 @@ final readonly class ConsentPayloadValidator
             $configVersion,
             $servedHash,
             $locale,
-            $path,
+            RecordedPath::mask($path),
             $this->states($data, 'purposes', $purposeCodes, [0, 1, 2], true),
             $this->states($data, 'services', $serviceKeys, [0, 1], true),
             $this->states($data, 'exempt', $exemptKeys, [0, 1], false),

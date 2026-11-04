@@ -75,6 +75,26 @@ final class ConsentEndpointTest extends CcmTestCase
         self::assertTrue($recorded[0]->firstChoice);
     }
 
+    public function testTheRegistryKeepsNoSecretSegmentOfThePath(): void
+    {
+        $paths = [
+            '/order/track/abc123' => '/order/track/*',
+            '/fr/order/track/abc123/details' => '/fr/order/track/*',
+            '/fr/creme-solaire-spf50.html' => '/fr/creme-solaire-spf50.html',
+            '/account/token/4f1c2b9e8d7a4c3e9b1f2a6d5e7c8b90' => '/account/token/*',
+            '/reset/4f1c2b9e-8d7a-4c3e-9b1f-2a6d5e7c8b90' => '/reset/*',
+        ];
+
+        foreach ($paths as $sent => $stored) {
+            $response = ($this->controller)($this->request($this->payload(['path' => $sent])));
+            self::assertSame(200, $response->getStatusCode(), $sent);
+
+            $entry = ConsentEntryQuery::create()->filterByConsentId(json_decode((string) $response->getContent(), true)['consent_id'])->findOne();
+            self::assertSame($stored, $entry->getPath(), $sent);
+            self::assertStringNotContainsString('abc123', $entry->getPath());
+        }
+    }
+
     public function testKeepsAValidFallbackUuidAndRejectsAnInvalidOne(): void
     {
         $response = ($this->controller)($this->request($this->payload(['consent_id' => self::UUID])));
