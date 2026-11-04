@@ -10,3 +10,4 @@
 /phpstan.neon.dist export-ignore
 /.php-cs-fixer.dist.php export-ignore
 /package.json export-ignore
+/Resources/vendor/tarteaucitron/tarteaucitron.services.js export-ignore
