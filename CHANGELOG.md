@@ -2,6 +2,28 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-11-04
+
+### Security
+
+- A service flagged as coming from a module must be declared by an active module with the `ccm.service` tag: an unknown key, code on a declared service, a script address other than the declared one, or a "strictly necessary" status the declaration does not give is a validation error. The import refuses such a file and publication is blocked.
+- Everything that can put a script on the storefront now needs the right that publishes (CREATE): writing or changing the code or script address of a custom service, importing a configuration, restoring a version and switching on experimental services. The buttons and fields are greyed out or hidden for other profiles.
+- The registry CSV export and the proof sheet need UPDATE instead of VIEW; the list stays readable with VIEW.
+- The publication diff shows the full code and script address of an added custom service.
+- The configuration import refuses a file over 1 MB and an invalid upload with a message instead of an error page.
+- The consent registry no longer keeps the password reset token of the page address: `password/reset` is a secret route and any segment holding 24 or more hexadecimal characters is masked.
+- The engine restores an iframe only from an `https://` or protocol-relative (`//host`) address and copies only plain attributes from `data-ccm-attr-*` (never an event handler or `srcdoc`), on the iframe and on a released placeholder.
+- A cookie policy address containing a backslash is refused, in the validation and in the engine.
+- The version in the script and panel addresses is limited to 9 digits: a longer one gives a 404 instead of a 500.
+
+### Added
+
+- A warning when the fallback address of the cookie policy is a terms and conditions page that no active language uses yet: a language activated later would show it to its visitors.
+
+### Fixed
+
+- `symfony/rate-limiter` is declared in `composer.json` (used by the consent endpoint).
+
 ## [1.0.0] - 2026-11-04
 
 First public release.
