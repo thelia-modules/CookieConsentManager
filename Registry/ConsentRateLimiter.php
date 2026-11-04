@@ -34,8 +34,22 @@ final readonly class ConsentRateLimiter
     /** @return int|null seconds to wait when refused, null when accepted */
     public function consume(string $clientKey): ?int
     {
-        $limit = $this->factory->create($clientKey)->consume();
+        $limit = $this->factory->create(self::counterKey($clientKey))->consume();
 
         return $limit->isAccepted() ? null : max(1, $limit->getRetryAfter()->getTimestamp() - time());
+    }
+
+    /** A visitor owns a whole IPv6 /64: rotating inside it must not give a fresh counter. IPv4 is kept as is. */
+    private static function counterKey(string $clientKey): string
+    {
+        $packed = @inet_pton($clientKey);
+        if (false === $packed || 16 !== \strlen($packed)) {
+            return $clientKey;
+        }
+        if (str_starts_with($packed, str_repeat("\0", 10)."\xff\xff")) {
+            return (string) inet_ntop(substr($packed, 12));
+        }
+
+        return (string) inet_ntop(substr($packed, 0, 8).str_repeat("\0", 8)).'/64';
     }
 }
