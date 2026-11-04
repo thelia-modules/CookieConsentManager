@@ -66,7 +66,7 @@
             {% for preset in presets %}
                 <div class="border rounded p-3 mb-3" data-testid="ccm-preset-{{ preset.code }}">
                     <h3 class="h6">{{ preset.label }} <code>{{ preset.code }}</code></h3>
-                    <p class="small text-secondary mb-2">{{ 'Legal basis'|trans }}{{ ': '|trans }}{{ preset.legalBasis|join(', ') }}. {{ 'Reviewed on %date%'|trans({'%date%': preset.reviewedAt}) }}</p>
+                    <p class="small text-secondary mb-2">{{ 'Legal basis'|trans }}{{ ': '|trans }}{{ preset.legalBasis|join(', ') }}.</p>
                     <form method="get" action="{{ path('ccm_admin_presets_preview') }}" class="row g-2 align-items-end" data-ccm-read>
                         <input type="hidden" name="preset" value="{{ preset.code }}">
                         <div class="col-auto">

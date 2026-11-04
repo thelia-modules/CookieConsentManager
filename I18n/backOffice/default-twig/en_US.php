@@ -573,7 +573,6 @@ return [
     'No preset' => 'No preset',
     'Available presets' => 'Available presets',
     'Legal basis' => 'Legal basis',
-    'Reviewed on %date%' => 'Reviewed on %date%',
     'Language to apply it to' => 'Language to apply it to',
     'See what will change' => 'See what will change',
     'No preset is provided.' => 'No preset is provided.',

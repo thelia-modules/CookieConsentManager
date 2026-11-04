@@ -573,7 +573,6 @@ return [
     'No preset' => 'Geen voorinstelling',
     'Available presets' => 'Beschikbare voorinstellingen',
     'Legal basis' => 'Rechtsgrond',
-    'Reviewed on %date%' => 'Nagekeken op %date%',
     'Language to apply it to' => 'Taal waarop het wordt toegepast',
     'See what will change' => 'Bekijken wat er verandert',
     'No preset is provided.' => 'Er wordt geen voorinstelling meegeleverd.',

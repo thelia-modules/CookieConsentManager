@@ -4,8 +4,7 @@
     "code": "fr-FR",
     "country": "FR",
     "label": "France (CNIL)",
-    "legal_basis": ["RGPD", "Directive 2002/58/CE art. 5(3)", "Loi Informatique et Libertés art. 82", "CNIL délibérations 2020-091 et 2020-092"],
-    "reviewed_at": "2026-11-01"
+    "legal_basis": ["RGPD", "Directive 2002/58/CE art. 5(3)", "Loi Informatique et Libertés art. 82", "CNIL délibérations 2020-091 et 2020-092"]
   },
   "general": { "layout": "bar", "close_button": true, "floating_button": false, "reload_on_script_withdraw": true, "block_embedded_iframes": true, "renewal_months": 6 },
   "policy": { "page_title": "Politique de cookies" },

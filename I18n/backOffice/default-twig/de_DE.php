@@ -573,7 +573,6 @@ return [
     'No preset' => 'Keine Voreinstellung',
     'Available presets' => 'Verfügbare Voreinstellungen',
     'Legal basis' => 'Rechtsgrundlage',
-    'Reviewed on %date%' => 'Geprüft am %date%',
     'Language to apply it to' => 'Sprache, auf die angewendet wird',
     'See what will change' => 'Änderungen ansehen',
     'No preset is provided.' => 'Es wird keine Voreinstellung mitgeliefert.',

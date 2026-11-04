@@ -573,7 +573,6 @@ return [
     'No preset' => 'Ningún preajuste',
     'Available presets' => 'Preajustes disponibles',
     'Legal basis' => 'Base jurídica',
-    'Reviewed on %date%' => 'Revisado el %date%',
     'Language to apply it to' => 'Idioma al que aplicarlo',
     'See what will change' => 'Ver qué va a cambiar',
     'No preset is provided.' => 'No se proporciona ningún preajuste.',

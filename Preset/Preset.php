@@ -19,7 +19,6 @@ final readonly class Preset
         public string $country,
         public string $label,
         public array $legalBasis,
-        public string $reviewedAt,
         public array $document,
     ) {
     }
@@ -49,7 +48,6 @@ final readonly class Preset
             (string) ($identity['country'] ?? substr((string) $identity['code'], 3)),
             (string) ($identity['label'] ?? $identity['code']),
             array_values(array_map('strval', (array) ($identity['legal_basis'] ?? []))),
-            (string) ($identity['reviewed_at'] ?? ''),
             $document,
         );
     }
