@@ -47,10 +47,12 @@ final readonly class DailyStatRepository
             return 0;
         }
 
+        // A first choice is the entry with no earlier one for its consent: the lookup uses the consent_id index,
+        // so a batch costs the same wherever it sits in the registry.
         $select = $con->prepare(
             'SELECT e.id, e.recorded_at, e.action, e.purposes_json, e.services_json FROM ccm_consent_entry e'
-            .' INNER JOIN (SELECT MIN(id) AS first_id FROM ccm_consent_entry GROUP BY consent_id) f ON f.first_id = e.id'
-            .' WHERE e.id > :last ORDER BY e.id LIMIT 500',
+            .' WHERE e.id > :last AND NOT EXISTS (SELECT 1 FROM ccm_consent_entry earlier WHERE earlier.consent_id = e.consent_id AND earlier.id < e.id)'
+            .' ORDER BY e.id LIMIT 500',
         );
 
         $counts = [];
