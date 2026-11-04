@@ -56,6 +56,7 @@ final readonly class AlertCollector
         private CookieDurations $durations,
         private TermsPolicyAlert $termsPolicy,
         private EmbeddedMediaAlert $embeddedMedia,
+        private ThemeHookScanner $themeHooks,
     ) {
     }
 
@@ -130,6 +131,10 @@ final readonly class AlertCollector
             $alerts[] = new Alert(Alert::DANGER, 'purge_late', null === $last
                 ? $this->t('The registry was never purged: purge it from the registry screen, or have a scheduled purge set up.')
                 : $this->t('The registry was last purged on %date% (more than 7 days ago): purge it from the registry screen, or have a scheduled purge set up.', ['%date%' => $last->format('Y-m-d')]), 'ccm_admin_registry', ['ccm:registry:purge']);
+        }
+
+        if ([] !== $missingHooks = $this->themeHooks->missing()) {
+            $alerts[] = new Alert(Alert::DANGER, 'theme_hooks_missing', $this->t('The active front theme does not call the theme hook(s) %hooks%: the banner and the consent script are not injected, so visitors are never asked. Use a Twig theme such as Flexy, or add the hook call to the theme layout.', ['%hooks%' => implode(', ', $missingHooks)]), 'ccm_admin_help', $missingHooks);
         }
 
         if ([] !== $files = $this->fonts->findings()) {
