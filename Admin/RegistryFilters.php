@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Admin;
 
+use CookieConsentManager\Model\ConsentEntryQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
+
 final readonly class RegistryFilters
 {
     public const PER_PAGE = 25;
@@ -38,6 +41,32 @@ final readonly class RegistryFilters
             $text($query['q'] ?? null),
             max(1, (int) ($query['page'] ?? 1)),
         );
+    }
+
+    /** The list and its CSV export read the registry through this one method, so that they always show the same entries. */
+    public function applyTo(ConsentEntryQuery $query): ConsentEntryQuery
+    {
+        if (null !== $this->action) {
+            $query->filterByAction($this->action);
+        }
+        if (null !== $this->source) {
+            $query->filterBySource($this->source);
+        }
+        if (null !== $this->version) {
+            $query->filterByVersion($this->version);
+        }
+        if (null !== $this->from) {
+            $query->filterByRecordedAt($this->from, Criteria::GREATER_EQUAL);
+        }
+        if (null !== $this->to) {
+            $query->filterByRecordedAt($this->to, Criteria::LESS_EQUAL);
+        }
+        if (null !== $this->search) {
+            // An identifier is looked up by its start: the visitor reads it from the preferences panel.
+            $query->filterByConsentId(addcslashes(strtolower($this->search), '%_\\').'%', Criteria::LIKE);
+        }
+
+        return $query;
     }
 
     /** @return array<string, scalar> */

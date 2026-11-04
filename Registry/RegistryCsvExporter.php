@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CookieConsentManager\Registry;
 
 use CookieConsentManager\Admin\CsvLabeler;
+use CookieConsentManager\Admin\RegistryFilters;
 use CookieConsentManager\Model\ConsentEntry;
 use Propel\Runtime\Propel;
 
@@ -20,7 +21,7 @@ final readonly class RegistryCsvExporter
     }
 
     /** @param resource $stream */
-    public function write($stream, ?string $action = null, ?\DateTimeInterface $from = null, ?\DateTimeInterface $to = null, ?CsvLabeler $labeler = null, string $locale = 'en'): int
+    public function write($stream, ?RegistryFilters $filters = null, ?CsvLabeler $labeler = null, string $locale = 'en'): int
     {
         $registry = $this->options->current();
         $withIp = 'truncated' === $registry['ip_mode'];
@@ -38,7 +39,7 @@ final readonly class RegistryCsvExporter
         Propel::disableInstancePooling();
 
         try {
-            foreach ($this->entries->iterate($action, $from, $to) as $entry) {
+            foreach ($this->entries->iterate($filters) as $entry) {
                 $row = $this->row($entry);
                 if ($withIp) {
                     $row[] = $entry->getIpTruncated();

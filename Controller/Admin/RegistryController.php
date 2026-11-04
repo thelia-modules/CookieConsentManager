@@ -71,7 +71,7 @@ final class RegistryController extends AbstractScreenController
         $response = new StreamedResponse(function () use ($filters, $locale): void {
             $stream = fopen('php://output', 'w');
             if (false !== $stream) {
-                $this->csv->write($stream, $filters->action, $filters->from, $filters->to, $this->csvLabeler, $locale);
+                $this->csv->write($stream, $filters, $this->csvLabeler, $locale);
                 fclose($stream);
             }
         });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Tests\Integration;
 
+use CookieConsentManager\Admin\RegistryFilters;
 use CookieConsentManager\Model\ConsentEntry;
 use CookieConsentManager\Model\ConsentEntryQuery;
 use CookieConsentManager\Model\Map\ConsentEntryTableMap;
@@ -120,6 +121,32 @@ final class RegistryPurgeTest extends CcmTestCase
         (new RegistryCsvExporter(new RegistryOptions($this->ccm->drafts, $this->ccm->versions), $this->ccm->entries))->write($stream);
         rewind($stream);
         self::assertStringEndsWith('services_json;ip_truncated', (string) strtok((string) stream_get_contents($stream), "\n"));
+    }
+
+    public function testTheExportKeepsEveryFilterOfTheList(): void
+    {
+        ConsentEntryQuery::create()->deleteAll();
+        $this->entry('aaaaaaaa-1111-4111-8111-111111111111', '2026-10-30 10:00:00');
+        (new ConsentEntry())
+            ->setConsentId('bbbbbbbb-2222-4222-8222-222222222222')
+            ->setRecordedAt(new \DateTimeImmutable('2026-10-30 10:00:00', new \DateTimeZone('UTC')))
+            ->setAction('custom')->setSource('preferences')->setVersion(2)->setVersionHash('abcdef012345')
+            ->setLocale('fr_FR')->setPath('/p')->setPurposesJson('{}')->setServicesJson('{}')
+            ->save();
+        $exporter = new RegistryCsvExporter(new RegistryOptions($this->ccm->drafts, $this->ccm->versions), $this->ccm->entries);
+        $exported = static function (array $query) use ($exporter): array {
+            $stream = fopen('php://memory', 'w+');
+            $exporter->write($stream, RegistryFilters::fromQuery($query));
+            rewind($stream);
+            $lines = \array_slice(array_filter(explode("\n", (string) stream_get_contents($stream))), 1);
+
+            return array_map(static fn (string $line): string => str_getcsv($line, ';', '"', '\\')[0], $lines);
+        };
+
+        self::assertSame(['aaaaaaaa-1111-4111-8111-111111111111'], $exported(['q' => 'AAAAAAAA']), 'the consent identifier filter');
+        self::assertSame(['aaaaaaaa-1111-4111-8111-111111111111'], $exported(['source' => 'banner']), 'the source filter');
+        self::assertSame(['bbbbbbbb-2222-4222-8222-222222222222'], $exported(['version' => '2']), 'the version filter');
+        self::assertCount(2, $exported([]), 'no filter exports the whole registry');
     }
 
     public function testTheBatchedPurgeRemovesEverythingExpiredAndNothingRecentInSeveralBatches(): void

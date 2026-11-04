@@ -13,26 +13,7 @@ final readonly class RegistryBrowser
     /** @return array{rows: list<ConsentEntry>, total: int, pages: int} */
     public function search(RegistryFilters $filters): array
     {
-        $query = ConsentEntryQuery::create();
-        if (null !== $filters->action) {
-            $query->filterByAction($filters->action);
-        }
-        if (null !== $filters->source) {
-            $query->filterBySource($filters->source);
-        }
-        if (null !== $filters->version) {
-            $query->filterByVersion($filters->version);
-        }
-        if (null !== $filters->from) {
-            $query->filterByRecordedAt($filters->from, Criteria::GREATER_EQUAL);
-        }
-        if (null !== $filters->to) {
-            $query->filterByRecordedAt($filters->to, Criteria::LESS_EQUAL);
-        }
-        if (null !== $filters->search) {
-            // An identifier is looked up by its start: the visitor reads it from the preferences panel.
-            $query->filterByConsentId(addcslashes(strtolower($filters->search), '%_\\').'%', Criteria::LIKE);
-        }
+        $query = $filters->applyTo(ConsentEntryQuery::create());
 
         $total = $query->count();
         $pages = max(1, (int) ceil($total / RegistryFilters::PER_PAGE));

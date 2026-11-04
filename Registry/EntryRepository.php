@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Registry;
 
+use CookieConsentManager\Admin\RegistryFilters;
 use CookieConsentManager\Model\ConsentEntry;
 use CookieConsentManager\Model\ConsentEntryQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -68,21 +69,13 @@ final readonly class EntryRepository
      *
      * @return \Generator<int, ConsentEntry>
      */
-    public function iterate(?string $action = null, ?\DateTimeInterface $from = null, ?\DateTimeInterface $to = null, int $chunk = 500): \Generator
+    public function iterate(?RegistryFilters $filters = null, int $chunk = 500): \Generator
     {
+        $filters ??= new RegistryFilters();
         $lastId = 0;
 
         while (true) {
-            $query = ConsentEntryQuery::create()->filterById($lastId, Criteria::GREATER_THAN)->orderById()->limit($chunk);
-            if (null !== $action) {
-                $query->filterByAction($action);
-            }
-            if (null !== $from) {
-                $query->filterByRecordedAt($from, Criteria::GREATER_EQUAL);
-            }
-            if (null !== $to) {
-                $query->filterByRecordedAt($to, Criteria::LESS_EQUAL);
-            }
+            $query = $filters->applyTo(ConsentEntryQuery::create())->filterById($lastId, Criteria::GREATER_THAN)->orderById()->limit($chunk);
 
             $entries = $query->find();
             if (0 === \count($entries)) {
