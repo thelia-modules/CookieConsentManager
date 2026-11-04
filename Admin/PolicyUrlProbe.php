@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Admin;
 
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -14,11 +15,15 @@ class PolicyUrlProbe
 {
     private const TTL = 300;
 
+    private readonly HttpClientInterface $client;
+
     public function __construct(
-        private readonly HttpClientInterface $client,
+        HttpClientInterface $client,
         private readonly RequestStack $requests,
         private readonly CacheInterface $cache,
     ) {
+        // The address is typed by an administrator: the shop never reaches a private, loopback or metadata address, redirects included.
+        $this->client = new NoPrivateNetworkHttpClient($client);
     }
 
     /** @return int|null the final HTTP status, null when nothing answered */

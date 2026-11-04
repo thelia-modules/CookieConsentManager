@@ -45,14 +45,15 @@ final class PolicyUrlAlertTest extends TestCase
 
             return new MockResponse('', ['http_code' => 404]);
         });
+        // A public IP literal: the probe resolves hosts itself and refuses private ones.
         $stack = new RequestStack();
-        $stack->push(Request::create('https://shop.test/admin'));
+        $stack->push(Request::create('https://93.184.216.34/admin'));
         $probe = new PolicyUrlProbe($client, $stack, new ArrayAdapter());
 
         $probe->status('/politique');
         $probe->status('/politique');
 
-        self::assertSame(['https://shop.test/politique'], $urls);
+        self::assertSame(['https://93.184.216.34/politique'], $urls);
     }
 
     private function alert(int $status): ?Alert
@@ -63,7 +64,7 @@ final class PolicyUrlAlertTest extends TestCase
     private function alertWith(MockHttpClient $client, ?string $url = '/politique'): ?Alert
     {
         $stack = new RequestStack();
-        $stack->push(Request::create('https://shop.test/admin'));
+        $stack->push(Request::create('https://93.184.216.34/admin'));
         $translator = new class implements TranslatorInterface {
             public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
