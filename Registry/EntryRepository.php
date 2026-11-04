@@ -7,6 +7,7 @@ namespace CookieConsentManager\Registry;
 use CookieConsentManager\Model\ConsentEntry;
 use CookieConsentManager\Model\ConsentEntryQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
 
 final readonly class EntryRepository
 {
@@ -25,9 +26,26 @@ final readonly class EntryRepository
         return ConsentEntryQuery::create()->filterByRecordedAt($limit, Criteria::LESS_THAN)->count() > 0;
     }
 
-    public function purgeOlderThan(\DateTimeInterface $cutoff): int
+    public function countOlderThan(\DateTimeInterface $cutoff): int
     {
-        return (int) ConsentEntryQuery::create()->filterByRecordedAt($cutoff, Criteria::LESS_THAN)->delete();
+        return ConsentEntryQuery::create()->filterByRecordedAt($cutoff, Criteria::LESS_THAN)->count();
+    }
+
+    /** Deletes by batches, so that a large registry never holds one long lock nor one huge transaction. */
+    public function purgeOlderThan(\DateTimeInterface $cutoff, int $batchSize = 10000): int
+    {
+        $statement = Propel::getWriteConnection('TheliaMain')->prepare(
+            \sprintf('DELETE FROM ccm_consent_entry WHERE recorded_at < :cutoff LIMIT %d', max(1, $batchSize)),
+        );
+
+        $deleted = 0;
+        do {
+            $statement->execute(['cutoff' => $cutoff->format('Y-m-d H:i:s')]);
+            $batch = $statement->rowCount();
+            $deleted += $batch;
+        } while ($batch >= max(1, $batchSize));
+
+        return $deleted;
     }
 
     /** @return list<ConsentEntry> */

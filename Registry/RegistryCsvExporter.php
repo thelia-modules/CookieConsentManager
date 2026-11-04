@@ -6,6 +6,7 @@ namespace CookieConsentManager\Registry;
 
 use CookieConsentManager\Admin\CsvLabeler;
 use CookieConsentManager\Model\ConsentEntry;
+use Propel\Runtime\Propel;
 
 /** Columns of SPEC annex B, in order; the optional ones only when the matching option is on. */
 final readonly class RegistryCsvExporter
@@ -23,29 +24,32 @@ final readonly class RegistryCsvExporter
     {
         $registry = $this->options->current();
         $withIp = 'truncated' === $registry['ip_mode'];
-        $withCustomer = $registry['link_customer'];
 
         $header = self::COLUMNS;
         if ($withIp) {
             $header[] = 'ip_truncated';
         }
-        if ($withCustomer) {
-            $header[] = 'customer_id';
-        }
         $columns = $header;
         $this->put($stream, null === $labeler ? $header : $labeler->header($header));
 
         $rows = 0;
-        foreach ($this->entries->iterate($action, $from, $to) as $entry) {
-            $row = $this->row($entry);
-            if ($withIp) {
-                $row[] = $entry->getIpTruncated();
+        // Propel keeps every hydrated object in its instance pool: an export would grow with the registry.
+        $pooling = Propel::isInstancePoolingEnabled();
+        Propel::disableInstancePooling();
+
+        try {
+            foreach ($this->entries->iterate($action, $from, $to) as $entry) {
+                $row = $this->row($entry);
+                if ($withIp) {
+                    $row[] = $entry->getIpTruncated();
+                }
+                $this->put($stream, null === $labeler ? $row : $labeler->row($columns, $row, $locale));
+                ++$rows;
             }
-            if ($withCustomer) {
-                $row[] = $entry->getCustomerId();
+        } finally {
+            if ($pooling) {
+                Propel::enableInstancePooling();
             }
-            $this->put($stream, null === $labeler ? $row : $labeler->row($columns, $row, $locale));
-            ++$rows;
         }
 
         return $rows;

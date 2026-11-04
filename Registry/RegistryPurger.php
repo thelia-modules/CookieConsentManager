@@ -27,23 +27,13 @@ final readonly class RegistryPurger
         $cutoff = $this->cutoff($now);
 
         if ($dryRun) {
-            return \count(iterator_to_array($this->olderThan($cutoff), false));
+            return $this->entries->countOlderThan($cutoff);
         }
 
         $deleted = $this->entries->purgeOlderThan($cutoff);
         $this->lastPurge->write($now);
 
         return $deleted;
-    }
-
-    /** @return \Generator<int, mixed> */
-    private function olderThan(\DateTimeImmutable $cutoff): \Generator
-    {
-        foreach ($this->entries->iterate(to: $cutoff) as $entry) {
-            if ($entry->getRecordedAt() < $cutoff) {
-                yield $entry->getId();
-            }
-        }
     }
 
     /**
