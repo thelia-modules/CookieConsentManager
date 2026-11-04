@@ -6,9 +6,14 @@ namespace CookieConsentManager\Front;
 
 use CookieConsentManager\Draft\DraftRepository;
 use CookieConsentManager\Publication\PublishedConfigBuilder;
+use CookieConsentManager\Publication\PublishedVersionPointer;
 use CookieConsentManager\Publication\SnapshotAssembler;
 use CookieConsentManager\Publication\VersionRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Lang;
 
@@ -17,7 +22,7 @@ use Thelia\Model\Lang;
  * otherwise, the draft for a request carrying the preview token while an administrator is connected, the published version without
  * reading or writing a choice for a request carrying the same token with `ccm_audit`.
  */
-final class FrontConfigProvider
+final class FrontConfigProvider implements ResetInterface
 {
     public const AUDIT_QUERY = 'ccm_audit';
 
@@ -32,6 +37,9 @@ final class FrontConfigProvider
         private readonly PreviewToken $tokens,
         private readonly ServedHashResolver $hashes,
         private readonly SecurityContext $security,
+        private readonly PublishedVersionPointer $pointer,
+        #[Autowire(service: 'cache.app')]
+        private readonly CacheInterface $cache,
     ) {
     }
 
@@ -56,9 +64,23 @@ final class FrontConfigProvider
         return $this->memo[$memoKey];
     }
 
+    /** Clears what was memoised for the request (called by the kernel between the requests of a worker). */
+    public function reset(): void
+    {
+        $this->memo = [];
+    }
+
+    /** The published configuration for a language, whatever the request: what a page view shows once nothing is previewed or audited. */
+    public function forLocale(string $locale): ?FrontConfig
+    {
+        $number = $this->pointer->latest();
+
+        return 0 === $number ? null : $this->published($number, $locale);
+    }
+
     private function resolve(string $locale, ?string $preview, ?string $audit): ?FrontConfig
     {
-        $latest = $this->versions->latest();
+        $number = $this->pointer->latest();
 
         if (null !== $preview) {
             $draft = $this->drafts->load();
@@ -66,30 +88,51 @@ final class FrontConfigProvider
                 $snapshot = $this->assembler->assemble($draft);
 
                 return new FrontConfig(
-                    $this->builder->build($snapshot, $locale, $latest?->getVersion() ?? 0, substr($preview, 0, 12), 0, 'preview', \sprintf('/ccm/preview-%s.js', $preview)),
+                    $this->builder->build($snapshot, $locale, $number, substr($preview, 0, 12), 0, 'preview', \sprintf('/ccm/preview-%s.js', $preview)),
                     $snapshot,
                 );
             }
         }
 
-        if (null === $latest) {
+        $published = 0 === $number ? null : $this->published($number, $locale);
+        if (null === $published) {
             return null;
         }
 
-        $snapshot = $this->versions->snapshot($latest);
-        $mode = null !== $audit && $this->tokens->isValid($audit, $this->drafts->load()) ? 'audit' : 'live';
+        if (null !== $audit && $this->tokens->isValid($audit, $this->drafts->load())) {
+            return new FrontConfig(array_replace($published->config, ['mode' => 'audit']), $published->snapshot);
+        }
 
-        return new FrontConfig(
-            $this->builder->build(
+        return $published;
+    }
+
+    // Built once per (version, language, module version and overrides) and kept in the application cache: a page view reads
+    // neither the snapshot nor the script files again.
+    private function published(int $number, string $locale): ?FrontConfig
+    {
+        $key = \sprintf('ccm.front.%d.%s.%s', $number, preg_replace('/\W/', '_', $locale), $this->hashes->stamp());
+
+        return $this->cache->get($key, function (ItemInterface $item) use ($number, $locale): ?FrontConfig {
+            $latest = $this->versions->find($number);
+            if (null === $latest) {
+                $item->expiresAfter(5);
+
+                return null;
+            }
+
+            $snapshot = $this->versions->snapshot($latest);
+
+            return new FrontConfig(
+                $this->builder->build(
+                    $snapshot,
+                    $locale,
+                    $latest->getVersion(),
+                    $this->hashes->forVersion($latest),
+                    $this->versions->substantialVersionUpTo($latest->getVersion()),
+                ),
                 $snapshot,
-                $locale,
-                $latest->getVersion(),
-                $this->hashes->forVersion($latest),
-                $this->versions->substantialVersionUpTo($latest->getVersion()),
-                $mode,
-            ),
-            $snapshot,
-        );
+            );
+        });
     }
 
     private function token(Request $request, string $name): ?string

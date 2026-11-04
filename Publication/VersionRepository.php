@@ -14,6 +14,12 @@ final readonly class VersionRepository
         return VersionQuery::create()->orderByVersion('DESC')->findOne();
     }
 
+    /** Number of the latest version without reading its snapshot, 0 while nothing is published. */
+    public function latestNumber(): int
+    {
+        return (int) VersionQuery::create()->orderByVersion('DESC')->select('Version')->findOne();
+    }
+
     public function find(int $version): ?Version
     {
         return VersionQuery::create()->filterByVersion($version)->findOne();

@@ -37,6 +37,24 @@ final class OverrideScanner
         return array_values($overridden);
     }
 
+    /**
+     * One glob and one stat per override, no read: what `scan()` reports changes only if this does.
+     *
+     * @param array<string, string> $themes theme name => absolute path
+     */
+    public function signature(array $themes): string
+    {
+        clearstatcache();
+        $parts = [];
+        foreach ($themes as $name => $path) {
+            foreach (glob($path.'/'.self::DIRECTORY.'/*.twig') ?: [] as $file) {
+                $parts[] = $name.'|'.$file.'|'.(int) @filemtime($file).'|'.(int) @filesize($file);
+            }
+        }
+
+        return implode("\n", $parts);
+    }
+
     public static function contract(string $source): ?string
     {
         return 1 === preg_match(self::MARKER, $source, $match) ? $match[1] : null;

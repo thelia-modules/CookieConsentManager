@@ -10,4 +10,9 @@ final readonly class NoOverriddenTemplates implements OverriddenTemplatesProvide
     {
         return [];
     }
+
+    public function signature(): string
+    {
+        return '';
+    }
 }

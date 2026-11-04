@@ -6,13 +6,14 @@ namespace CookieConsentManager\Admin;
 
 use CookieConsentManager\Draft\DraftRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /** Readable names for the paths and codes the back-office would otherwise print raw. */
-final class AdminTwigExtension extends AbstractExtension
+final class AdminTwigExtension extends AbstractExtension implements ResetInterface
 {
     /** @var array<string, mixed>|null */
     private ?array $draft = null;
@@ -24,6 +25,11 @@ final class AdminTwigExtension extends AbstractExtension
         private readonly TranslatorInterface $translator,
         private readonly AdminGuard $guard,
     ) {
+    }
+
+    public function reset(): void
+    {
+        $this->draft = null;
     }
 
     public function getFunctions(): array

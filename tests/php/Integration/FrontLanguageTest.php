@@ -96,10 +96,10 @@ final class FrontLanguageTest extends CcmTestCase
         $translator = static::getContainer()->get(TranslatorInterface::class);
         $texts = new FrontTexts($translator);
         $moduleVersion = new ModuleVersion($module.'/Config/module.xml');
-        $hashes = new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher(new ServedScriptAssembler($module)), $moduleVersion, new NoOverriddenTemplates());
+        $hashes = new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher(new ServedScriptAssembler($module)), $moduleVersion, new NoOverriddenTemplates(), $this->ccm->pool);
         $security = $this->createStub(SecurityContext::class);
         $security->method('hasAdminUser')->willReturn(true);
-        $configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security);
+        $configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool);
         $twig = new Environment(new FilesystemLoader([$module.'/templates/frontOffice/flexy']), ['strict_variables' => true]);
         $hook = new ConsentThemeHook($stack, $configs, new TemplateContext($texts), $texts, new StyleSheet($module.'/assets/css/ccm.css'), $twig, $module.'/assets/js/head.js');
 
@@ -132,14 +132,14 @@ final class FrontLanguageTest extends CcmTestCase
         $moduleVersion = new ModuleVersion($module.'/Config/module.xml');
         $hasher = new AssembledScriptHasher(new ServedScriptAssembler($module));
         $templates = new NoOverriddenTemplates();
-        $hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates);
-        $publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion);
+        $hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates, $this->ccm->pool);
+        $publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion, $this->ccm->pointer);
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
         $publisher->publish('alice');
 
         $security = $this->createStub(SecurityContext::class);
         $security->method('hasAdminUser')->willReturn(true);
-        $front = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security))->forRequest(Request::create('/'));
+        $front = (new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $security, $this->ccm->pointer, $this->ccm->pool))->forRequest(Request::create('/'));
         self::assertNotNull($front);
 
         return $front;

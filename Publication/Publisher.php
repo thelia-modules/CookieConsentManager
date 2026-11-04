@@ -19,6 +19,7 @@ final readonly class Publisher
         private VersionRepository $versions,
         private SharedCachePurger $cache,
         private ModuleVersion $moduleVersion,
+        private PublishedVersionPointer $pointer,
     ) {
     }
 
@@ -70,6 +71,7 @@ final readonly class Publisher
         }
 
         $this->drafts->markPublished($version->getVersion());
+        $this->pointer->invalidate();
         $this->cache->purgeAll();
 
         return $version;

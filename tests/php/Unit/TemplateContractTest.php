@@ -86,6 +86,11 @@ final class TemplateContractTest extends TestCase
             {
                 return $this->scanner->scan($this->themes);
             }
+
+            public function signature(): string
+            {
+                return $this->scanner->signature($this->themes);
+            }
         };
 
         $outdated = (new TemplateContractChecker($provider))->outdated();

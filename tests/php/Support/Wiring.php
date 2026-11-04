@@ -13,6 +13,7 @@ use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Publication\ModuleVersion;
 use CookieConsentManager\Publication\NoOverriddenTemplates;
 use CookieConsentManager\Publication\PublishedConfigBuilder;
+use CookieConsentManager\Publication\PublishedVersionPointer;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\SnapshotAssembler;
 use CookieConsentManager\Publication\VersionRepository;
@@ -28,6 +29,7 @@ use CookieConsentManager\Transfer\ConfigSchemaValidator;
 use CookieConsentManager\Transfer\PolicyUrlResolver;
 use CookieConsentManager\Validation\ConflictingModuleDetector;
 use CookieConsentManager\Validation\DraftValidator;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -50,6 +52,8 @@ final class Wiring
     public EntryRepository $entries;
     public EventDispatcher $dispatcher;
     public RecordingCachePurger $cache;
+    public ArrayAdapter $pool;
+    public PublishedVersionPointer $pointer;
 
     public function __construct(bool $googleTagManagerModuleActive = false)
     {
@@ -93,6 +97,8 @@ final class Wiring
         $moduleVersion = new ModuleVersion($moduleDirectory.'/Config/module.xml');
         $this->assembler = new SnapshotAssembler($this->catalogue, $moduleVersion, new NoOverriddenTemplates());
         $this->cache = new RecordingCachePurger();
+        $this->pool = new ArrayAdapter();
+        $this->pointer = new PublishedVersionPointer($this->versions, $this->pool);
         $this->publisher = new Publisher(
             $this->drafts,
             $this->validator,
@@ -101,6 +107,7 @@ final class Wiring
             $this->versions,
             $this->cache,
             $moduleVersion,
+            $this->pointer,
         );
         $this->builder = new PublishedConfigBuilder();
         $this->restorer = new VersionRestorer($this->versions, $this->drafts);

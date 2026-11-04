@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Front;
 
-use CookieConsentManager\Publication\VersionRepository;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Core\Content\Slot\ContentSlotLink;
@@ -25,7 +24,7 @@ final readonly class FooterLinkResolver implements ContentSlotResolverInterface
 
     /** @param iterable<ContentSlotResolverInterface> $resolvers */
     public function __construct(
-        private VersionRepository $versions,
+        private FrontConfigProvider $configs,
         private TemplateContext $context,
         #[AutowireIterator('thelia.content_slot_resolver')]
         private iterable $resolvers,
@@ -34,8 +33,12 @@ final readonly class FooterLinkResolver implements ContentSlotResolverInterface
 
     public function resolve(string $slot, string $locale): ?array
     {
-        $latest = $this->versions->latest();
-        if (ContentSlots::FOOTER !== $slot || null === $latest) {
+        if (ContentSlots::FOOTER !== $slot) {
+            return null;
+        }
+
+        $front = $this->configs->forLocale($locale);
+        if (null === $front) {
             return null;
         }
 
@@ -52,7 +55,7 @@ final readonly class FooterLinkResolver implements ContentSlotResolverInterface
         }
 
         $language = strtolower(substr($locale, 0, 2));
-        $label = $this->context->texts($this->versions->snapshot($latest)['config']['texts'], $language)['preferences'];
+        $label = $this->context->texts($front->snapshot['config']['texts'], $language)['preferences'];
 
         return [...$links, new ContentSlotLink($label, self::URL, 'ccm')];
     }

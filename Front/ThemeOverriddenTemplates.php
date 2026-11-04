@@ -18,12 +18,23 @@ final readonly class ThemeOverriddenTemplates implements OverriddenTemplatesProv
 
     public function list(): array
     {
+        return $this->scanner->scan($this->themes());
+    }
+
+    public function signature(): string
+    {
+        return $this->scanner->signature($this->themes());
+    }
+
+    /** @return array<string, string> */
+    private function themes(): array
+    {
         $theme = $this->templates->getActiveFrontTemplate();
         $paths = [$theme->getName() => $theme->getAbsolutePath()];
         foreach ($theme->getParentList() ?? [] as $parent) {
             $paths[$parent->getName()] ??= $parent->getAbsolutePath();
         }
 
-        return $this->scanner->scan($paths);
+        return $paths;
     }
 }
