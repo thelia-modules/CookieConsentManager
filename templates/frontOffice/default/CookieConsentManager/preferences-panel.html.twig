@@ -1,0 +1,70 @@
+{# ccm-templates:1 #}
+{# ccm-templates/1 : second level. Switches carry data-ccm-purpose / data-ccm-service / data-ccm-exempt. #}
+{% set ccmStyle %}{% if colors %}--ccm-primary:{{ colors.primary }};--ccm-on-primary:{{ colors.on_primary }};--ccm-surface:{{ colors.surface }};--ccm-text:{{ colors.text }};{% endif %}{% endset %}
+<div class="ccm ccm-panel" data-ccm-panel hidden role="dialog" aria-modal="true" aria-labelledby="ccm-panel-title"{% if ccmStyle|trim %} style="{{ ccmStyle|trim }}"{% endif %}>
+    <div class="ccm-dialog">
+        <div class="ccm-panel-head">
+            <h2 class="ccm-title" id="ccm-panel-title">{{ texts.panel_title }}</h2>
+            <button type="button" class="ccm-icon-btn" data-ccm-action="close" aria-label="{{ texts.close_panel }}"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <p class="ccm-remembered">{{ texts.remembered }}</p>
+        <p class="ccm-withdrawn" data-ccm-withdrawn hidden>{{ texts.withdrawn_notice }}</p>
+        <div class="ccm-groups">
+            <section class="ccm-group">
+                <div class="ccm-group-head">
+                    <h3 class="ccm-group-title">{{ texts.essential }}</h3>
+                    <span class="ccm-always-on">{{ texts.always_on }}</span>
+                </div>
+                <p class="ccm-group-desc">{{ texts.essential_description }}</p>
+            </section>
+            {% for purpose in purposes %}
+                <section class="ccm-group">
+                    <div class="ccm-group-head">
+                        <h3 class="ccm-group-title" id="ccm-purpose-{{ purpose.code }}">{{ purpose.label }}</h3>
+                        <button type="button" class="ccm-switch" role="switch" aria-checked="false" aria-labelledby="ccm-purpose-{{ purpose.code }}" data-ccm-purpose="{{ purpose.code }}" data-ccm-purpose-label="{{ purpose.label }}"><span class="ccm-switch-knob" aria-hidden="true"></span></button>
+                    </div>
+                    <p class="ccm-group-desc">{{ purpose.description }}</p>
+                    {% if purpose.services %}
+                        <details class="ccm-services">
+                            <summary>{{ texts.services }} ({{ purpose.services|length }})</summary>
+                            <ul>
+                                {% for service in purpose.services %}
+                                    <li class="ccm-service">
+                                        <div class="ccm-group-head">
+                                            <span class="ccm-service-name" id="ccm-service-{{ service.key }}">{{ service.name }}</span>
+                                            <button type="button" class="ccm-switch" role="switch" aria-checked="false" aria-labelledby="ccm-service-{{ service.key }}" data-ccm-service="{{ service.key }}"><span class="ccm-switch-knob" aria-hidden="true"></span></button>
+                                        </div>
+                                        <p class="ccm-service-meta">{{ texts.controller }}{{ texts.colon }}{{ service.controller }}{% if service.policy_url %} · <a class="ccm-link" href="{{ service.policy_url }}" target="_blank" rel="noopener noreferrer">{{ texts.policy }}</a>{% endif %}</p>
+                                        <p class="ccm-service-meta">{{ texts.cookies }}{{ texts.colon }}{% if service.cookie_details|default([]) %}{% for cookie in service.cookie_details %}{{ cookie.name }}{% if cookie.duration %} ({{ cookie.duration }}){% endif %}{{ loop.last ? '' : ', ' }}{% endfor %}{% elseif service.cookies %}{{ service.cookies|join(', ') }}{% else %}{{ texts.none }}{% endif %}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    {% endif %}
+                </section>
+            {% endfor %}
+            {% if exempt_services %}
+                <details class="ccm-group ccm-services" data-ccm-exempt-group>
+                    <summary>{{ texts.measurement }}</summary>
+                    <ul>
+                        {% for service in exempt_services %}
+                            <li class="ccm-service">
+                                <div class="ccm-group-head">
+                                    <span class="ccm-service-name" id="ccm-exempt-{{ service.key }}">{{ service.name }}</span>
+                                    <button type="button" class="ccm-switch" role="switch" aria-checked="true" aria-labelledby="ccm-exempt-{{ service.key }}" data-ccm-exempt="{{ service.key }}"><span class="ccm-switch-knob" aria-hidden="true"></span></button>
+                                </div>
+                                <p class="ccm-service-meta">{{ texts.measurement_help }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            {% endif %}
+        </div>
+        <p class="ccm-consent-id">{{ texts.consent_id }}{{ texts.colon }}<code data-ccm-consent-id></code></p>
+        <div class="ccm-actions">
+            <button type="button" class="ccm-btn ccm-btn--choice" data-ccm-action="reject_all">{{ texts.reject }}</button>
+            <button type="button" class="ccm-btn ccm-btn--choice" data-ccm-action="accept_all">{{ texts.accept }}</button>
+            <button type="button" class="ccm-btn ccm-btn--outline" data-ccm-action="save">{{ texts.save }}</button>
+        </div>
+    </div>
+</div>

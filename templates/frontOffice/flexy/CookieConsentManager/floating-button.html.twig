@@ -1,0 +1,7 @@
+{# ccm-templates:1 #}
+{# ccm-templates/1 (Flexy) : floating button (option). #}
+{% set ccmStyle %}{% if colors|default(false) %}--ccm-primary:{{ colors.primary }};--ccm-on-primary:{{ colors.on_primary }};--ccm-surface:{{ colors.surface }};--ccm-text:{{ colors.text }};{% endif %}{% endset %}
+<button type="button" class="ccm ccm--flexy ccm-floating ccm-floating--{{ position|default('bottom-left') }}" data-ccm-open{% if ccmStyle|trim %} style="{{ ccmStyle|trim }}"{% endif %}>
+    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5Zm-3 7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm-1 6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6-1a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/></svg>
+    <span>{{ label }}</span>
+</button>
