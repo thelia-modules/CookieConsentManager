@@ -32,6 +32,7 @@ final class VersionsController extends AbstractScreenController
 {
     private const PAGE_SIZE = 25;
     private const IMPORT_MAX_BYTES = 1048576;
+    private const CONFIRM_REPLACE = 'confirm_replace';
 
     public function __construct(
         UrlGeneratorInterface $urls,
@@ -108,6 +109,9 @@ final class VersionsController extends AbstractScreenController
         // An import can carry the code of a custom service: same right as publishing.
         if (null !== $denied = $this->guardWrite($request, AccessManager::CREATE)) {
             return $denied;
+        }
+        if (null !== $unconfirmed = $this->refuseUnconfirmedReplacement($request, 'ccm_admin_versions')) {
+            return $unconfirmed;
         }
 
         $file = $request->files->get('config_file');
@@ -206,6 +210,9 @@ final class VersionsController extends AbstractScreenController
         if (null === $this->versions->find($number)) {
             return $this->pageNotFound();
         }
+        if (null !== $unconfirmed = $this->refuseUnconfirmedReplacement($request, 'ccm_admin_version_show', ['number' => $number])) {
+            return $unconfirmed;
+        }
 
         $this->restorer->restore($number, $this->author());
         $this->flash($request, 'success', $this->say('Version %version% restored in the draft. Publish to make it live.', ['%version%' => (string) $number]));
@@ -260,6 +267,20 @@ final class VersionsController extends AbstractScreenController
             'environment_pending' => (array) ($draft['_meta']['environment_pending'] ?? []),
             'env_fields' => $this->environmentFields->pending($draft),
         ], $status);
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    private function refuseUnconfirmedReplacement(Request $request, string $route, array $parameters = []): ?Response
+    {
+        if ($request->request->getBoolean(self::CONFIRM_REPLACE)) {
+            return null;
+        }
+
+        $this->flash($request, 'warning', $this->say('Nothing was changed: tick the confirmation that the current draft will be replaced.'));
+
+        return $this->redirectTo($route, $parameters);
     }
 
     private function uiLocale(): string
