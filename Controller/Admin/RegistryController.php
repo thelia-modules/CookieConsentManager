@@ -85,7 +85,7 @@ final class RegistryController extends AbstractScreenController
     #[Route('/consent/{consentId}', name: '_consent', methods: ['GET'], requirements: ['consentId' => '[0-9a-fA-F-]{36}'])]
     public function consent(string $consentId): Response
     {
-        if (null !== $denied = $this->guardRead()) {
+        if (null !== $denied = $this->guardAccess(AccessManager::UPDATE)) {
             return $denied;
         }
 
@@ -148,11 +148,14 @@ final class RegistryController extends AbstractScreenController
      */
     private function screen(Request $request, array $draft, array $issues = [], int $status = 200): Response
     {
-        $filters = RegistryFilters::fromQuery($request->query->all());
-        $page = $this->browser->search($filters);
+        // The entries are personal data, read with the right that exports them: without it nothing is searched, not even to count.
+        $readable = $this->isGranted(AccessManager::UPDATE);
+        $filters = RegistryFilters::fromQuery($readable ? $request->query->all() : []);
+        $page = $readable ? $this->browser->search($filters) : ['rows' => [], 'total' => 0, 'pages' => 1];
 
         return $this->view('registry', 'registry', [
             'draft' => $draft,
+            'entries_readable' => $readable,
             'issues' => $issues,
             'filters' => $filters,
             'query' => $filters->toQuery(),

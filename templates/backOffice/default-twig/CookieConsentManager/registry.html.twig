@@ -5,6 +5,9 @@
 {% block ccm_crumb %}<li class="breadcrumb-item active" aria-current="page">{{ 'Registry'|trans }}</li>{% endblock %}
 
 {% block ccm_content %}
+    {% if not entries_readable %}
+        <div class="alert alert-secondary" role="status" data-testid="ccm-registry-restricted"><i class="bi bi-lock me-1" aria-hidden="true"></i>{{ 'The consent entries hold personal data: listing, searching and opening them needs the UPDATE right.'|trans }}</div>
+    {% else %}
     <div class="card mb-3" data-testid="ccm-registry-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h5 mb-0">{{ 'Consent entries'|trans }} <span class="badge text-bg-secondary" data-testid="ccm-registry-total">{{ total }}</span></h2>
@@ -54,6 +57,7 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
 
     <div class="card mb-3" data-testid="ccm-stats-card">{% include 'CookieConsentManager/include/stats.html.twig' %}</div>
 
@@ -92,12 +96,14 @@
             <div class="card h-100" data-testid="ccm-registry-help-card">
                 <div class="card-header"><h2 class="h5 mb-0">{{ 'Find a visitor'|trans }}</h2></div>
                 <div class="card-body">
+                    {% if entries_readable %}
                     <ol class="ps-3">
                         <li>{{ 'Ask the visitor for the consent identifier shown at the bottom of the "Manage my cookies" panel.'|trans }}</li>
                         <li>{{ 'Type its first characters in the search above.'|trans }}</li>
                         <li>{{ 'Open the proof sheet: entry, the version the visitor saw and the hashes. Print it from the browser.'|trans }}</li>
                     </ol>
                     <p class="small text-secondary">{{ 'Without the identifier, the search relies on the truncated IP option.'|trans }}</p>
+                    {% endif %}
                     <h3 class="h6">{{ 'Sample text for your privacy policy'|trans }}</h3>
                     <blockquote class="small border-start ps-3 text-secondary mb-0" data-testid="ccm-policy-sample">{{ 'To prove the consent you give, we keep a record of your choices: a random identifier, the date, your choices, the banner version, the language, the page, your browser family and, if enabled, a truncated IP address. These data are kept for %months% months and are used only as proof of consent.'|trans({'%months%': in_force.retention_months}) }}</blockquote>
                 </div>
