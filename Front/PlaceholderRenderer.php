@@ -15,6 +15,12 @@ final readonly class PlaceholderRenderer
     ) {
     }
 
+    /** False on a route that is not a page of the theme: the Twig loader does not know the active theme yet. */
+    public function canRender(): bool
+    {
+        return $this->twig->getLoader()->exists('CookieConsentManager/placeholder.html.twig');
+    }
+
     /** @param array<string, string> $attributes iframe attributes without `src`, restored by the engine */
     public function render(FrontConfig $front, string $key, string $src, array $attributes): string
     {

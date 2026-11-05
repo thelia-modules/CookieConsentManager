@@ -70,8 +70,8 @@ final readonly class IframeRewriteListener
             return;
         }
 
-        // The route of a LiveComponent is not a page of the theme: the placeholder template is found through the active theme.
-        if ($request->attributes->has('_live_component')) {
+        // A LiveComponent, an ESI fragment, a controller or a page of another module is not a page of the theme: the placeholder template is found through the active theme.
+        if (!$this->placeholders->canRender()) {
             $this->theme->activate();
         }
 
