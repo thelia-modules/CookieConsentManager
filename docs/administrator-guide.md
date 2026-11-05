@@ -143,6 +143,7 @@ There are two levels:
 
 "Preview the draft on the shop" opens your real shop with the draft: the banner shows with your services. Nothing is written to the registry.
 A "Preview" strip marks the mode, and no service is actually loaded. To check cookies, use the published version.
+The preview and the Verification are signed with the secret of the shop (`APP_SECRET`). If it is empty or shorter than 32 characters, both are unavailable: the dashboard shows a warning and the preview button explains why. Set a longer secret in the environment of the shop.
 
 ## Publishing and "substantial change"
 

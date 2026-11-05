@@ -85,13 +85,13 @@ final class ServedScriptAssemblerTest extends TestCase
 
     public function testPreviewTokenFollowsTheDraftAndTheSecret(): void
     {
-        $tokens = new PreviewToken('secret');
+        $tokens = new PreviewToken(str_repeat('s', 32));
         $token = $tokens->forDraft(['a' => 1]);
 
         self::assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $token);
         self::assertTrue($tokens->isValid($token, ['a' => 1]));
         self::assertFalse($tokens->isValid($token, ['a' => 2]));
-        self::assertFalse((new PreviewToken('other'))->isValid($token, ['a' => 1]));
+        self::assertFalse((new PreviewToken(str_repeat('o', 32)))->isValid($token, ['a' => 1]));
         self::assertFalse($tokens->isValid('', ['a' => 1]));
     }
 

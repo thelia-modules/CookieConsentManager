@@ -19,15 +19,20 @@ class FrontLinks
     ) {
     }
 
-    /** The token of the front lot: derived from the draft, so one value opens both the preview and the audit. */
-    public function token(): string
+    /** The token of the front lot: derived from the draft, so one value opens both the preview and the audit. Null while the secret of the shop is too weak to sign one. */
+    public function token(): ?string
     {
         return $this->tokens->forDraft($this->drafts->load());
     }
 
-    public function preview(string $path): string
+    public function preview(string $path): ?string
     {
-        return $this->withParameter($this->absolute($path), PreviewToken::QUERY, $this->token());
+        $token = $this->token();
+        if (null === $token) {
+            return null;
+        }
+
+        return $this->withParameter($this->absolute($path), PreviewToken::QUERY, $token);
     }
 
     /** @return array<string, string> label key => absolute URL of a real page of the shop */

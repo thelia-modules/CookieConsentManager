@@ -42,7 +42,7 @@ final class WorkerModeTest extends CcmTestCase
         $this->hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates, $this->ccm->pool);
         $this->publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion, $this->ccm->pointer);
         $security = $this->createStub(SecurityContext::class);
-        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $this->hashes, $security, $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
+        $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken(str_repeat('t', 32)), $this->hashes, $security, $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
     }
 
     public function testEveryServiceThatMemoisesAcrossRequestsIsResetByTheKernel(): void
