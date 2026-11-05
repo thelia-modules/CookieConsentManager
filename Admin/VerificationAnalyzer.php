@@ -304,7 +304,7 @@ final class VerificationAnalyzer
     private function matchesAny(string $name, array $patterns): bool
     {
         foreach ($patterns as $pattern) {
-            if (1 === preg_match('/^'.str_replace('\*', '.*', preg_quote($pattern, '/')).'$/', $name)) {
+            if (1 === preg_match('/^'.str_replace('\*', '.*', preg_quote($pattern, '/')).'$/D', $name)) {
                 return true;
             }
         }

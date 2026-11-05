@@ -12,7 +12,8 @@ final readonly class DraftValidator
     public const MAX_COOKIE_DAYS = 7300;
     public const FRANCE_PRESET = 'fr-FR';
 
-    public const KEY_PATTERN = '/^[a-z0-9][a-z0-9_-]{0,63}$/';
+    public const KEY_PATTERN = '/^[a-z0-9][a-z0-9_-]{0,63}$/D';
+    public const PURPOSE_CODE_PATTERN = '/^[a-z][a-z0-9_]{0,63}$/D';
     public const MAX_RETENTION_MONTHS = 60;
     public const TEXT_LIMITS = ['title' => 120, 'body' => 1500, 'accept' => 60, 'reject' => 60, 'customize' => 60, 'close' => 80, 'allow' => 60, 'preferences' => 60, 'free_text' => 1500];
     public const REQUIRED_TEXTS = ['accept', 'reject', 'customize'];
@@ -24,6 +25,9 @@ final readonly class DraftValidator
 
     /** Issues that refuse an import outright: a service claiming to come from a module that does not declare it, or going beyond its declaration. */
     public const MODULE_ERROR_CODES = ['module_undeclared', 'module_code', 'module_script_url', 'module_necessary'];
+
+    /** Issues that refuse an import outright: a purpose code the banner could not use as an identifier. */
+    public const PURPOSE_ERROR_CODES = ['purpose_code'];
 
     /** @param iterable<SectionValidator> $sections */
     public function __construct(
@@ -69,6 +73,6 @@ final readonly class DraftValidator
             return !str_starts_with($url, '//') && 1 !== preg_match('/\s/', $url);
         }
 
-        return 1 === preg_match('~^https://[^\s"\'<>/]+[^\s"\'<>]*$~i', $url);
+        return 1 === preg_match('~^https://[^\s"\'<>/]+[^\s"\'<>]*$~iD', $url);
     }
 }

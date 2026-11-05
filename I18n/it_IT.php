@@ -6,6 +6,7 @@ return [
     'Service key "%key%" is declared twice.' => 'La chiave di servizio «%key%» è dichiarata due volte.',
     'Service key "%key%" is invalid (lowercase letters, digits, "-" and "_").' => 'La chiave di servizio «%key%» non è valida (lettere minuscole, cifre, «-» e «_»).',
     'Unknown purpose "%purpose%".' => 'Finalità sconosciuta «%purpose%».',
+    'The purpose code "%code%" is invalid (lowercase letters, digits and "_", starting with a letter).' => 'Il codice della finalità «%code%» non è valido (lettere minuscole, cifre e «_», a partire da una lettera).',
     'The environment field "%path%" imported from another site is not confirmed.' => 'Il campo di ambiente «%path%» importato da un altro sito non è confermato.',
     'The layout must be "bar" or "modal".' => 'Il layout deve essere «bar» o «modal».',
     'The renewal delay must be between 1 and 13 months.' => 'Il periodo di rinnovo deve essere compreso tra 1 e 13 mesi.',

@@ -30,6 +30,11 @@ final readonly class ServicesSection implements SectionValidator
     {
         $issues = [];
         $purposes = array_column($draft['purposes'], 'code');
+        foreach ($purposes as $index => $code) {
+            if (1 !== preg_match(DraftValidator::PURPOSE_CODE_PATTERN, $code)) {
+                $issues[] = $this->issues->error('purpose_code', 'purposes.'.$index, 'The purpose code "%code%" is invalid (lowercase letters, digits and "_", starting with a letter).', ['%code%' => $code]);
+            }
+        }
 
         $seen = [];
         foreach ($draft['services'] as $service) {
@@ -150,7 +155,7 @@ final readonly class ServicesSection implements SectionValidator
         }
 
         $scriptUrl = (string) ($service['script_url'] ?? '');
-        if ('' !== $scriptUrl && 1 !== preg_match('~^https://[^\s"\'<>]+$~i', $scriptUrl)) {
+        if ('' !== $scriptUrl && 1 !== preg_match('~^https://[^\s"\'<>]+$~iD', $scriptUrl)) {
             $issues[] = $this->issues->error('script_url', $field.'.script_url', 'A script service needs an https URL.');
 
             return;
@@ -160,7 +165,7 @@ final readonly class ServicesSection implements SectionValidator
             return;
         }
 
-        if ('script' === $service['kind'] && 1 !== preg_match('~^https://[^\s"\'<>]+$~i', (string) ($service['script_url'] ?? ''))) {
+        if ('script' === $service['kind'] && 1 !== preg_match('~^https://[^\s"\'<>]+$~iD', (string) ($service['script_url'] ?? ''))) {
             $issues[] = $this->issues->error('script_url', $field.'.script_url', 'A script service needs an https URL.');
         }
         if ('custom' === $service['kind'] && '' === trim((string) ($service['code'] ?? ''))) {
@@ -222,7 +227,7 @@ final readonly class ServicesSection implements SectionValidator
                 continue;
             }
 
-            if (null !== $param['pattern'] && 1 !== @preg_match('~'.str_replace('~', '\~', $param['pattern']).'~u', $value)) {
+            if (null !== $param['pattern'] && 1 !== @preg_match('~'.str_replace('~', '\~', $param['pattern']).'~uD', $value)) {
                 $help = $param['help'][$this->issues->locale()] ?? $param['help']['en'] ?? '';
                 $issues[] = '' === $help
                     ? $this->issues->error('param_pattern', $parameterField, 'The field "%name%" has an invalid format.', ['%name%' => $label])

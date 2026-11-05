@@ -190,7 +190,7 @@ Ask your developer to host the fonts on the site (font files copied into the the
 ## From test to production
 
 1. On the test site: tab "Versions and verification", "Export the draft (JSON)". The export holds the draft, not the published version, so publish first if needed.
-2. On production: "Import a configuration (JSON)" (CREATE right, the one that publishes, because a file can carry code). The import replaces the draft, never the live version. A file over 1 MB is refused. Invalid addresses, and services presented as coming from a module that does not declare them, block the write. Other errors are imported so that you can correct them in the back-office. Experimental services of the file are skipped while "Experimental services" is off.
+2. On production: "Import a configuration (JSON)" (CREATE right, the one that publishes, because a file can carry code). The import replaces the draft, never the live version. A file over 1 MB is refused. Invalid addresses, invalid purpose codes, and services presented as coming from a module that does not declare them, block the write. Other errors are imported so that you can correct them in the back-office. Experimental services of the file are skipped while "Experimental services" is off.
 3. The screen lists the environment fields: service identifiers (Google Analytics, Meta, Crisp...), policy address, regions. They come from the test site, so re-enter or confirm the production values one by one before publishing. Publication is refused until they are confirmed. For each field the test value is shown next to the input, and no box is pre-ticked.
 4. Check that the policy page exists on the production site, then publish.
 

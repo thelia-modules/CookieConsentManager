@@ -44,11 +44,11 @@ final readonly class ExecutableChanges
     /** A path of the draft (`services.<key>.parameters.<name>`, `services.<key>.code`...) that holds something the storefront runs. */
     public function isExecutablePath(string $path): bool
     {
-        if (1 === preg_match('/^services\.([^.]+)\.(?:code|script_url)$/', $path)) {
+        if (1 === preg_match('/^services\.([^.]+)\.(?:code|script_url)$/D', $path)) {
             return true;
         }
 
-        return 1 === preg_match('/^services\.([^.]+)\.parameters\.(.+)$/', $path, $match) && $this->isExecutableParameter($match[1], $match[2]);
+        return 1 === preg_match('/^services\.([^.]+)\.parameters\.(.+)$/D', $path, $match) && $this->isExecutableParameter($match[1], $match[2]);
     }
 
     private function isExecutableParameter(string $serviceKey, string $name): bool

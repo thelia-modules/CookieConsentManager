@@ -6,6 +6,7 @@ namespace CookieConsentManager\Admin;
 
 use CookieConsentManager\Catalogue\CatalogueReader;
 use CookieConsentManager\Draft\DefaultSettings;
+use CookieConsentManager\Validation\DraftValidator;
 
 /** Turns the posted form of one screen into a candidate draft; nothing is stored here. */
 final readonly class DraftSectionEditor
@@ -71,7 +72,7 @@ final readonly class DraftSectionEditor
     public function texts(array $draft, array $input): array
     {
         foreach ((array) ($input['texts'] ?? []) as $locale => $values) {
-            if (1 !== preg_match('/^[a-z]{2}$/', (string) $locale)) {
+            if (1 !== preg_match('/^[a-z]{2}$/D', (string) $locale)) {
                 continue;
             }
             $values = array_map(static fn (mixed $value): string => trim((string) $value), (array) $values);
@@ -118,7 +119,7 @@ final readonly class DraftSectionEditor
 
         $new = (array) ($input['new_purpose'] ?? []);
         $code = strtolower(trim((string) ($new['code'] ?? '')));
-        if (1 === preg_match('/^[a-z][a-z0-9_]{0,63}$/', $code) && 'essential' !== $code && !\in_array($code, array_column($purposes, 'code'), true)) {
+        if (1 === preg_match(DraftValidator::PURPOSE_CODE_PATTERN, $code) && 'essential' !== $code && !\in_array($code, array_column($purposes, 'code'), true)) {
             $purposes[] = [
                 'code' => $code,
                 'order' => \count($purposes) + 1,

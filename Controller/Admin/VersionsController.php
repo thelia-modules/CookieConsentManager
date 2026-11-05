@@ -221,7 +221,7 @@ final class VersionsController extends AbstractScreenController
 
         $path = (string) $request->query->get('path', '/');
         // A path of this site only: never a host, never a scheme-relative URL.
-        if (1 !== preg_match('~^/(?!/)[^\s\\\\]*$~', $path)) {
+        if (1 !== preg_match('~^/(?!/)[^\s\\\\]*$~D', $path)) {
             $path = '/';
         }
 

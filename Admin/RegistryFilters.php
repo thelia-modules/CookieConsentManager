@@ -28,7 +28,7 @@ final readonly class RegistryFilters
         $date = static function (mixed $value, string $time): ?\DateTimeImmutable {
             $value = \is_string($value) ? $value : '';
 
-            return 1 === preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? new \DateTimeImmutable($value.' '.$time, new \DateTimeZone('UTC')) : null;
+            return 1 === preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value) ? new \DateTimeImmutable($value.' '.$time, new \DateTimeZone('UTC')) : null;
         };
         $text = static fn (mixed $value): ?string => \is_string($value) && '' !== trim($value) ? trim($value) : null;
 

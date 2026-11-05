@@ -123,7 +123,7 @@ final class EmbedRules
         $at = strrpos($authority, '@');
         $hostAndPort = false === $at ? $authority : substr($authority, $at + 1);
         $colon = strpos($hostAndPort, ':');
-        if (false !== $colon && 1 !== preg_match('~^[0-9]*$~', substr($hostAndPort, $colon + 1))) {
+        if (false !== $colon && 1 !== preg_match('~^[0-9]*$~D', substr($hostAndPort, $colon + 1))) {
             return null;
         }
         $host = self::host(false === $colon ? $hostAndPort : substr($hostAndPort, 0, $colon));
@@ -145,7 +145,7 @@ final class EmbedRules
             $host = strtolower(rtrim($ascii, '.'));
         }
 
-        return 1 === preg_match('~^[a-z0-9._-]+$~', $host) ? $host : null;
+        return 1 === preg_match('~^[a-z0-9._-]+$~D', $host) ? $host : null;
     }
 
     private static function path(string $path): string

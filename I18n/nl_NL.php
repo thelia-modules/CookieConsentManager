@@ -6,6 +6,7 @@ return [
     'Service key "%key%" is declared twice.' => 'De dienstsleutel “%key%” is twee keer gedeclareerd.',
     'Service key "%key%" is invalid (lowercase letters, digits, "-" and "_").' => 'De dienstsleutel “%key%” is ongeldig (kleine letters, cijfers, “-” en “_”).',
     'Unknown purpose "%purpose%".' => 'Onbekend doel “%purpose%”.',
+    'The purpose code "%code%" is invalid (lowercase letters, digits and "_", starting with a letter).' => 'De doelcode “%code%” is ongeldig (kleine letters, cijfers en “_”, beginnend met een letter).',
     'The environment field "%path%" imported from another site is not confirmed.' => 'Het omgevingsveld “%path%”, geïmporteerd van een andere site, is niet bevestigd.',
     'The layout must be "bar" or "modal".' => 'De opmaak moet “bar” of “modal” zijn.',
     'The renewal delay must be between 1 and 13 months.' => 'De vernieuwingstermijn moet tussen 1 en 13 maanden liggen.',
