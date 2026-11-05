@@ -34,7 +34,7 @@ final readonly class ConsentRecorder
             $payload->purposes,
             $payload->services,
             $payload->exempt,
-            $request->isSecure(),
+            $request->isSecure() || 'https' === strtolower((string) parse_url((string) $request->headers->get('Origin'), \PHP_URL_SCHEME)),
         );
         if ($cookie->encodedLength() > ConsentCookie::MAX_ENCODED_BYTES) {
             throw new ConsentRejectedException(413, 'too_large');
