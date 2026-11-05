@@ -85,7 +85,8 @@ final class FrontConfigProvider implements ResetInterface
     /** The published configuration of one version for a language, as the page that embedded it saw it. */
     public function forVersion(int $number, string $locale): ?FrontConfig
     {
-        $published = $this->published($number, $locale);
+        // The number comes from a URL: the cache keys must never grow with what a visitor types, so a number that is no published version stops here.
+        $published = null === $this->versions->find($number) ? null : $this->published($number, $locale);
 
         return null === $published ? null : $this->withUrls($published, null);
     }
