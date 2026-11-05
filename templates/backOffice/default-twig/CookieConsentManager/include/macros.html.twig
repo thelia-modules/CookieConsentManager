@@ -29,7 +29,7 @@
         <thead><tr><th>{{ 'Field'|trans }}</th><th>{{ 'Before'|trans }}</th><th>{{ 'After'|trans }}</th></tr></thead>
         <tbody>
             {% for row in rows %}
-                <tr title="{{ row.path }}"><td>{{ row.label }}</td><td class="text-break">{{ row.before }}</td><td class="text-break">{{ row.after }}</td></tr>
+                <tr title="{{ row.path }}"><td>{{ row.label }}{% if row.executable|default(false) %} <span class="badge text-bg-warning" data-testid="ccm-executable-change">{{ 'Runs on the storefront'|trans }}</span>{% endif %}</td><td class="text-break">{{ row.before }}</td><td class="text-break">{{ row.after }}</td></tr>
             {% endfor %}
         </tbody>
     </table>

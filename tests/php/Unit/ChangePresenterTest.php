@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CookieConsentManager\Tests\Unit;
 
 use CookieConsentManager\Admin\ChangePresenter;
+use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\FieldLabeler;
 use CookieConsentManager\Catalogue\CatalogueReader;
 use CookieConsentManager\Tests\Support\CatalogueTranslator;
@@ -15,7 +16,8 @@ final class ChangePresenterTest extends TestCase
     private function present(array $before, array $after): array
     {
         $translator = new CatalogueTranslator('fr_FR');
-        $presenter = new ChangePresenter(new FieldLabeler(new CatalogueReader(__DIR__.'/../Fixtures/catalogue.json'), $translator), $translator);
+        $catalogue = new CatalogueReader(__DIR__.'/../Fixtures/catalogue.json');
+        $presenter = new ChangePresenter(new FieldLabeler($catalogue, $translator), $translator, new ExecutableChanges($catalogue));
 
         return array_column($presenter->present($before, $after, 'fr'), null, 'path');
     }
@@ -63,5 +65,32 @@ final class ChangePresenterTest extends TestCase
 
         self::assertSame('a();', $rows['services.chat.code']['before']);
         self::assertSame('b();', $rows['services.chat.code']['after']);
+    }
+
+    public function testAChangedParameterThatIsAnAddressIsFlaggedAndAnIdentifierIsNot(): void
+    {
+        $service = static fn (string $host, string $id): array => ['key' => 'matomo', 'purpose' => 'analytics', 'enabled' => true, 'parameters' => ['matomoHost' => $host, 'matomoId' => $id]];
+        $rows = $this->present(['services' => [$service('https://a.test/', '1')]], ['services' => [$service('https://b.test/', '2')]]);
+
+        self::assertTrue($rows['services.matomo.parameters.matomoHost']['executable']);
+        self::assertFalse($rows['services.matomo.parameters.matomoId']['executable']);
+    }
+
+    public function testAnAddedServiceShowsItsAddressParametersInFullAndFlagged(): void
+    {
+        $rows = $this->present(['services' => []], ['services' => [['key' => 'matomo', 'purpose' => 'analytics', 'enabled' => true, 'parameters' => ['matomoHost' => 'https://b.test/', 'matomoId' => '2']]]]);
+
+        self::assertSame('https://b.test/', $rows['services.matomo.parameters.matomoHost']['after']);
+        self::assertTrue($rows['services.matomo.parameters.matomoHost']['executable']);
+        self::assertArrayNotHasKey('services.matomo.parameters.matomoId', $rows, 'an identifier stays folded in the row of the service');
+        self::assertFalse($rows['services.matomo']['executable']);
+    }
+
+    public function testTheCodeOfACustomServiceIsFlagged(): void
+    {
+        $service = ['key' => 'chat', 'custom' => true, 'kind' => 'custom', 'purpose' => 'ads', 'enabled' => true, 'name' => 'Chat', 'code' => 'a();'];
+        $rows = $this->present(['services' => [$service]], ['services' => [['code' => 'b();'] + $service]]);
+
+        self::assertTrue($rows['services.chat.code']['executable']);
     }
 }

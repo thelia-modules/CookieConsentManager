@@ -18,6 +18,7 @@ final readonly class ChangePresenter
     public function __construct(
         private FieldLabeler $labels,
         private TranslatorInterface $translator,
+        private ExecutableChanges $executable,
     ) {
     }
 
@@ -25,7 +26,7 @@ final readonly class ChangePresenter
      * @param array<string, mixed> $before
      * @param array<string, mixed> $after
      *
-     * @return list<array{path: string, label: string, before: string, after: string}>
+     * @return list<array{path: string, label: string, before: string, after: string, executable: bool}>
      */
     public function present(array $before, array $after, string $locale): array
     {
@@ -44,12 +45,11 @@ final readonly class ChangePresenter
             $removed = [] === array_filter($serviceChanges, static fn (array $change): bool => null !== $change['after']);
             if ($added || $removed) {
                 $collapsed[$key] = true;
-                $rows[] = ['path' => 'services.'.$key, 'label' => $this->labels->label('services.'.$key, $locale, $after + $before), 'before' => $added ? '-' : $this->t('Service configured'), 'after' => $added ? $this->t('Service added') : $this->t('Service removed')];
-                // What an added service will run on the storefront is shown in full, never folded.
-                foreach (['code', 'script_url'] as $executable) {
-                    $path = 'services.'.$key.'.'.$executable;
-                    if ($added && isset($serviceChanges[$path]) && '' !== (string) $serviceChanges[$path]['after']) {
-                        $rows[] = ['path' => $path, 'label' => $this->labels->label($path, $locale, $after + $before), 'before' => '-', 'after' => (string) $serviceChanges[$path]['after']];
+                $rows[] = ['path' => 'services.'.$key, 'label' => $this->labels->label('services.'.$key, $locale, $after + $before), 'before' => $added ? '-' : $this->t('Service configured'), 'after' => $added ? $this->t('Service added') : $this->t('Service removed'), 'executable' => false];
+                // What an added service will run on the storefront (its code, its address, a parameter that is an address) is shown in full, never folded.
+                foreach ($serviceChanges as $path => $change) {
+                    if ($added && $this->executable->isExecutablePath($path) && '' !== (string) $change['after']) {
+                        $rows[] = ['path' => $path, 'label' => $this->labels->label($path, $locale, $after + $before), 'before' => '-', 'after' => (string) $change['after'], 'executable' => true];
                     }
                 }
             }
@@ -59,7 +59,7 @@ final readonly class ChangePresenter
             if (1 === preg_match('/^services\.([^.]+)\./', $path, $match) && isset($collapsed[$match[1]])) {
                 continue;
             }
-            $rows[] = ['path' => $path, 'label' => $this->labels->label($path, $locale, $after), 'before' => $this->value($path, $change['before']), 'after' => $this->value($path, $change['after'])];
+            $rows[] = ['path' => $path, 'label' => $this->labels->label($path, $locale, $after), 'before' => $this->value($path, $change['before']), 'after' => $this->value($path, $change['after']), 'executable' => $this->executable->isExecutablePath($path)];
         }
 
         return $rows;

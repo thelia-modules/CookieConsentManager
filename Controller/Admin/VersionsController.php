@@ -7,6 +7,7 @@ namespace CookieConsentManager\Controller\Admin;
 use CookieConsentManager\Admin\ChangePresenter;
 use CookieConsentManager\Admin\DraftSectionEditor;
 use CookieConsentManager\Admin\DraftWriter;
+use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\FrontLinks;
 use CookieConsentManager\Draft\DraftRepository;
 use CookieConsentManager\Publication\PublicationRefusedException;
@@ -45,6 +46,7 @@ final class VersionsController extends AbstractScreenController
         private readonly FrontLinks $links,
         private readonly EnvironmentFields $environmentFields,
         private readonly ChangePresenter $changes,
+        private readonly ExecutableChanges $executable,
     ) {
         parent::__construct($urls, $drafts, $writer, $editor, $versions);
     }
@@ -146,7 +148,12 @@ final class VersionsController extends AbstractScreenController
         $confirmed = array_values(array_filter((array) ($input['confirmed'] ?? []), 'is_string'));
         $values = array_filter((array) ($input['values'] ?? []), 'is_string');
 
-        $outcome = $this->environmentFields->resolve($this->drafts->load(), $confirmed, $values);
+        $draft = $this->drafts->load();
+        $outcome = $this->environmentFields->resolve($draft, $confirmed, $values);
+        // A value typed for a parameter that is the address of a script is a change of what the storefront runs.
+        if (null !== $denied = $this->guardExecutable($this->executable, $draft, $outcome['draft'])) {
+            return $denied;
+        }
         if ([] === $outcome['resolved']) {
             $this->flash($request, 'warning', $this->say('Nothing was confirmed: tick a field to keep its imported value, or type the value of this shop.'));
 
