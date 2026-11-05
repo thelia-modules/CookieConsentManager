@@ -57,32 +57,127 @@ final class EmbedRules
     /**
      * The most specific rule wins (the longest path prefix): the playlist of YouTube and a single video share a host.
      *
+     * The address is read as a browser reads it (see normalise()) before the rules apply. An address that a browser would
+     * reject, but that still names the host and the path of an active service, is claimed as well: the frame is blocked
+     * rather than risk one that a tolerant browser would load.
+     *
      * @param list<string> $activeKeys keys of the media services active and published
      */
     public static function serviceFor(string $src, array $activeKeys): ?string
     {
-        $parts = parse_url(str_starts_with($src, '//') ? 'https:'.$src : $src);
-        if (!\is_array($parts) || !isset($parts['host']) || !\in_array($parts['scheme'] ?? 'https', ['http', 'https'], true)) {
-            return null;
-        }
-
-        $host = strtolower($parts['host']);
-        $path = ($parts['path'] ?? '/').(isset($parts['query']) ? '?'.$parts['query'] : '');
-
+        $address = self::normalise($src);
         $best = null;
         $bestLength = -1;
         foreach (self::rules() as $key => $hosts) {
-            if (!\in_array($key, $activeKeys, true) || !isset($hosts[$host])) {
+            if (!\in_array($key, $activeKeys, true)) {
                 continue;
             }
-            foreach ($hosts[$host] as $prefix) {
-                if (str_starts_with($path, $prefix) && \strlen($prefix) > $bestLength) {
-                    $best = $key;
-                    $bestLength = \strlen($prefix);
+            foreach ($hosts as $host => $prefixes) {
+                foreach ($prefixes as $prefix) {
+                    $matches = null === $address
+                        ? self::looksLike($src, $host, $prefix)
+                        : $address['host'] === $host && str_starts_with($address['path'], $prefix);
+                    if ($matches && \strlen($prefix) > $bestLength) {
+                        $best = $key;
+                        $bestLength = \strlen($prefix);
+                    }
                 }
             }
         }
 
         return $best;
+    }
+
+    /**
+     * The host and the path (with its query) that a browser would request, following the WHATWG URL rules that matter
+     * here. An empty host means an address that never reaches another site (relative, or a scheme other than http and https);
+     * null means an address that cannot be read with certainty.
+     *
+     * @return array{host: string, path: string}|null
+     */
+    private static function normalise(string $src): ?array
+    {
+        $none = ['host' => '', 'path' => ''];
+        $url = str_replace(["\t", "\n", "\r"], '', trim($src, "\x00..\x20"));
+
+        if (1 === preg_match('~^([a-z][a-z0-9+.\-]*):~i', $url, $scheme)) {
+            if (!\in_array(strtolower($scheme[1]), ['http', 'https'], true)) {
+                return $none;
+            }
+            $url = substr($url, \strlen($scheme[0]));
+        } elseif (1 !== preg_match('~^[/\\\\]{2}~', $url)) {
+            return $none;
+        }
+
+        $cut = strcspn($url, '?#');
+        $hierarchy = ltrim(strtr(substr($url, 0, $cut), '\\', '/'), '/');
+        $query = '';
+        if (isset($url[$cut]) && '?' === $url[$cut]) {
+            $query = '?'.substr($url, $cut + 1, strcspn($url, '#', $cut + 1));
+        }
+
+        $slash = strpos($hierarchy, '/');
+        $authority = false === $slash ? $hierarchy : substr($hierarchy, 0, $slash);
+        $path = false === $slash ? '/' : substr($hierarchy, $slash);
+
+        $at = strrpos($authority, '@');
+        $hostAndPort = false === $at ? $authority : substr($authority, $at + 1);
+        $colon = strpos($hostAndPort, ':');
+        if (false !== $colon && 1 !== preg_match('~^[0-9]*$~', substr($hostAndPort, $colon + 1))) {
+            return null;
+        }
+        $host = self::host(false === $colon ? $hostAndPort : substr($hostAndPort, 0, $colon));
+        if (null === $host) {
+            return null;
+        }
+
+        return ['host' => $host, 'path' => self::path($path).$query];
+    }
+
+    private static function host(string $raw): ?string
+    {
+        $host = strtolower(rtrim(str_replace(["\u{3002}", "\u{ff0e}", "\u{ff61}"], '.', rawurldecode($raw)), '.'));
+        if (1 === preg_match('~[^\x20-\x7e]~', $host)) {
+            $ascii = \function_exists('idn_to_ascii') ? idn_to_ascii($host, \IDNA_NONTRANSITIONAL_TO_ASCII, \INTL_IDNA_VARIANT_UTS46) : false;
+            if (false === $ascii) {
+                return null;
+            }
+            $host = strtolower(rtrim($ascii, '.'));
+        }
+
+        return 1 === preg_match('~^[a-z0-9._-]+$~', $host) ? $host : null;
+    }
+
+    private static function path(string $path): string
+    {
+        $path = (string) preg_replace_callback(
+            '~%(?:2d|2e|3[0-9]|4[1-9a-f]|5[0-9a]|5f|6[1-9a-f]|7[0-9a]|7e)~i',
+            static fn (array $found): string => \chr((int) hexdec(substr($found[0], 1))),
+            $path,
+        );
+
+        $segments = [];
+        $segmentsOfPath = explode('/', $path);
+        foreach ($segmentsOfPath as $position => $segment) {
+            if ('..' === $segment) {
+                array_pop($segments);
+            } elseif ('.' !== $segment && '' !== $segment) {
+                $segments[] = $segment;
+            }
+            $last = $position === \count($segmentsOfPath) - 1;
+            if ($last && \in_array($segment, ['.', '..', ''], true) && [] !== $segments) {
+                $segments[] = '';
+            }
+        }
+
+        return '/'.implode('/', $segments);
+    }
+
+    private static function looksLike(string $src, string $host, string $prefix): bool
+    {
+        $text = strtolower(rawurldecode((string) preg_replace('~[\x00-\x20]+~', '', $src)));
+        $position = strpos($text, $host);
+
+        return false !== $position && str_contains(substr($text, $position + \strlen($host)), $prefix);
     }
 }
