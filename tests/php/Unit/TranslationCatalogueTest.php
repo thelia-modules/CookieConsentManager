@@ -8,12 +8,12 @@ use CookieConsentManager\Front\FrontTexts;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** The module domain (validation messages) and the front domain: same keys and placeholders in the five languages. */
+/** The module domain (validation messages) and the front domain: same keys and placeholders in the six languages. */
 final class TranslationCatalogueTest extends TestCase
 {
     private const ROOT = __DIR__.'/../../..';
     private const DOMAINS = ['I18n' => 'validation', 'I18n/frontOffice/flexy' => 'front'];
-    private const LANGUAGES = ['fr_FR', 'en_US', 'de_DE', 'nl_NL', 'es_ES'];
+    private const LANGUAGES = ['fr_FR', 'en_US', 'de_DE', 'nl_NL', 'es_ES', 'it_IT'];
 
     /** @return iterable<string, array{string, string}> */
     public static function catalogues(): iterable

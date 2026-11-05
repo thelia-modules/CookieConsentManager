@@ -35,7 +35,7 @@ final class FrontLanguageTest extends CcmTestCase
     /** @return iterable<string, array{string}> */
     public static function languages(): iterable
     {
-        foreach (['fr', 'de', 'nl', 'es'] as $language) {
+        foreach (['fr', 'de', 'nl', 'es', 'it'] as $language) {
             yield $language => [$language];
         }
     }
@@ -77,11 +77,23 @@ final class FrontLanguageTest extends CcmTestCase
         self::assertSame('Reichweitenmessung', $variables['purposes'][0]['label']);
     }
 
+    public function testTheItalianBannerIsInItalian(): void
+    {
+        $front = $this->published();
+        $texts = new FrontTexts(static::getContainer()->get(TranslatorInterface::class));
+        $variables = (new TemplateContext($texts))->build(new FrontConfig(['locale' => 'it_IT'] + $front->config, $this->withoutTexts($front->snapshot, 'it')));
+
+        self::assertSame('Le sue scelte sui cookie', $variables['texts']['title']);
+        self::assertSame('Rifiuta tutto', $variables['texts']['reject']);
+        self::assertSame('Accetta tutto', $variables['texts']['accept']);
+        self::assertSame('Misurazione dell\'audience', $variables['purposes'][0]['label']);
+    }
+
     public function testALanguageWithoutCatalogueFallsBackToTheTypedOrEnglishTexts(): void
     {
         $front = $this->published();
         $texts = new FrontTexts(static::getContainer()->get(TranslatorInterface::class));
-        $variables = (new TemplateContext($texts))->build(new FrontConfig(['locale' => 'it_IT'] + $front->config, $front->snapshot));
+        $variables = (new TemplateContext($texts))->build(new FrontConfig(['locale' => 'pt_PT'] + $front->config, $front->snapshot));
 
         self::assertSame('Reject all', $variables['texts']['reject']);
         self::assertSame('Cookie preferences', $variables['texts']['panel_title']);

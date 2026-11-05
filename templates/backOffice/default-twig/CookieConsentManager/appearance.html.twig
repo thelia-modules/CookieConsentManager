@@ -83,7 +83,7 @@
     <div class="card mb-3" data-testid="ccm-texts-card">
         <div class="card-header"><h2 class="h5 mb-0">{{ 'Texts by language'|trans }}</h2></div>
         <div class="card-body">
-            <p class="text-secondary">{{ 'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch and Spanish are provided, any other language shows English.'|trans }}</p>
+            <p class="text-secondary">{{ 'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch, Spanish and Italian are provided, any other language shows English.'|trans }}</p>
             <div data-testid="ccm-texts-form">
                 {% set fields = {title: 'Title', body: 'Message', accept: 'Accept button', reject: 'Reject button', customize: 'Customize button', close: 'Close link', allow: 'Placeholder "Allow" button', preferences: 'Open preferences link', free_text: 'Free text (optional)'} %}
                 {% for locale in locales %}

@@ -29,12 +29,16 @@ final class ConsentStalenessTest extends TestCase
         $payload = [
             'f' => 1,
             'id' => '4f1c2b9e-8d7a-4c3e-9b1f-2a6d5e7c8b90',
-            't' => time() - $case['ageSeconds'],
             'p' => ['analytics' => 1],
             's' => ['gtag' => 1],
             'x' => [],
             'pd' => 0,
         ];
+        if (!\array_key_exists('rawTime', $case)) {
+            $payload['t'] = time() - $case['ageSeconds'];
+        } elseif (null !== $case['rawTime']) {
+            $payload['t'] = $case['rawTime'];
+        }
         if (null !== $case['choiceVersion']) {
             $payload['ver'] = $case['choiceVersion'];
         }

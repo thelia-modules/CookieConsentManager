@@ -22,6 +22,7 @@ final readonly class FrontTexts
         'de' => 'de_DE',
         'nl' => 'nl_NL',
         'es' => 'es_ES',
+        'it' => 'it_IT',
     ];
 
     /** @var array<string, string> name used by the templates => English message */

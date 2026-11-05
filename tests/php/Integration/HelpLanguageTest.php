@@ -40,7 +40,7 @@ final class HelpLanguageTest extends CcmTestCase
 
     public function testAnyOtherBackOfficeLanguageGetsTheEnglishGuides(): void
     {
-        foreach (['en_US', 'de_DE', 'es_ES'] as $locale) {
+        foreach (['en_US', 'de_DE', 'es_ES', 'it_IT'] as $locale) {
             $administrator = $this->helpPage($locale, 'administrateur');
             self::assertStringContainsString('Administrator guide', $administrator, $locale);
             self::assertStringNotContainsString('gérer le consentement', $administrator, $locale);

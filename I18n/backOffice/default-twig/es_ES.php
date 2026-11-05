@@ -128,7 +128,7 @@ return [
     'Too low' => 'Demasiado bajo',
     'Compliant color' => 'Color conforme',
     'Texts by language' => 'Textos por idioma',
-    'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch and Spanish are provided, any other language shows English.' => 'Un conjunto de textos por idioma activo. Un idioma sin texto muestra el texto por defecto de ese idioma: se proporcionan francés, inglés, alemán, neerlandés y español; cualquier otro idioma muestra inglés.',
+    'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch, Spanish and Italian are provided, any other language shows English.' => 'Un conjunto de textos por idioma activo. Un idioma sin texto muestra el texto por defecto de ese idioma: se proporcionan francés, inglés, alemán, neerlandés, español e italiano; cualquier otro idioma muestra inglés.',
     'language not active' => 'idioma no activo',
     'no text yet (English shown)' => 'aún sin texto (se muestra inglés)',
     'Restore default texts' => 'Restaurar los textos por defecto',

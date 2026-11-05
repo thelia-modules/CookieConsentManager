@@ -76,7 +76,7 @@ Under the France preset, the "Cookie policy" link of the banner must lead to a p
 The model holds the text that does not change: the site publisher (name, address and email read from Configuration, Store in Thelia, with an alert for what is missing), the roles of each party (joint responsibility for collection and transmission when a service such as Meta Pixel or a social module requires it), the duration of the visitor's choice, the retention of proofs, and the rights of individuals.
 The list of services, cookies, lifetimes and responsible entities is not copied into it. A link "Up-to-date list of services and cookies" leads to `/ccm/preferences`, which always matches the published version. You do not have to update the page when you change services.
 
-Under the France preset attached to the main language, every active language must have its own page. Make one page per language. The model exists in the five languages of the module. For another language the fixed sentences are in English and need translating. A language without its own address that falls back to the terms and conditions refuses publication. Read the model before putting it online.
+Under the France preset attached to the main language, every active language must have its own page. Make one page per language. The model exists in the six languages of the module. For another language the fixed sentences are in English and need translating. A language without its own address that falls back to the terms and conditions refuses publication. Read the model before putting it online.
 
 Tip: the Thelia back-office text editor saves an empty summary and postscriptum as `<p></p>`, and some themes display it. If these two lines appear on the page, empty them in the database or adapt the theme template.
 
@@ -93,12 +93,12 @@ A length gap of more than 50% between the two labels, or a consent-by-browsing f
 
 ## Languages
 
-- The module ships in French, English, German, Dutch and Spanish: banner, panel, banner messages and back-office (in the language of the administrator's profile). The site languages you activate in Thelia appear in the texts screen and the purposes screen.
+- The module ships in French, English, German, Dutch, Spanish and Italian: banner, panel, banner messages and back-office (in the language of the administrator's profile). The site languages you activate in Thelia appear in the texts screen and the purposes screen.
 - For each text the visitor sees, in order: what you entered in their language, else the module's default text in their language, else what you entered in English, else the English default. A provided language therefore never mixes two languages.
 - A new draft holds the English text only. The four other languages show the translated default text until you enter something. "Restore default texts" removes your entry. A text you have already entered does not follow a future change of the default.
-- A language that is not provided (Italian, for example): until you enter something, English is shown and a red alert says so. Even when you enter the editable texts, the module's fixed sentences (purpose list, way of refusing, partner mention, duration of the choice, panel messages) stay in English, because the module cannot translate them for you. The alert "incomplete translation" reminds you as long as a text or a purpose label is missing.
+- A language that is not provided (Portuguese, for example): until you enter something, English is shown and a red alert says so. Even when you enter the editable texts, the module's fixed sentences (purpose list, way of refusing, partner mention, duration of the choice, panel messages) stay in English, because the module cannot translate them for you. The alert "incomplete translation" reminds you as long as a text or a purpose label is missing.
 - The cookie policy page title is unique and follows the main language of the site.
-- The German, Dutch and Spanish translations were not reviewed by a native speaker. Have them reviewed before going live.
+- The German, Dutch, Spanish and Italian translations were not reviewed by a native speaker. Have them reviewed before going live.
 
 ## Presets (tab "Presets")
 

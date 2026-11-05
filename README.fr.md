@@ -10,7 +10,7 @@ CookieConsentManager est un module de consentement aux cookies et aux traceurs p
 - Il tient un registre des consentements avec une fiche de preuve imprimable, un export CSV et une purge selon la durée de conservation. Les versions publiées sont immuables, et rien n'est servi tant qu'un administrateur n'a pas publié.
 - Il bloque les scripts et contenus intégrés tiers jusqu'au consentement, avec un catalogue de services dérivé de tarteaucitron.js (23 services vérifiés, 213 expérimentaux) et un moyen pour d'autres modules de déclarer les leurs.
 - Il envoie les signaux Google Consent Mode v2 (basique ou avancé, `gtag` et Google Tag Manager).
-- Le bandeau, le panneau et le back-office sont traduits en français, anglais, allemand, néerlandais et espagnol. Un préréglage France (CNIL) fournit textes et réglages.
+- Le bandeau, le panneau et le back-office sont traduits en français, anglais, allemand, néerlandais, espagnol et italien. Un préréglage France (CNIL) fournit textes et réglages.
 
 Ce n'est pas une CMP certifiée IAB TCF ni par Google. Licence MIT.
 
