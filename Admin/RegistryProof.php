@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace CookieConsentManager\Admin;
 
+use CookieConsentManager\Front\ServedHashResolver;
 use CookieConsentManager\Model\ConsentEntry;
+use CookieConsentManager\Model\Version;
 use CookieConsentManager\Publication\VersionRepository;
 
 /** What a proof sheet holds: the entry, the version the visitor was served and its hashes (printable from the browser). */
 final readonly class RegistryProof
 {
-    public function __construct(private VersionRepository $versions)
+    public function __construct(private VersionRepository $versions, private ServedHashResolver $servedHashes)
     {
     }
 
@@ -46,7 +48,7 @@ final readonly class RegistryProof
                 'served_hash' => $version->getServedHash(),
                 'substantial' => 1 === $version->getSubstantial(),
             ],
-            'hash_matches' => null !== $version && $version->getServedHash() === $entry->getVersionHash(),
+            'hash_status' => null === $version ? null : $this->hashStatus($version, $entry->getVersionHash()),
             'texts' => $this->shownTexts($snapshot, $locale),
             'layout' => $snapshot['config']['general']['layout'] ?? null,
             'policy_url' => null === $snapshot ? null : ($snapshot['config']['policy']['urls'][$locale] ?? $snapshot['config']['policy']['url'] ?? null),
@@ -55,6 +57,16 @@ final readonly class RegistryProof
             'service_names' => array_column($snapshot['services_resolved'] ?? [], 'name', 'key'),
             'templates' => $snapshot['templates'] ?? [],
         ];
+    }
+
+    /** published: the hash stored at publication; current: the hash the version is served with now (module or files updated since); unknown: neither. */
+    private function hashStatus(Version $version, string $entryHash): string
+    {
+        return match (true) {
+            $version->getServedHash() === $entryHash => 'published',
+            $this->servedHashes->forVersion($version) === $entryHash => 'current',
+            default => 'unknown',
+        };
     }
 
     /**
