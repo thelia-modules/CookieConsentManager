@@ -2,6 +2,23 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2026-11-05
+
+### Added
+
+- Italian translation of the banner, the panel, the page without JavaScript and the back-office. Not reviewed by a native speaker yet.
+
+### Fixed
+
+- An HTML response that is not a page of the theme (an ESI fragment, an application controller, a page of another module) and holds a blocked media iframe no longer fails with an error 500: the placeholder template is now found outside the theme.
+- The consent cookie set by the registry endpoint keeps its `Secure` flag behind a TLS proxy that is not declared in `trusted_proxies`, when the browser's `Origin` is `https`. It used to overwrite the secure cookie written by the engine.
+- A consent choice dated more than one day in the future is treated as expired, in the head script, the engine and the PHP helpers.
+- A restored `text/plain` script keeps the CSP `nonce` of its original tag. Browsers hide the nonce attribute, so the copy used to be empty and a strict CSP blocked the script.
+
+### Documentation
+
+- Integrator guide: CSP for restored scripts, indicative statistics, content that is not rewritten (`X-Requested-With` responses, iframes created in JavaScript), `setConsent` reserved for the site's code.
+
 ## [1.0.2] - 2026-11-04
 
 ### Fixed
