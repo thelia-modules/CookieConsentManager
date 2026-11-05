@@ -204,8 +204,8 @@ Each action needs one right. Rights do not include each other: to open the scree
 
 | Action | Right needed |
 |--------|:------------:|
-| Browse all screens and the registry list, preview the draft, run the Verification and download its report, export (JSON of the draft or of a version) | VIEW |
-| Export the registry (CSV), open a proof sheet | UPDATE |
+| Browse all screens (the registry shows its settings and aggregated statistics, not its entries), preview the draft, run the Verification and download its report, export (JSON of the draft or of a version) | VIEW |
+| List, search and open the registry entries (they hold personal data), export the registry (CSV), open a proof sheet | UPDATE |
 | Edit the draft (services, purposes, texts, colours, Consent Mode, settings) | UPDATE |
 | Import a preset | UPDATE |
 | Write or change the code or the script address of a custom service, set or change a service parameter that is an address (flagged "Runs on the storefront"), switch on experimental services | CREATE |
@@ -218,7 +218,7 @@ Each action needs one right. Rights do not include each other: to open the scree
 
 Publishing is a sensitive right. It sends the configuration to every visitor, and that includes JavaScript: custom services with a `code` field and script services with a `script_url` serve code to all visitors of the shop. Whatever can bring such code into the draft therefore needs CREATE too: writing or changing the code or script address of a service, setting or changing a catalogue parameter that is itself an address or a host loaded as a script (the Matomo address, the custom domain of a Google tag, the library address of AT Internet... 31 parameters, flagged `executable` in the catalogue and "Runs on the storefront" in the lists of changes), importing a configuration, restoring a version, switching on experimental services. UPDATE alone edits everything else in the draft and cannot publish. Give CREATE only to people who may put code on every page. DELETE covers the registry purge only.
 
-Read-only profile (VIEW without UPDATE): every screen can be browsed, fields are disabled, write buttons are hidden, and a strip "Read-only access" says so. Without VIEW, the menu entry "Cookie consent" does not appear.
+Read-only profile (VIEW without UPDATE): every screen can be browsed except the registry entries, which need UPDATE; fields are disabled, write buttons are hidden, and a strip "Read-only access" says so. Without VIEW, the menu entry "Cookie consent" does not appear.
 
 ## Sample text for the privacy policy
 

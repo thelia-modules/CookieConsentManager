@@ -170,9 +170,9 @@ Les droits se règlent par profil dans Configuration, Profils d'administrateurs,
 
 | Action | VIEW | UPDATE | CREATE | DELETE |
 |--------|:----:|:------:|:------:|:------:|
-| Consulter tous les écrans, la liste du registre, les versions | oui | oui | oui | oui |
+| Consulter tous les écrans (le registre n'y montre que ses réglages et ses statistiques agrégées, pas ses entrées), les versions | oui | oui | oui | oui |
 | Exporter (JSON du brouillon ou d'une version) | oui | oui | oui | oui |
-| Exporter le registre (CSV), ouvrir une fiche de preuve | non | oui | non | non |
+| Lister, rechercher et ouvrir les entrées du registre (données personnelles), exporter le registre (CSV), ouvrir une fiche de preuve | non | oui | non | non |
 | Aperçu du brouillon | oui | oui | oui | oui |
 | Lancer la Vérification et télécharger le rapport | oui | oui | oui | oui |
 | Modifier le brouillon (services, finalités, textes, couleurs, Consent Mode, réglages) | non | oui | non | non |
@@ -189,7 +189,7 @@ Chaque colonne s'ajoute aux autres : un profil qui publie a typiquement VIEW, UP
 
 **La publication est un droit sensible.** Elle envoie la configuration à tous les visiteurs, JavaScript compris : un service personnalisé avec un champ `code`, ou un service à adresse de script, sert du code à tous les visiteurs. Tout ce qui peut amener un tel code au brouillon exige donc aussi CREATE : écrire ou changer le code ou l'adresse de script d'un service, saisir ou changer un paramètre du catalogue qui est lui-même une adresse ou un hôte chargé comme script (l'adresse de Matomo, le domaine personnalisé d'une balise Google, l'adresse de la bibliothèque AT Internet... 31 paramètres, marqués `executable` dans le catalogue et « Exécuté sur la boutique » dans les listes de modifications), importer une configuration, restaurer une version, activer les services expérimentaux. UPDATE seul modifie le reste du brouillon et ne peut pas publier. DELETE ne couvre que la purge du registre.
 
-**Profil en lecture seule** (VIEW sans UPDATE) : tous les écrans se consultent, les champs sont désactivés, les boutons d'écriture sont masqués et un bandeau « Accès en lecture seule » le rappelle. Sans le droit VIEW, l'entrée de menu « Consentement aux cookies » n'apparaît pas.
+**Profil en lecture seule** (VIEW sans UPDATE) : tous les écrans se consultent, sauf les entrées du registre qui demandent UPDATE ; les champs sont désactivés, les boutons d'écriture sont masqués et un bandeau « Accès en lecture seule » le rappelle. Sans le droit VIEW, l'entrée de menu « Consentement aux cookies » n'apparaît pas.
 
 ## Texte type pour la politique de confidentialité
 

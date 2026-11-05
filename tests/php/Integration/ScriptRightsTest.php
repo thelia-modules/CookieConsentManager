@@ -8,6 +8,7 @@ use CookieConsentManager\Controller\Admin\DashboardController;
 use CookieConsentManager\Controller\Admin\RegistryController;
 use CookieConsentManager\Controller\Admin\ServicesController;
 use CookieConsentManager\Controller\Admin\VersionsController;
+use CookieConsentManager\Model\ConsentEntry;
 use CookieConsentManager\Publication\ConfigDiff;
 use CookieConsentManager\Tests\Support\CcmTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -270,6 +271,37 @@ final class ScriptRightsTest extends CcmTestCase
         self::assertSame(403, $this->post($viewOnly, [], static fn (Request $request): Response => $controller->proof(1, $request), [], 'GET')->getStatusCode());
         self::assertSame(200, $this->post(self::VIEW_UPDATE, [], $controller->export(...), [], 'GET')->getStatusCode());
         self::assertNotSame(403, $this->post(self::VIEW_UPDATE, [], static fn (Request $request): Response => $controller->proof(1, $request), [], 'GET')->getStatusCode());
-        self::assertNotSame(403, $this->post($viewOnly, [], $controller->list(...), [], 'GET')->getStatusCode(), 'the list stays readable');
+    }
+
+    public function testTheEntriesOfTheRegistryNeedUpdateWhileItsSettingsAndStatisticsStayReadable(): void
+    {
+        $consentId = '4f1c2b9e-8d7a-4c3e-9b1f-2a6d5e7c8b90';
+        (new ConsentEntry())
+            ->setConsentId($consentId)->setRecordedAt(new \DateTimeImmutable('2026-10-30 10:00:00', new \DateTimeZone('UTC')))
+            ->setAction('custom')->setSource('banner')->setVersion(1)->setVersionHash('abcdef012345')
+            ->setLocale('fr_FR')->setPath('/marker-visited-page')->setBrowser('Chrome 130')->setPurposesJson('{}')->setServicesJson('{}')
+            ->save();
+        $controller = $this->getService(RegistryController::class);
+        $list = static fn (Request $request): Response => $controller->list($request);
+        $detail = static fn (Request $request): Response => $controller->consent($consentId);
+
+        $viewOnly = $this->post([AccessManager::VIEW], ['q' => '4f1c2b9e'], $list, [], 'GET');
+        self::assertSame(200, $viewOnly->getStatusCode(), 'the screen stays open');
+        $html = (string) $viewOnly->getContent();
+        self::assertStringContainsString('ccm-registry-options-card', $html, 'the settings stay');
+        self::assertStringContainsString('ccm-stats-card', $html, 'the aggregated statistics stay');
+        self::assertStringContainsString('ccm-registry-restricted', $html, 'the screen says why there is no entry');
+        foreach (['4f1c2b9e', 'marker-visited-page', 'ccm-registry-table', 'ccm-registry-filters', 'ccm-registry-total'] as $leak) {
+            self::assertStringNotContainsString($leak, $html, $leak);
+        }
+        self::assertSame(403, $this->post([AccessManager::VIEW], [], $detail, [], 'GET')->getStatusCode());
+
+        $updater = $this->post(self::VIEW_UPDATE, ['q' => '4f1c2b9e'], $list, [], 'GET');
+        self::assertSame(200, $updater->getStatusCode());
+        self::assertStringContainsString('marker-visited-page', (string) $updater->getContent());
+        self::assertStringNotContainsString('ccm-registry-restricted', (string) $updater->getContent());
+        $opened = $this->post(self::VIEW_UPDATE, [], $detail, [], 'GET');
+        self::assertSame(200, $opened->getStatusCode());
+        self::assertStringContainsString($consentId, (string) $opened->getContent());
     }
 }
