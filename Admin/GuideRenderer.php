@@ -90,14 +90,14 @@ final class GuideRenderer
                 $this->close($open, $html);
                 continue;
             }
-            if (1 === preg_match('/^(#{1,4})\s+(.+)$/', $line, $heading)) {
+            if (1 === preg_match('/^(#{1,4})\s+(.+)$/D', $line, $heading)) {
                 $this->flush($paragraph, $html);
                 $this->close($open, $html);
                 $level = \strlen($heading[1]) + 1;
                 $html[] = \sprintf('<h%d id="%s">%s</h%d>', $level, self::slug($heading[2]), $this->inline($heading[2]), $level);
                 continue;
             }
-            if (1 === preg_match('/^\s*[-*]\s+(.+)$/', $line, $item) || 1 === preg_match('/^\s*\d+[.)]\s+(.+)$/', $line, $item)) {
+            if (1 === preg_match('/^\s*[-*]\s+(.+)$/D', $line, $item) || 1 === preg_match('/^\s*\d+[.)]\s+(.+)$/D', $line, $item)) {
                 $this->flush($paragraph, $html);
                 $tag = 1 === preg_match('/^\s*\d/', $line) ? 'ol' : 'ul';
                 if ($open !== $tag) {
@@ -113,7 +113,7 @@ final class GuideRenderer
                 $this->close($open, $html);
                 $rows = [];
                 while ($i < $count && str_starts_with(ltrim($lines[$i]), '|')) {
-                    if (1 !== preg_match('/^\s*\|[\s:|-]+\|\s*$/', $lines[$i])) {
+                    if (1 !== preg_match('/^\s*\|[\s:|-]+\|\s*$/D', $lines[$i])) {
                         $rows[] = array_map('trim', explode('|', trim(trim($lines[$i]), '|')));
                     }
                     ++$i;
@@ -182,7 +182,7 @@ final class GuideRenderer
         $text = preg_replace('/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $text) ?? $text;
         $text = preg_replace_callback('/\[([^\]]+)\]\(([^)\s]+)\)/', static function (array $match): string {
             $url = html_entity_decode($match[2], \ENT_QUOTES);
-            if (1 === preg_match('~^(?:[\w./-]*/)?([\w.-]+\.md)(#[\w-]*)?$~i', $url, $file)) {
+            if (1 === preg_match('~^(?:[\w./-]*/)?([\w.-]+\.md)(#[\w-]*)?$~iD', $url, $file)) {
                 // The other Markdown files are not served by the back-office: only the guides have a page.
                 $guide = self::GUIDE_FILES[$file[1]] ?? null;
 

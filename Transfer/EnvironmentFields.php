@@ -79,7 +79,7 @@ final readonly class EnvironmentFields
         }
 
         foreach ($draft['services'] as $service) {
-            if (1 === preg_match('/^services\.'.preg_quote((string) $service['key'], '/').'\.parameters\.(.+)$/', $path, $match)) {
+            if (1 === preg_match('/^services\.'.preg_quote((string) $service['key'], '/').'\.parameters\.(.+)$/D', $path, $match)) {
                 return (string) ($service['parameters'][$match[1]] ?? '');
             }
         }
@@ -101,7 +101,7 @@ final readonly class EnvironmentFields
         }
 
         foreach ($draft['services'] as $index => $service) {
-            if (1 === preg_match('/^services\.'.preg_quote((string) $service['key'], '/').'\.parameters\.(.+)$/', $path, $match)) {
+            if (1 === preg_match('/^services\.'.preg_quote((string) $service['key'], '/').'\.parameters\.(.+)$/D', $path, $match)) {
                 $draft['services'][$index]['parameters'][$match[1]] = $value;
             }
         }

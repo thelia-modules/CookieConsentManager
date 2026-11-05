@@ -159,7 +159,7 @@ Le thème Flexy charge ses polices depuis Google (`fonts.googleapis.com`, `fonts
 ## Passage recette vers production
 
 1. Sur la recette : onglet « Versions et vérification », **Exporter le brouillon (JSON)**. L'export contient le **brouillon**, pas la version publiée : publiez d'abord si besoin.
-2. Sur la production : **Importer une configuration (JSON)** (droit CREATE, celui qui publie, car un fichier peut porter du code). L'import remplace le brouillon, jamais la version en ligne. Un fichier de plus de 1 Mo est refusé, de même qu'un service présenté comme venant d'un module qui ne le déclare pas.
+2. Sur la production : **Importer une configuration (JSON)** (droit CREATE, celui qui publie, car un fichier peut porter du code). L'import remplace le brouillon, jamais la version en ligne. Un fichier de plus de 1 Mo est refusé, de même qu'un code de finalité invalide et qu'un service présenté comme venant d'un module qui ne le déclare pas.
 3. L'écran liste les **champs d'environnement** : identifiants de services (Google Analytics, Meta, Crisp...), adresse de la politique, régions. Ils viennent du site de recette : **ressaisissez ou confirmez les valeurs de la production** une à une avant de publier. La publication est refusée tant qu'ils ne sont pas confirmés. Pour chaque champ, la valeur de recette est affichée à côté de la zone de saisie ; aucune case n'est précochée.
 4. Vérifier que la page de politique existe sur le site de production, puis publier.
 

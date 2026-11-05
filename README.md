@@ -106,7 +106,7 @@ php Thelia ccm:config:publish --confirm-environment --comment="Go live"
 ```
 
 - Environment fields (service identifiers, policy address, regions) come from another site. The import lists them, and you must confirm or re-enter them before publishing. Without `--confirm-environment`, publication is refused.
-- `ccm:config:import` exits with `0` when the draft is created. Fields to confirm are printed as warnings, which is not a failure. Any other code means the file was unreadable or refused. Only invalid addresses block the write; other errors are imported so that you can correct them in the back-office.
+- `ccm:config:import` exits with `0` when the draft is created. Fields to confirm are printed as warnings, which is not a failure. Any other code means the file was unreadable or refused. Only invalid addresses and invalid purpose codes block the write; other errors are imported so that you can correct them in the back-office.
 - `ccm:config:publish` options: `--confirm-environment`, `--substantial`, `--force`, `--comment=<text>`.
 - The file schema is `Config/schema/ccm-config-1.schema.json`. The key `registry.link_customer` of older exports is ignored on import.
 - Registry purge: `php Thelia ccm:registry:purge` (`--dry-run` only counts). Schedule it, for example `17 3 * * *`. On Thelia 3.3 with a worker on `scheduler_thelia`, a daily task at 03:17 already exists.

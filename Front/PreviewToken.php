@@ -34,7 +34,7 @@ final readonly class PreviewToken
     /** @param array<string, mixed> $draft normalized draft */
     public function isValid(string $token, array $draft): bool
     {
-        return 1 === preg_match('/^'.self::PATTERN.'$/', $token) && hash_equals($this->forDraft($draft), $token);
+        return 1 === preg_match('/^'.self::PATTERN.'$/D', $token) && hash_equals($this->forDraft($draft), $token);
     }
 
     /** Proof that the token was presented on a page opened by an administrator: bound to the token, valid until the next edit of the draft. */

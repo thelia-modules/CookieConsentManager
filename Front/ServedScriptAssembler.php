@@ -52,7 +52,7 @@ final readonly class ServedScriptAssembler
             return \sprintf("tarteaucitron.services[%s] = {key:%s, js:function(){\n%s\n}, fallback:function(){}};", $key, $key, $service['code']);
         }
 
-        if (!\in_array($service['kind'], ['script', 'media'], true) || 1 !== preg_match('/^[A-Za-z0-9_-]+$/', $service['key'])) {
+        if (!\in_array($service['kind'], ['script', 'media'], true) || 1 !== preg_match('/^[A-Za-z0-9_-]+$/D', $service['key'])) {
             return null;
         }
 

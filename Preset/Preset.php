@@ -31,7 +31,7 @@ final readonly class Preset
     public static function fromDocument(array $document): self
     {
         $identity = $document['preset'] ?? null;
-        if (!\is_array($identity) || 1 !== preg_match('/^[a-z]{2}-[A-Z]{2}$/', (string) ($identity['code'] ?? ''))) {
+        if (!\is_array($identity) || 1 !== preg_match('/^[a-z]{2}-[A-Z]{2}$/D', (string) ($identity['code'] ?? ''))) {
             throw new \InvalidArgumentException('A preset needs a "preset.code" such as "fr-FR".');
         }
         $unknown = array_diff(array_keys($document), self::SECTIONS);

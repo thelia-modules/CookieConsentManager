@@ -185,6 +185,18 @@ final class ConsentEndpointTest extends CcmTestCase
         self::assertSame($before, ConsentEntryQuery::create()->count(), 'a refused request writes nothing');
     }
 
+    public function testAHashAndALocaleWithAFinalLineFeedAreRefused(): void
+    {
+        $before = ConsentEntryQuery::create()->count();
+        foreach (['served_hash' => $this->hash."\n", 'locale' => "fr_FR\n"] as $field => $value) {
+            $response = ($this->controller)($this->request($this->payload([$field => $value])));
+
+            self::assertSame(422, $response->getStatusCode(), $field);
+            self::assertSame(['error' => 'invalid_payload', 'field' => $field], json_decode((string) $response->getContent(), true), $field);
+        }
+        self::assertSame($before, ConsentEntryQuery::create()->count());
+    }
+
     public function test429WithRetryAfterOnceTheLimitIsReached(): void
     {
         $controller = $this->controller(2);

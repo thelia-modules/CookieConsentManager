@@ -16,7 +16,7 @@ final class ContrastChecker
 
     public static function isHex(string $color): bool
     {
-        return 1 === preg_match('/^#[0-9a-fA-F]{6}$/', $color);
+        return 1 === preg_match('/^#[0-9a-fA-F]{6}$/D', $color);
     }
 
     public static function ratio(string $first, string $second): float
