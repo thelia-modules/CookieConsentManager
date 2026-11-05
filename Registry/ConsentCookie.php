@@ -64,7 +64,8 @@ final class ConsentCookie extends Cookie
     /**
      * Same rule as head.js and engine.js: a choice is no consent once it is older than the renewal
      * or older than the last substantial version. A choice without a whole-number time cannot be
-     * dated, so it is never renewed otherwise.
+     * dated, so it is never renewed otherwise. A time more than one day ahead of the clock cannot
+     * be genuine either (a day of drift between the visitor's clock and the server's is tolerated).
      *
      * @param array<string, mixed> $state
      */
@@ -74,6 +75,7 @@ final class ConsentCookie extends Cookie
 
         return !\is_int($time)
             || $time + $repromptDays * 86400 <= $now
+            || $time > $now + 86400
             || ($substantialVersion > 0 && (int) ($state['ver'] ?? 0) < $substantialVersion);
     }
 
