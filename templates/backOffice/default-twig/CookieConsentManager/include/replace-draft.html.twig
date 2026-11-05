@@ -1,0 +1,12 @@
+{% trans_default_domain 'cookieconsentmanager.bo.default-twig' %}
+{# Confirmation of an action that replaces the whole draft; the server refuses the post without the field. `id` prefixes the test identifiers. #}
+<p class="small mb-2" data-testid="ccm-replace-notice">{{ 'The whole draft is replaced, including what is not published yet. The published version is not touched.'|trans }}</p>
+{% if unpublished_changes is null %}
+    <div class="alert alert-warning py-2 small" role="status" data-testid="ccm-replace-unpublished">{{ 'No version is published yet: the draft will be replaced and cannot be recovered.'|trans }}</div>
+{% elseif unpublished_changes > 0 %}
+    <div class="alert alert-warning py-2 small" role="status" data-testid="ccm-replace-unpublished">{{ 'The draft holds %count% change(s) that are not published: they will be lost.'|trans({'%count%': unpublished_changes}) }}</div>
+{% endif %}
+<div class="form-check mb-2">
+    <input class="form-check-input" type="checkbox" id="{{ id }}_confirm" name="confirm_replace" value="1" required data-testid="{{ id }}-confirm">
+    <label class="form-check-label" for="{{ id }}_confirm">{{ 'I confirm that the current draft will be replaced.'|trans }}</label>
+</div>

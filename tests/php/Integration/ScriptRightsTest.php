@@ -241,7 +241,7 @@ final class ScriptRightsTest extends CcmTestCase
         file_put_contents($invalid, $this->completeConfigJson());
 
         foreach ([new UploadedFile($big, 'big.json', null, \UPLOAD_ERR_OK, true), new UploadedFile($invalid, 'x.json', null, \UPLOAD_ERR_INI_SIZE, true)] as $file) {
-            $response = $this->post(self::WITH_CREATE, [], $controller->import(...), ['config_file' => $file]);
+            $response = $this->post(self::WITH_CREATE, ['confirm_replace' => '1'], $controller->import(...), ['config_file' => $file]);
             self::assertSame(302, $response->getStatusCode());
             self::assertSame([], ConfigDiff::between($before, $this->ccm->drafts->load()));
         }
@@ -256,7 +256,7 @@ final class ScriptRightsTest extends CcmTestCase
         $controller = $this->getService(VersionsController::class);
 
         $denied = $this->post(self::VIEW_UPDATE, [], static fn (Request $request): Response => $controller->restore($request, $version));
-        $allowed = $this->post(self::WITH_CREATE, [], static fn (Request $request): Response => $controller->restore($request, $version));
+        $allowed = $this->post(self::WITH_CREATE, ['confirm_replace' => '1'], static fn (Request $request): Response => $controller->restore($request, $version));
 
         self::assertSame(403, $denied->getStatusCode());
         self::assertSame(302, $allowed->getStatusCode());

@@ -13,7 +13,7 @@ Où le trouver : back-office Thelia, menu du haut, **Consentement aux cookies**.
 - Tout ce que vous modifiez va dans le **brouillon**. Le brouillon n'est jamais montré aux visiteurs.
 - **Publier** crée une version numérotée qui n'est plus modifiable et la met en ligne. Tant qu'aucune version n'est publiée, **la bannière n'apparaît pas**.
 - Chaque consentement est enregistré avec le numéro de version que le visiteur a vue : c'est ce qui permet de le prouver.
-- Vous pouvez toujours revenir en arrière : « Restaurer comme brouillon » reprend une ancienne version dans le brouillon, qu'il faut ensuite publier.
+- Vous pouvez toujours revenir en arrière : « Restaurer comme brouillon » reprend une ancienne version dans le brouillon, qu'il faut ensuite publier. Le brouillon entier est remplacé, y compris ce qui n'est pas encore publié : la page vous en avertit et le serveur refuse l'action tant que la confirmation n'est pas cochée.
 
 ## Tableau de bord
 
@@ -160,7 +160,7 @@ Le thème Flexy charge ses polices depuis Google (`fonts.googleapis.com`, `fonts
 ## Passage recette vers production
 
 1. Sur la recette : onglet « Versions et vérification », **Exporter le brouillon (JSON)**. L'export contient le **brouillon**, pas la version publiée : publiez d'abord si besoin.
-2. Sur la production : **Importer une configuration (JSON)** (droit CREATE, celui qui publie, car un fichier peut porter du code). L'import remplace le brouillon, jamais la version en ligne. Un fichier de plus de 1 Mo est refusé, de même qu'un code de finalité invalide et qu'un service présenté comme venant d'un module qui ne le déclare pas.
+2. Sur la production : **Importer une configuration (JSON)** (droit CREATE, celui qui publie, car un fichier peut porter du code). L'import remplace le brouillon entier, y compris ce qui n'est pas encore publié (l'écran compte les modifications non publiées et le serveur refuse l'import tant que la confirmation n'est pas cochée), jamais la version en ligne. Un fichier de plus de 1 Mo est refusé, de même qu'un code de finalité invalide et qu'un service présenté comme venant d'un module qui ne le déclare pas.
 3. L'écran liste les **champs d'environnement** : identifiants de services (Google Analytics, Meta, Crisp...), adresse de la politique, régions. Ils viennent du site de recette : **ressaisissez ou confirmez les valeurs de la production** une à une avant de publier. La publication est refusée tant qu'ils ne sont pas confirmés. Pour chaque champ, la valeur de recette est affichée à côté de la zone de saisie ; aucune case n'est précochée.
 4. Vérifier que la page de politique existe sur le site de production, puis publier.
 
