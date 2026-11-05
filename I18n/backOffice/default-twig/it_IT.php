@@ -522,6 +522,7 @@ return [
     'Service configured' => 'Servizio configurato',
     'Service added' => 'Servizio aggiunto',
     'Service removed' => 'Servizio rimosso',
+    'Runs on the storefront' => 'Viene eseguito nel negozio',
     'Pages' => 'Pagine',
     'Consent identifier' => 'Identificativo del consenso',
     'Date and time (UTC)' => 'Data e ora (UTC)',

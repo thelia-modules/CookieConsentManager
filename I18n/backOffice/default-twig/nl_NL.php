@@ -522,6 +522,7 @@ return [
     'Service configured' => 'Dienst geconfigureerd',
     'Service added' => 'Dienst toegevoegd',
     'Service removed' => 'Dienst verwijderd',
+    'Runs on the storefront' => 'Wordt uitgevoerd in de winkel',
     'Pages' => 'Pagina\'s',
     'Consent identifier' => 'Toestemmings-ID',
     'Date and time (UTC)' => 'Datum en tijd (UTC)',

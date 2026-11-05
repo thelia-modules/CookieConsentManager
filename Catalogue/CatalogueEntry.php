@@ -7,10 +7,10 @@ namespace CookieConsentManager\Catalogue;
 final readonly class CatalogueEntry
 {
     /**
-     * @param list<array{name: string, required: bool, label: array<string, string>, help: array<string, string>, pattern: ?string}> $params
-     * @param list<string>                                                                                                           $cookies
-     * @param list<string>                                                                                                           $storage
-     * @param list<string>                                                                                                           $domains
+     * @param list<array{name: string, required: bool, label: array<string, string>, help: array<string, string>, pattern: ?string, executable: bool}> $params
+     * @param list<string>                                                                                                                             $cookies
+     * @param list<string>                                                                                                                             $storage
+     * @param list<string>                                                                                                                             $domains
      */
     public function __construct(
         public string $key,
@@ -28,6 +28,18 @@ final readonly class CatalogueEntry
     ) {
     }
 
+    /** Whether the value decides what script runs on the storefront (see tools/catalogue/executable.mjs). */
+    public function isExecutable(string $parameter): bool
+    {
+        foreach ($this->params as $param) {
+            if ($param['name'] === $parameter) {
+                return $param['executable'];
+            }
+        }
+
+        return true;
+    }
+
     /** @param array<string, mixed> $row */
     public static function fromArray(array $row): self
     {
@@ -39,6 +51,8 @@ final readonly class CatalogueEntry
                 'label' => (array) ($param['label'] ?? []),
                 'help' => (array) ($param['help'] ?? []),
                 'pattern' => isset($param['pattern']) && '' !== $param['pattern'] ? (string) $param['pattern'] : null,
+                // A parameter the catalogue does not flag is treated as executable: the flag is generated, never assumed.
+                'executable' => (bool) ($param['executable'] ?? true),
             ];
         }
 

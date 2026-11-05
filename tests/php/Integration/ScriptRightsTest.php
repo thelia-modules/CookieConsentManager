@@ -87,6 +87,119 @@ final class ScriptRightsTest extends CcmTestCase
         self::assertSame('window.x=1;', $this->services()['chat_maison']['code']);
     }
 
+    /** @return array<string, mixed> */
+    private function parametersOf(string $key): array
+    {
+        return $this->services()[$key]['parameters'] ?? [];
+    }
+
+    /** A draft with Matomo Tag Manager (experimental service, the address of its container is a script) and GA4. */
+    private function draftWithExecutableParameter(string $value = ''): array
+    {
+        $draft = $this->publishableDraft();
+        $draft['general']['experimental_services'] = true;
+        $draft['services'][] = ['key' => 'matomotm', 'purpose' => 'analytics', 'enabled' => true, 'parameters' => '' === $value ? [] : ['matomotmUrl' => $value]];
+
+        return $draft;
+    }
+
+    public function testChangingTheAddressOfAScriptParameterNeedsThePublishRight(): void
+    {
+        $this->ccm->drafts->replace($this->draftWithExecutableParameter('https://tm.example.test/container.js'), 'test');
+        $controller = $this->getService(ServicesController::class);
+        $fields = ['enabled' => '1', 'parameters' => ['matomotmUrl' => 'https://evil.example.test/x.js']];
+
+        $denied = $this->post(self::VIEW_UPDATE, $fields, static fn (Request $request): Response => $controller->saveCatalogueService($request, 'matomotm'));
+        self::assertSame(403, $denied->getStatusCode());
+        self::assertSame('https://tm.example.test/container.js', $this->parametersOf('matomotm')['matomotmUrl'], 'nothing was written');
+
+        $allowed = $this->post(self::WITH_CREATE, $fields, static fn (Request $request): Response => $controller->saveCatalogueService($request, 'matomotm'));
+        self::assertSame(302, $allowed->getStatusCode());
+        self::assertSame('https://evil.example.test/x.js', $this->parametersOf('matomotm')['matomotmUrl']);
+    }
+
+    public function testASetOfAScriptParameterFromNothingNeedsThePublishRightToo(): void
+    {
+        $this->ccm->drafts->replace($this->draftWithExecutableParameter(), 'test');
+        $controller = $this->getService(ServicesController::class);
+
+        $denied = $this->post(self::VIEW_UPDATE, ['enabled' => '1', 'parameters' => ['matomotmUrl' => 'https://tm.example.test/c.js']], static fn (Request $request): Response => $controller->saveCatalogueService($request, 'matomotm'));
+
+        self::assertSame(403, $denied->getStatusCode());
+        self::assertArrayNotHasKey('matomotmUrl', $this->parametersOf('matomotm'));
+    }
+
+    public function testAnIdentifierOfAnAccountAndAScriptParameterLeftAsItIsNeedOnlyUpdate(): void
+    {
+        $this->ccm->drafts->replace($this->draftWithExecutableParameter('https://tm.example.test/container.js'), 'test');
+        $controller = $this->getService(ServicesController::class);
+
+        $identifier = $this->post(self::VIEW_UPDATE, ['enabled' => '1', 'parameters' => ['gtagUa' => 'G-NEWACCOUNT1']], static fn (Request $request): Response => $controller->saveCatalogueService($request, 'gtag'));
+        self::assertSame(302, $identifier->getStatusCode());
+        self::assertSame('G-NEWACCOUNT1', $this->parametersOf('gtag')['gtagUa']);
+
+        $untouched = $this->post(self::VIEW_UPDATE, ['parameters' => ['matomotmUrl' => 'https://tm.example.test/container.js']], static fn (Request $request): Response => $controller->saveCatalogueService($request, 'matomotm'));
+        self::assertSame(302, $untouched->getStatusCode(), 'same address, service switched off');
+        self::assertFalse($this->services()['matomotm']['enabled']);
+    }
+
+    public function testEmptyingAScriptParameterNeedsOnlyUpdate(): void
+    {
+        $this->ccm->drafts->replace($this->draftWithExecutableParameter('https://tm.example.test/container.js'), 'test');
+        $controller = $this->getService(ServicesController::class);
+
+        $response = $this->post(self::VIEW_UPDATE, ['parameters' => ['matomotmUrl' => '']], static fn (Request $request): Response => $controller->saveCatalogueService($request, 'matomotm'));
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertArrayNotHasKey('matomotmUrl', $this->parametersOf('matomotm'));
+    }
+
+    public function testTheSetupAssistantNeedsThePublishRightToSetAScriptParameter(): void
+    {
+        $draft = $this->publishableDraft();
+        $draft['services'] = [];
+        $this->ccm->drafts->replace($draft, 'test');
+        $controller = $this->getService(DashboardController::class);
+        $fields = ['step' => '2', 'keys' => ['matomo'], 'services' => ['matomo' => ['parameters' => ['matomoId' => '3', 'matomoHost' => 'https://stats.example.test/']]]];
+
+        $denied = $this->post(self::VIEW_UPDATE, $fields, $controller->saveWizard(...));
+        self::assertSame(403, $denied->getStatusCode());
+        self::assertSame([], $this->ccm->drafts->load()['services'], 'nothing was written');
+
+        $allowed = $this->post(self::WITH_CREATE, $fields, $controller->saveWizard(...));
+        self::assertSame(302, $allowed->getStatusCode());
+        self::assertSame('https://stats.example.test/', $this->parametersOf('matomo')['matomoHost']);
+    }
+
+    public function testTheSetupAssistantStillSetsAnIdentifierWithUpdate(): void
+    {
+        $draft = $this->publishableDraft();
+        $draft['services'] = [];
+        $this->ccm->drafts->replace($draft, 'test');
+        $controller = $this->getService(DashboardController::class);
+
+        $response = $this->post(self::VIEW_UPDATE, ['step' => '2', 'keys' => ['gtag'], 'services' => ['gtag' => ['parameters' => ['gtagUa' => 'G-ABC123XYZ']]]], $controller->saveWizard(...));
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('G-ABC123XYZ', $this->parametersOf('gtag')['gtagUa']);
+    }
+
+    public function testTypingTheValueOfAPendingScriptParameterNeedsThePublishRight(): void
+    {
+        $draft = $this->draftWithExecutableParameter('https://tm.example.test/container.js');
+        $draft['_meta']['environment_pending'] = ['services.matomotm.parameters.matomotmUrl', 'services.gtag.parameters.gtagUa'];
+        $this->ccm->drafts->replace($draft, 'test');
+        $controller = $this->getService(VersionsController::class);
+
+        $denied = $this->post(self::VIEW_UPDATE, ['values' => ['services.matomotm.parameters.matomotmUrl' => 'https://evil.example.test/x.js']], $controller->confirmEnvironment(...));
+        self::assertSame(403, $denied->getStatusCode());
+        self::assertSame('https://tm.example.test/container.js', $this->parametersOf('matomotm')['matomotmUrl']);
+
+        $confirmed = $this->post(self::VIEW_UPDATE, ['confirmed' => ['services.matomotm.parameters.matomotmUrl'], 'values' => ['services.gtag.parameters.gtagUa' => 'G-NEWACCOUNT1']], $controller->confirmEnvironment(...));
+        self::assertSame(302, $confirmed->getStatusCode(), 'confirming the value as it stands, and typing an identifier, are UPDATE');
+        self::assertSame('G-NEWACCOUNT1', $this->parametersOf('gtag')['gtagUa']);
+    }
+
     public function testSwitchingExperimentalServicesOnNeedsThePublishRight(): void
     {
         $draft = $this->publishableDraft();

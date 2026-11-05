@@ -8,6 +8,7 @@ use CookieConsentManager\Admin\ActiveLanguages;
 use CookieConsentManager\Admin\AlertCollector;
 use CookieConsentManager\Admin\DraftSectionEditor;
 use CookieConsentManager\Admin\DraftWriter;
+use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\ProfileRights;
 use CookieConsentManager\Admin\StatsPresenter;
 use CookieConsentManager\Catalogue\CatalogueEntry;
@@ -37,6 +38,7 @@ final class DashboardController extends AbstractScreenController
         private readonly CatalogueReader $catalogue,
         private readonly Publisher $publisher,
         private readonly ActiveLanguages $languages,
+        private readonly ExecutableChanges $executable,
     ) {
         parent::__construct($urls, $drafts, $writer, $editor, $versions);
     }
@@ -106,11 +108,17 @@ final class DashboardController extends AbstractScreenController
         if (2 === $step) {
             $keys = array_values(array_filter($request->request->all('keys'), 'is_string'));
             $services = (array) ($request->request->all()['services'] ?? []);
+            $candidate = $draft;
             foreach ($keys as $key) {
                 $row = (array) ($services[$key] ?? []);
                 $row['enabled'] = '1';
-                $draft = $this->editor->catalogueService($draft, $key, $row);
+                $candidate = $this->editor->catalogueService($candidate, $key, $row);
             }
+            // A parameter that is the address of a script is set by the right that publishes, here as on the Services screen.
+            if (null !== $denied = $this->guardExecutable($this->executable, $draft, $candidate)) {
+                return $denied;
+            }
+            $draft = $candidate;
             $result = $this->save($draft, ['services.']);
             if (!$result->saved) {
                 return $this->wizardView($request, $result->draft, $result->issues, 422, 2, $keys);
