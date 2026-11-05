@@ -41,10 +41,47 @@ final class IframeRewriter
         try {
             return $this->scan($html, $activeKeys, $placeholder);
         } catch (\RuntimeException $exception) {
-            $this->logger->warning('Iframe rewriting skipped: the page could not be processed ({error}).', ['error' => $exception->getMessage()]);
+            // Never serve the original markup: its iframes would load without any consent.
+            $this->logger->warning('Iframe rewriting failed, the frames of the media services are emptied instead ({error}).', ['error' => $exception->getMessage()]);
 
-            return $html;
+            return $this->neutralise($html, $activeKeys);
         }
+    }
+
+    /**
+     * The fallback when the page cannot be read: no tokenizer, no pattern, so nothing left to fail. Every iframe that names a
+     * host of an active service, or hides its address behind character references, gets an empty document and a blank
+     * address in front of its attributes (a browser keeps the first of two identical attributes). Nothing is added that could
+     * close a quoted attribute, so that an iframe inside an attribute value stays harmless.
+     *
+     * @param list<string> $activeKeys
+     */
+    private function neutralise(string $html, array $activeKeys): string
+    {
+        $hosts = [];
+        foreach (EmbedRules::rules() as $key => $byHost) {
+            if (\in_array($key, $activeKeys, true)) {
+                array_push($hosts, ...array_keys($byHost));
+            }
+        }
+
+        $out = '';
+        $copied = 0;
+        $offset = 0;
+        while (false !== ($at = stripos($html, '<iframe', $offset))) {
+            $offset = $at + 7;
+            $window = strtolower(str_replace(self::SPACE, '', substr($html, $at, 4096)));
+            $names = str_contains($window, '&#') || str_contains($window, '&tab;') || str_contains($window, '&newline;');
+            foreach ($hosts as $host) {
+                $names = $names || str_contains($window, $host);
+            }
+            if ($names) {
+                $out .= substr($html, $copied, $offset - $copied).' srcdoc=&#32; src=about:blank ';
+                $copied = $offset;
+            }
+        }
+
+        return $out.substr($html, $copied);
     }
 
     /**
