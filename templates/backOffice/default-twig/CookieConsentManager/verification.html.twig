@@ -11,6 +11,9 @@
     <div class="card mb-3" data-testid="ccm-verification-card">
         <div class="card-header"><h2 class="h5 mb-0">{{ 'Verification of the published version'|trans }}</h2></div>
         <div class="card-body">
+            {% if audit_unavailable %}
+                <div class="alert alert-warning" data-testid="ccm-verification-unavailable">{{ audit_unavailable }}</div>
+            {% endif %}
             {% if not published %}
                 <div class="alert alert-warning" data-testid="ccm-verification-nopublication">{{ 'Nothing is published: publish a version first, the verification audits what visitors get.'|trans }}</div>
             {% endif %}
@@ -36,7 +39,7 @@
                     </div>
                 </div>
                 <p class="small text-secondary mt-2">{{ 'Same-origin pages only (this shop).'|trans }}</p>
-                <button class="btn btn-primary" type="submit" id="ccm-audit-start" data-testid="ccm-audit-start" {{ published ? '' : 'disabled' }}><i class="bi bi-play-fill" aria-hidden="true"></i> {{ 'Run the verification'|trans }}</button>
+                <button class="btn btn-primary" type="submit" id="ccm-audit-start" data-testid="ccm-audit-start" {{ published and not audit_unavailable ? '' : 'disabled' }}><i class="bi bi-play-fill" aria-hidden="true"></i> {{ 'Run the verification'|trans }}</button>
                 <span class="ms-2 small text-secondary" id="ccm-audit-progress" aria-live="polite" data-testid="ccm-audit-progress"></span>
             </form>
 

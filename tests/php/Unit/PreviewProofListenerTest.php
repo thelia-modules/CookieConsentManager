@@ -16,7 +16,7 @@ final class PreviewProofListenerTest extends TestCase
 {
     public function testOnlyAPagePreviewedByAnAdministratorReceivesTheProof(): void
     {
-        $tokens = new PreviewToken('secret');
+        $tokens = new PreviewToken(str_repeat('s', 32));
         $listener = new PreviewProofListener($tokens);
         $kernel = $this->createStub(HttpKernelInterface::class);
         $token = str_repeat('a', 32);
@@ -43,7 +43,7 @@ final class PreviewProofListenerTest extends TestCase
         $request->attributes->set(PreviewToken::PROOF_ATTRIBUTE, str_repeat('a', 32));
         $response = new Response();
 
-        (new PreviewProofListener(new PreviewToken('secret')))->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
+        (new PreviewProofListener(new PreviewToken(str_repeat('s', 32))))->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         self::assertSame('/shop/ccm/', $response->headers->getCookies()[0]->getPath());
     }

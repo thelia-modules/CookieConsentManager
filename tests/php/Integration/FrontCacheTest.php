@@ -47,7 +47,7 @@ final class FrontCacheTest extends CcmTestCase
         $module = \dirname(__DIR__, 3);
         $hashes = new ServedHashResolver($this->ccm->versions, $this->hasher, new ModuleVersion($module.'/Config/module.xml'), $this->templates, $this->ccm->pool);
 
-        return new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken('test-secret'), $hashes, $this->createStub(SecurityContext::class), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
+        return new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, new PreviewToken(str_repeat('t', 32)), $hashes, $this->createStub(SecurityContext::class), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
     }
 
     private function queries(callable $work): int

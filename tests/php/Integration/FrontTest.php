@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CookieConsentManager\Tests\Integration;
 
 use CookieConsentManager\Admin\ActiveLanguages;
+use CookieConsentManager\Admin\FrontLinks;
 use CookieConsentManager\Controller\PanelController;
 use CookieConsentManager\Controller\PreferencesPageController;
 use CookieConsentManager\Controller\ServedScriptController;
@@ -23,6 +24,7 @@ use CookieConsentManager\Front\ServedHashResolver;
 use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Front\StyleSheet;
 use CookieConsentManager\Front\TemplateContext;
+use CookieConsentManager\Publication\CanonicalJson;
 use CookieConsentManager\Publication\ModuleVersion;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\SnapshotAssembler;
@@ -62,7 +64,7 @@ final class FrontTest extends CcmTestCase
         $templates = new NoOverriddenTemplates();
         $this->hashes = new ServedHashResolver($this->ccm->versions, $hasher, $moduleVersion, $templates, $this->ccm->pool);
         $this->publisher = new Publisher($this->ccm->drafts, $this->ccm->validator, new SnapshotAssembler($this->ccm->catalogue, $moduleVersion, $templates), $hasher, $this->ccm->versions, $this->ccm->cache, $moduleVersion, $this->ccm->pointer);
-        $this->tokens = new PreviewToken('test-secret');
+        $this->tokens = new PreviewToken(str_repeat('t', 32));
         $this->configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $this->tokens, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
     }
 
@@ -216,6 +218,36 @@ final class FrontTest extends CcmTestCase
         $request->cookies->set(PreviewToken::PROOF_COOKIE, $this->tokens->proofFor(str_repeat('c', 32)));
 
         return $request;
+    }
+
+    public function testAWeakSecretMakesThePreviewAndTheAuditUnavailableEvenToAForgedToken(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $draft = $this->ccm->drafts->load();
+        $weak = new PreviewToken('');
+        $forged = substr(hash_hmac('sha256', CanonicalJson::encode($draft), ''), 0, 32);
+        $proof = substr(hash_hmac('sha256', 'ccm-preview-proof|'.$forged, ''), 0, 32);
+
+        $configs = new FrontConfigProvider($this->ccm->versions, $this->ccm->builder, $this->ccm->assembler, $this->ccm->drafts, $weak, $this->hashes, $this->security(true), $this->ccm->pointer, $this->ccm->pool, $this->ccm->urls);
+        self::assertNull($configs->forRequest(Request::create('/', 'GET', [PreviewToken::QUERY => $forged])), 'nothing is published and the forged token opens no preview');
+
+        $controller = new ServedScriptController($this->ccm->versions, $this->hashes, $this->script, $this->ccm->assembler, $this->ccm->drafts, $weak, $this->ccm->urls);
+        $request = Request::create('/ccm/preview-'.$forged.'.js');
+        $request->cookies->set(PreviewToken::PROOF_COOKIE, $proof);
+        try {
+            $controller->preview($request, $forged);
+            self::fail('404 expected: the draft script must not be readable with a token computed from a weak secret');
+        } catch (NotFoundHttpException) {
+            self::addToAssertionCount(1);
+        }
+
+        $this->publisher->publish('alice');
+        $audited = $configs->forRequest(Request::create('/', 'GET', [FrontConfigProvider::AUDIT_QUERY => $forged]));
+        self::assertSame('live', $audited?->mode(), 'the audit mode is not opened either');
+
+        $links = new FrontLinks($weak, $this->ccm->drafts);
+        self::assertNull($links->token());
+        self::assertNull($links->preview('/'));
     }
 
     public function testThePreviewScriptIsNeverCachedAndNeedsTheToken(): void
@@ -419,6 +451,46 @@ final class FrontTest extends CcmTestCase
                 self::addToAssertionCount(1);
             }
         }
+    }
+
+    public function testAPanelRequestForAVersionThatDoesNotExistLeavesNothingInTheCache(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $version = $this->publisher->publish('alice')->getVersion();
+        $config = $this->configs->forRequest(Request::create('/'))->config;
+        $controller = $this->panelController();
+        $controller($version, $config['hash'], 'en_US');
+        $before = array_keys($this->ccm->pool->getValues());
+        self::assertNotSame([], $before, 'the cache of the real version is warm');
+
+        foreach ([0, $version + 1, 987654321] as $number) {
+            foreach ([$config['hash'], str_repeat('a', 12)] as $hash) {
+                try {
+                    $controller($number, $hash, 'en_US');
+                    self::fail('404 expected for version '.$number);
+                } catch (NotFoundHttpException) {
+                    self::addToAssertionCount(1);
+                }
+            }
+        }
+
+        self::assertSame($before, array_keys($this->ccm->pool->getValues()), 'a version that was never published creates no cache entry');
+    }
+
+    public function testAPanelRequestUnderAWrongHashOfARealVersionCreatesNoCacheEntryEither(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $version = $this->publisher->publish('alice')->getVersion();
+        $config = $this->configs->forRequest(Request::create('/'))->config;
+        $controller = $this->panelController();
+        $controller($version, $config['hash'], 'en_US');
+        $before = array_keys($this->ccm->pool->getValues());
+
+        foreach (['000000000000', 'ffffffffffff', 'abcabcabcabc'] as $hash) {
+            self::assertSame(302, $controller($version, $hash, 'en_US')->getStatusCode());
+        }
+
+        self::assertSame($before, array_keys($this->ccm->pool->getValues()), 'the hash typed in the URL is not part of any cache key');
     }
 
     public function testTheStyleSheetIsServedUnderItsOwnHash(): void

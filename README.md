@@ -106,7 +106,7 @@ php Thelia ccm:config:publish --confirm-environment --comment="Go live"
 ```
 
 - Environment fields (service identifiers, policy address, regions) come from another site. The import lists them, and you must confirm or re-enter them before publishing. Without `--confirm-environment`, publication is refused.
-- `ccm:config:import` exits with `0` when the draft is created. Fields to confirm are printed as warnings, which is not a failure. Any other code means the file was unreadable or refused. Only invalid addresses block the write; other errors are imported so that you can correct them in the back-office.
+- `ccm:config:import` exits with `0` when the draft is created. Fields to confirm are printed as warnings, which is not a failure. Any other code means the file was unreadable or refused. Only invalid addresses and invalid purpose codes block the write; other errors are imported so that you can correct them in the back-office.
 - `ccm:config:publish` options: `--confirm-environment`, `--substantial`, `--force`, `--comment=<text>`.
 - The file schema is `Config/schema/ccm-config-1.schema.json`. The key `registry.link_customer` of older exports is ignored on import.
 - Registry purge: `php Thelia ccm:registry:purge` (`--dry-run` only counts). Schedule it, for example `17 3 * * *`. On Thelia 3.3 with a worker on `scheduler_thelia`, a daily task at 03:17 already exists.
@@ -120,7 +120,7 @@ php Thelia ccm:config:publish --confirm-environment --comment="Go live"
 
 - Not an IAB TCF 2.2 or Google-certified CMP. Not covered: server-side geolocation, cross-domain consent, CSP nonce, Microsoft Clarity consent signal.
 - The module cannot authenticate an anonymous visitor: the registry proves what the browser sent, not who sent it.
-- The right to publish (CREATE on the module in Configuration, Administrator profiles) lets a user serve JavaScript to all visitors, through custom services. The same right is needed to write or change the code or script address of a service, to import a configuration, to restore a version and to switch on experimental services. Grant it with care.
+- The right to publish (CREATE on the module in Configuration, Administrator profiles) lets a user serve JavaScript to all visitors, through custom services. The same right is needed to write or change the code or script address of a service, to set or change a catalogue parameter that is an address loaded as a script (the Matomo address, the custom domain of a Google tag), to import a configuration, to restore a version and to switch on experimental services. Grant it with care.
 - Behind a reverse proxy or a CDN, declare the proxy in `framework.trusted_proxies`. The registry endpoint is rate limited to 120 requests per minute per client address, and without it all visitors share one counter.
 - The Flexy theme loads Google fonts before the `layout.head.top` hook. The module cannot prevent it; host the fonts on the site. The dashboard and the Verification report it.
 - The Thelia 3.3 shared cache serves only visitors without a cookie, so a page that calls `ccm_has_consent` must stay out of it.

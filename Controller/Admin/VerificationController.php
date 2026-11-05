@@ -10,6 +10,7 @@ use CookieConsentManager\Admin\FrontLinks;
 use CookieConsentManager\Admin\StoredTime;
 use CookieConsentManager\Admin\VerificationAnalyzer;
 use CookieConsentManager\Draft\DraftRepository;
+use CookieConsentManager\Front\PreviewToken;
 use CookieConsentManager\Publication\VersionRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,9 +51,12 @@ final class VerificationController extends AbstractScreenController
             $services[] = ['key' => $service['key'], 'name' => $service['name'], 'purpose' => $service['purpose'], 'domains' => VerificationAnalyzer::serviceDomains($service, \in_array($service['key'], $exemptKeys, true))];
         }
 
+        $token = $this->links->token();
+
         return $this->view('verification', 'versions', [
             'presets' => $this->links->auditPresets($request->getLocale()),
-            'audit_token' => $this->links->token(),
+            'audit_token' => $token,
+            'audit_unavailable' => null === $token ? $this->say('The preview and the verification are unavailable: the secret of the shop (APP_SECRET) is empty or shorter than %min% characters. Set a longer secret in the environment of the shop.', ['%min%' => (string) PreviewToken::MINIMUM_SECRET_BYTES]) : null,
             'services' => $services,
             'site_origin' => $request->getSchemeAndHttpHost(),
         ]);

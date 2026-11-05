@@ -7,6 +7,7 @@ namespace CookieConsentManager\Controller\Admin;
 use CookieConsentManager\Admin\AdminGuard;
 use CookieConsentManager\Admin\DraftSectionEditor;
 use CookieConsentManager\Admin\DraftWriter;
+use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\SaveResult;
 use CookieConsentManager\CookieConsentManager;
 use CookieConsentManager\Draft\DraftRepository;
@@ -116,6 +117,17 @@ abstract class AbstractScreenController extends BaseAdminController
         $admin = $this->securityContext->getAdminUser();
 
         return \is_object($admin) && method_exists($admin, 'getId') ? (int) $admin->getId() : 0;
+    }
+
+    /**
+     * A change that puts a script on the storefront needs the right that publishes: every screen that writes services asks it here.
+     *
+     * @param array<string, mixed> $before
+     * @param array<string, mixed> $after
+     */
+    protected function guardExecutable(ExecutableChanges $executable, array $before, array $after): ?Response
+    {
+        return $executable->between($before, $after) ? $this->guardAccess(AccessManager::CREATE) : null;
     }
 
     protected function flash(Request $request, string $type, string $message): void

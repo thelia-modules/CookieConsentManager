@@ -135,7 +135,7 @@ final readonly class TemplateContext
         $colors = [];
         foreach (['primary', 'surface', 'text'] as $name) {
             $value = strtolower((string) ($configured[$name] ?? ''));
-            $colors[$name] = 1 === preg_match('/^#[0-9a-f]{6}$/', $value) ? $value : $defaults[$name];
+            $colors[$name] = 1 === preg_match('/^#[0-9a-f]{6}$/D', $value) ? $value : $defaults[$name];
         }
 
         if ($colors === array_map('strtolower', $defaults)) {

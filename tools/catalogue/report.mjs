@@ -79,6 +79,8 @@ Verified keys whose upstream \`kind\` differs from the derived one (engage in fa
 ## Parameters
 
 - Callbacks (\`typeof tarteaucitron.user.X === 'function'\`) are not exposed as parameters: ${Object.entries(notes.callbacks).map(([k, v]) => `${k}: ${v.join('/')}`).join('; ') || 'none'}
+- Executable parameters (\`executable: true\` in \`catalogue.json\`, derived by \`tools/catalogue/executable.mjs\`; changing one needs the publish right): ${Object.values(notes.executable).reduce((n, names) => n + names.length, 0)} on ${Object.keys(notes.executable).length} services, ${entries.reduce((n, e) => n + e.params.length, 0)} parameters in all.
+${Object.entries(notes.executable).map(([k, v]) => `  - \`${k}\`: ${v.join(', ')}`).join('\n')}
 - \`required\` for imported services is a heuristic (early \`return\` when undefined).
 - Cross-check against the optional services listing (${section3 ? 'loaded' : 'not provided, skipped'}): ${notes.section3Diff.length} service(s) differ (the code is authoritative).
 ${notes.section3Diff.map((d) => `  - ${d}`).join('\n')}

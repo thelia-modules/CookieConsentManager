@@ -9,6 +9,7 @@ use CookieConsentManager\Publication\PublicationRefusedException;
 use CookieConsentManager\Tests\Support\CcmTestCase;
 use CookieConsentManager\Transfer\ConfigExporter;
 use CookieConsentManager\Transfer\ImportRefusedException;
+use CookieConsentManager\Validation\ValidationIssue;
 
 final class ConfigTransferTest extends CcmTestCase
 {
@@ -124,6 +125,46 @@ final class ConfigTransferTest extends CcmTestCase
         $this->ccm->importer->import('{broken', 'alice');
     }
 
+    public function testAnImportRefusesAPurposeCodeOrAKeyEndingWithALineFeed(): void
+    {
+        $json = $this->completeConfigJson();
+        $cases = [
+            'purpose code' => [str_replace('{ "code": "reviews", "order": 6', '{ "code": "reviews\n", "order": 6', $json), 'code'],
+            'service key' => [str_replace('"key": "gtag",', '"key": "gtag\n",', $json), 'key'],
+        ];
+
+        foreach ($cases as $name => [$candidate, $needle]) {
+            self::assertNotSame($json, $candidate, $name);
+            try {
+                $this->ccm->importer->import($candidate, 'alice');
+                self::fail($name.' must be refused');
+            } catch (ImportRefusedException $exception) {
+                self::assertStringContainsString($needle, $exception->getMessage(), $name);
+            }
+        }
+    }
+
+    public function testTheValidatorRefusesAPurposeCodeThatIsNotAnIdentifier(): void
+    {
+        $draft = $this->publishableDraft();
+        self::assertNotContains('purpose_code', $this->issueCodes($draft));
+
+        foreach (["analytics\n", 'Analytics', 'a b', '1ads', ''] as $code) {
+            $candidate = $draft;
+            $candidate['purposes'][0]['code'] = $code;
+            self::assertContains('purpose_code', $this->issueCodes($candidate), json_encode($code));
+        }
+    }
+
+    public function testAParameterEndingWithALineFeedDoesNotMatchTheCataloguePattern(): void
+    {
+        $draft = $this->publishableDraft();
+        self::assertNotContains('param_pattern', $this->issueCodes($draft));
+
+        $draft['services'][0]['parameters']['gtagUa'] = "G-ABC123XYZ\n";
+        self::assertContains('param_pattern', $this->issueCodes($draft));
+    }
+
     public function testExperimentalServicesAreIgnoredWhileTheSettingIsOff(): void
     {
         $report = $this->ccm->importer->import(str_replace('"experimental_services": true', '"experimental_services": false', $this->completeConfigJson()), 'alice');
@@ -143,5 +184,15 @@ final class ConfigTransferTest extends CcmTestCase
     private function service(array $draft, string $key): ?array
     {
         return array_column($draft['services'], null, 'key')[$key] ?? null;
+    }
+
+    /**
+     * @param array<string, mixed> $draft
+     *
+     * @return list<string>
+     */
+    private function issueCodes(array $draft): array
+    {
+        return array_map(static fn (ValidationIssue $issue): string => $issue->code, $this->ccm->validator->validate($this->ccm->normalizer->normalize($draft)));
     }
 }

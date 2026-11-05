@@ -42,12 +42,12 @@ final readonly class ConsentPayloadValidator
         }
 
         $servedHash = $data['served_hash'] ?? null;
-        if (!\is_string($servedHash) || 1 !== preg_match('/^[0-9a-f]{12}$/', $servedHash)) {
+        if (!\is_string($servedHash) || 1 !== preg_match('/^[0-9a-f]{12}$/D', $servedHash)) {
             throw $this->invalid('served_hash');
         }
 
         $locale = $data['locale'] ?? null;
-        if (!\is_string($locale) || 1 !== preg_match('/^[a-z]{2}(_[A-Z]{2})?$/', $locale)) {
+        if (!\is_string($locale) || 1 !== preg_match('/^[a-z]{2}(_[A-Z]{2})?$/D', $locale)) {
             throw $this->invalid('locale');
         }
 

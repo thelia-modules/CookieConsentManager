@@ -6,6 +6,7 @@ return [
     'Service key "%key%" is declared twice.' => 'Service key "%key%" is declared twice.',
     'Service key "%key%" is invalid (lowercase letters, digits, "-" and "_").' => 'Service key "%key%" is invalid (lowercase letters, digits, "-" and "_").',
     'Unknown purpose "%purpose%".' => 'Unknown purpose "%purpose%".',
+    'The purpose code "%code%" is invalid (lowercase letters, digits and "_", starting with a letter).' => 'The purpose code "%code%" is invalid (lowercase letters, digits and "_", starting with a letter).',
     'The environment field "%path%" imported from another site is not confirmed.' => 'The environment field "%path%" imported from another site is not confirmed.',
     'The layout must be "bar" or "modal".' => 'The layout must be "bar" or "modal".',
     'The renewal delay must be between 1 and 13 months.' => 'The renewal delay must be between 1 and 13 months.',

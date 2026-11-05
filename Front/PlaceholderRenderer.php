@@ -24,7 +24,7 @@ final readonly class PlaceholderRenderer
     /** @param array<string, string> $attributes iframe attributes without `src`, restored by the engine */
     public function render(FrontConfig $front, string $key, string $src, array $attributes): string
     {
-        $attributes = array_filter($attributes, static fn (string $name): bool => 1 === preg_match('/^[a-z][a-z0-9_-]*$/', $name), \ARRAY_FILTER_USE_KEY);
+        $attributes = array_filter($attributes, static fn (string $name): bool => 1 === preg_match('/^[a-z][a-z0-9_-]*$/D', $name), \ARRAY_FILTER_USE_KEY);
         $variables = $this->context->build($front);
         $service = null;
         foreach ($front->snapshot['services_resolved'] as $candidate) {
