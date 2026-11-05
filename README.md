@@ -127,7 +127,7 @@ php Thelia ccm:config:publish --confirm-environment --comment="Go live"
 - On a shop served by several servers with a local application cache each, a publication can take up to 300 seconds to reach all of them.
 - Cookie durations without an official source (Meta Pixel, for example) are not provided; the administrator enters them. The 213 imported services are experimental.
 - Third-party cookies set on a third-party domain cannot be erased by the module. The Verification does not see `HttpOnly` cookies or requests inside third-party iframes.
-- The inline script of the page head carries no CSP nonce; the stylesheet is a file of your own origin. The engine does not need `unsafe-eval`.
+- The inline script of the page head carries no CSP nonce; the stylesheet is a file of your own origin. The engine does not need `unsafe-eval`. Restored scripts are inline: a strict CSP needs a nonce on the original tag or `strict-dynamic`.
 - None of the four audience measurement tools that can be exempt from consent has been tested on a real account.
 
 ## Documentation

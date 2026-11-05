@@ -65,7 +65,7 @@ Règles à ne pas casser : « Tout accepter » et « Tout refuser » gardent le 
 | Afficher un bloc seulement si accordé (rendu serveur) | `{% if ccm_has_consent('<clé>') %}` (derrière la garde, voir `docs/integrator-guide.md`) |
 | Vidéo ou carte intégrée | `ccm_placeholder('<service>', {src, title, ...})` |
 | Rouvrir les préférences | `ccm_open_link('Libellé')` ou tout élément portant `data-ccm-open` |
-| Déclencher un choix par code | `CookieConsentManager.setConsent({services: {crisp: 1}})` (source `api` au registre) |
+| Déclencher un choix par code | `CookieConsentManager.setConsent({services: {crisp: 1}})` (source `api` au registre ; réservé au code du site, jamais à la place d'un visiteur qui n'a pas choisi) |
 
 Points d'attention :
 - Le script du moteur est chargé en `defer` : n'utiliser `window.CookieConsentManager` qu'après `ccm:ready`, ou passer par `ccmQueue` (la file existe dès le `<head>`).
@@ -77,7 +77,8 @@ Points d'attention :
 ## Iframes remplacées par un encart
 
 - Les iframes des services média sont remplacées automatiquement par un encart « Autoriser » (option « Bloquer automatiquement les iframes intégrées », activée par défaut), seulement quand le service est actif et publié. Cela couvre 41 des 94 services média du catalogue : ceux dont l'intégration est une iframe d'hôte identifiable. Les hôtes et chemins viennent des fragments (`Resources/catalogue/embed-rules.json`, régénéré par `node tools/catalogue/embed-rules.mjs`), plus les hôtes d'intégration de YouTube, Vimeo, Dailymotion et Google Maps. Un hôte seul ne suffit jamais sur un domaine partagé (`www.google.com` sert aussi reCAPTCHA) : chaque règle porte des préfixes de chemin, le plus long l'emporte.
-- Les réponses d'un LiveComponent sont réécrites comme une page (le navigateur les fusionne dans la page : une iframe intacte contournerait le consentement). Les autres réponses AJAX ne sont pas touchées.
+- Les réponses d'un LiveComponent sont réécrites comme une page (le navigateur les fusionne dans la page : une iframe intacte contournerait le consentement). Les fragments ESI, les réponses HTML des contrôleurs et les pages des autres modules sont réécrits aussi. Les autres réponses AJAX ne sont pas touchées.
+- Non réécrits : les réponses à une requête portant `X-Requested-With` et les iframes créées en JavaScript. Pour ceux-là, utiliser le gabarit de placeholder ou la file `ccmQueue`.
 - Non réécrits côté serveur, avec la raison :
   - le service n'a pas d'iframe, il charge un script ou un widget (l'encart de son fragment s'applique une fois la page exécutée) : `addthis`, `addtoanyshare`, `adsense`, `adsensesearch`, `adsensesearchresult`, `aduptech_ads`, `calendly`, `clicmanager`, `criteo`, `datingaffiliationpopup`, `disqus`, `facebook`, `facebookcomment`, `facebookcustomerchat`, `facebooklikebox`, `fillout`, `googlemaps`, `googlepartners`, `gplus`, `gplusbadge`, `hcaptcha`, `intercomChat`, `kwanko`, `linkedin`, `m6meteo`, `pinterest`, `pipedrive`, `prelinker`, `pubdirecte`, `recaptcha`, `rumbletalk`, `seamlessaccess`, `shareaholic`, `shareasale`, `sharethis`, `statcounter`, `tidycal`, `tiktokvideo`, `trustpilot`, `twitter`, `twitterembed`, `twittertimeline`, `twitterwidgetsapi`, `vshop`, `xandrconversion`, `xandrsegment` ;
   - l'adresse de l'iframe est saisie par l'éditeur, aucun hôte n'est connu d'avance : `gallica`, `geoportail`, `googlemapsembed`, `helloasso`, `iframe`, `openstreetmap`, `podcloud`. Pour ceux-là, envelopper l'iframe avec `ccm_placeholder('<clé>', {src: ..., title: ...})` dans le gabarit, ou étiqueter l'iframe à la main.
@@ -106,9 +107,12 @@ Ce que le module émet, à autoriser :
 - script du moteur : même origine (`script-src 'self'`) ;
 - enregistrement des choix : `POST /ccm/consent` en même origine (`connect-src 'self'`) ;
 - le moteur n'emploie ni `eval` ni `unsafe-eval` ;
+- les scripts restaurés (les scripts `text/plain` que vous étiquetez et le code des services `custom`) sont des scripts inline recréés par le moteur : sous une CSP stricte sans `unsafe-inline`, poser un `nonce` sur la balise d'origine (le moteur le recopie) ou utiliser `strict-dynamic` côté site ;
 - les services activés chargent leurs propres domaines : les ajouter à `script-src`, `connect-src`, `img-src`, `frame-src` selon le service (les domaines contactés par un service sont dans le champ `domains` de `Resources/catalogue/catalogue.json` (renseigné pour les services vérifiés, sauf Matomo, auto-hébergé) ; la Vérification les révèle aussi). Les cookies et les iframes tierces restent bloqués par le module tant que le consentement manque.
 
 L'endpoint refuse (403 `forbidden_origin`) un POST dont `Origin` n'est pas l'hôte courant, dont `Sec-Fetch-Site` n'est ni `same-origin` ni `none`, ou qui n'a ni `Origin` ni `Sec-Fetch-Site` : ne pas le proxifier vers un autre domaine, et envoyer ces en-têtes dans un test `curl`.
+
+Les statistiques sont indicatives et l'endpoint n'est pas authentifié : un client HTTP qui forge des POST avec un `consent_id` neuf gonfle les premiers choix, dans la limite du limiteur par adresse. Le registre trace la source de chaque choix.
 
 ## 7. Tests
 
