@@ -59,7 +59,7 @@ Sous le préréglage France, le lien « Politique de cookies » de la bannière 
 
 Le modèle reprend le texte qui ne change pas : l'éditeur du site (nom, adresse et courriel lus dans **Configuration > Boutique** de Thelia ; une alerte signale ce qui manque), les rôles de chacun (avec la responsabilité conjointe pour la collecte et la transmission quand un service comme Meta Pixel ou un module social l'impose), la durée du choix du visiteur, la conservation des preuves et les droits des personnes. La liste des services, des cookies, de leurs durées et des responsables n'y est pas recopiée : un lien « Liste à jour des services et des cookies » mène à la page `/ccm/preferences`, toujours alignée sur la version publiée. Vous n'avez donc pas à mettre la page à jour quand vous changez de services.
 
-Sous le préréglage France rattaché à la langue principale, **chaque langue active** doit avoir sa page : faites une page par langue (le modèle existe dans les cinq langues du module ; pour une autre langue, ses phrases fixes sont en anglais, à traduire). Une langue sans adresse propre qui retombe sur les conditions générales refuse la publication. Relisez le modèle avant de le mettre en ligne.
+Sous le préréglage France rattaché à la langue principale, **chaque langue active** doit avoir sa page : faites une page par langue (le modèle existe dans les six langues du module ; pour une autre langue, ses phrases fixes sont en anglais, à traduire). Une langue sans adresse propre qui retombe sur les conditions générales refuse la publication. Relisez le modèle avant de le mettre en ligne.
 
 Astuce : l'éditeur de texte du back-office Thelia enregistre un résumé et un post-scriptum vides sous la forme `<p></p>`, et certains thèmes l'affichent tel quel. Si ces deux lignes apparaissent sur la page, videz-les en base ou adaptez le gabarit du thème.
 
@@ -72,12 +72,12 @@ Astuce : l'éditeur de texte du back-office Thelia enregistre un résumé et un 
 
 ## Langues
 
-- Le module est fourni en **français, anglais, allemand, néerlandais et espagnol** : bannière, panneau, messages de la bannière et back-office (dans la langue du profil de l'administrateur). Les langues du site que vous activez dans Thelia apparaissent dans l'écran des textes et dans celui des finalités.
+- Le module est fourni en **français, anglais, allemand, néerlandais, espagnol et italien** : bannière, panneau, messages de la bannière et back-office (dans la langue du profil de l'administrateur). Les langues du site que vous activez dans Thelia apparaissent dans l'écran des textes et dans celui des finalités.
 - Pour chaque texte, le visiteur voit dans l'ordre : ce que vous avez saisi dans sa langue, sinon le texte par défaut du module dans sa langue, sinon ce que vous avez saisi en anglais, sinon le texte par défaut anglais. Une langue fournie ne mélange donc jamais deux langues.
 - Un brouillon neuf ne contient que le texte anglais. Les quatre autres langues affichent le texte par défaut traduit tant que vous ne saisissez rien. « Rétablir les textes par défaut » supprime votre saisie. Un texte déjà saisi ne suit pas un changement futur du texte par défaut.
-- **Une langue non fournie** (l'italien, par exemple) : tant que vous n'avez rien saisi, l'anglais s'affiche et une alerte rouge le signale. Même quand vous saisissez les textes modifiables, les phrases fixes du module (liste des finalités, façon de refuser, mention des partenaires, durée du choix, messages du panneau) restent en anglais : le module ne peut pas les traduire pour vous. L'alerte « traduction incomplète » le rappelle tant qu'il manque un texte ou l'intitulé d'une finalité.
+- **Une langue non fournie** (le portugais, par exemple) : tant que vous n'avez rien saisi, l'anglais s'affiche et une alerte rouge le signale. Même quand vous saisissez les textes modifiables, les phrases fixes du module (liste des finalités, façon de refuser, mention des partenaires, durée du choix, messages du panneau) restent en anglais : le module ne peut pas les traduire pour vous. L'alerte « traduction incomplète » le rappelle tant qu'il manque un texte ou l'intitulé d'une finalité.
 - Le titre de la page de politique est unique : il suit la langue principale du site.
-- Les traductions allemande, néerlandaise et espagnole n'ont pas été relues par un locuteur natif : faites-les relire avant une mise en ligne.
+- Les traductions allemande, néerlandaise, espagnole et italienne n'ont pas été relues par un locuteur natif : faites-les relire avant une mise en ligne.
 
 ## Préréglages (onglet « Préréglages »)
 

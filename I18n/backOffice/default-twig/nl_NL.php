@@ -128,7 +128,7 @@ return [
     'Too low' => 'Te laag',
     'Compliant color' => 'Conforme kleur',
     'Texts by language' => 'Teksten per taal',
-    'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch and Spanish are provided, any other language shows English.' => 'Eén tekstenset per actieve taal. Een taal zonder tekst toont de standaardtekst van die taal: Frans, Engels, Duits, Nederlands en Spaans worden meegeleverd, elke andere taal toont Engels.',
+    'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch, Spanish and Italian are provided, any other language shows English.' => 'Eén tekstenset per actieve taal. Een taal zonder tekst toont de standaardtekst van die taal: Frans, Engels, Duits, Nederlands, Spaans en Italiaans worden meegeleverd, elke andere taal toont Engels.',
     'language not active' => 'taal niet actief',
     'no text yet (English shown)' => 'nog geen tekst (Engels getoond)',
     'Restore default texts' => 'Standaardteksten herstellen',

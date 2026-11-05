@@ -43,7 +43,7 @@ Ces prérequis concernent **le thème**. Les gabarits du module, eux, se surchar
 
 ### Langues et gabarits copiés
 
-Les gabarits n'ont plus de texte français ou anglais en dur : chaque libellé passe par le traducteur de Thelia, domaine `cookieconsentmanager.fo.flexy`, fichiers `I18n/frontOffice/flexy/<locale>.php` du module (fr_FR, en_US, de_DE, nl_NL, es_ES). Le domaine est nommé d'après le dossier du module, pas d'après le thème actif : un thème enfant l'utilise sans rien faire. Le français, l'anglais, l'allemand, le néerlandais et l'espagnol sont fournis ; pour une autre langue active, le message anglais est repris (le msgid est l'anglais).
+Les gabarits n'ont plus de texte français ou anglais en dur : chaque libellé passe par le traducteur de Thelia, domaine `cookieconsentmanager.fo.flexy`, fichiers `I18n/frontOffice/flexy/<locale>.php` du module (fr_FR, en_US, de_DE, nl_NL, es_ES, it_IT). Le domaine est nommé d'après le dossier du module, pas d'après le thème actif : un thème enfant l'utilise sans rien faire. Le français, l'anglais, l'allemand, le néerlandais, l'espagnol et l'italien sont fournis ; pour une autre langue active, le message anglais est repris (le msgid est l'anglais).
 
 Ce que cela change pour un thème qui a **copié** des gabarits :
 
@@ -51,7 +51,7 @@ Ce que cela change pour un thème qui a **copié** des gabarits :
 2. Reprendre aussi les nouveaux éléments du gabarit d'origine (liste des finalités avant le texte, pied `ccm-foot`, phrase de mesure exemptée, lien sans JavaScript de l'espace réservé, `data-ccm-withdrawn` du panneau) : une copie plus ancienne reste valide, mais n'affiche pas ces informations.
 3. Les textes éditables par l'administrateur (`texts.title`, `texts.body`, etc.) sont déjà résolus par le module : saisie dans la langue, sinon défaut traduit de la langue, sinon saisie en anglais, sinon défaut anglais. Ne pas réimplémenter ce repli dans le thème.
 4. Les messages affichés par le moteur JavaScript (espace réservé, confirmations) viennent de `#ccm-messages`, émis avec le hook `layout.body.top`. Aucun gabarit à copier : un thème qui garde ce hook (voir section 1) les reçoit. Sans cet élément, le moteur retombe sur l'anglais.
-5. Un nouveau libellé de gabarit se déclare dans `Front/FrontTexts.php` (`LABELS`) et dans les cinq fichiers de traduction (le test `TranslationCatalogueTest` vérifie que les clés et les `%paramètres%` sont identiques dans les cinq).
+5. Un nouveau libellé de gabarit se déclare dans `Front/FrontTexts.php` (`LABELS`) et dans les six fichiers de traduction (le test `TranslationCatalogueTest` vérifie que les clés et les `%paramètres%` sont identiques dans les six).
 
 Règles à ne pas casser : « Tout accepter » et « Tout refuser » gardent le même composant, la même classe et les mêmes couleurs ; la bannière garde `role="dialog"`, un titre et un nom accessibles ; la modale piège le focus.
 

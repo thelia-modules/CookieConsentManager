@@ -10,7 +10,7 @@ CookieConsentManager is a cookie and tracker consent module for Thelia 3 (packag
 - It keeps a consent registry with a printable proof sheet, a CSV export and a retention purge. Published versions are immutable, and nothing is served until an administrator publishes.
 - It blocks third-party scripts and embedded content until consent, with a service catalogue derived from tarteaucitron.js (23 verified services, 213 experimental ones) and a way for other modules to declare theirs.
 - It sends Google Consent Mode v2 signals (basic or advanced, `gtag` and Google Tag Manager).
-- The banner, the panel and the back-office are translated into French, English, German, Dutch and Spanish. A France (CNIL) preset provides texts and settings.
+- The banner, the panel and the back-office are translated into French, English, German, Dutch, Spanish and Italian. A France (CNIL) preset provides texts and settings.
 
 It is not an IAB TCF or Google-certified CMP. MIT licence.
 

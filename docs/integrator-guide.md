@@ -99,9 +99,9 @@ For a theme that copied templates:
 2. Pick up newer elements of the original (purpose list before the text, `ccm-foot` footer, exempt measurement sentence, no-JavaScript link of the placeholder, `data-ccm-withdrawn`). An older copy stays valid but does not show that information.
 3. Editable texts (`texts.title`, `texts.body`, and so on) are already resolved by the module: the administrator's entry in the language, else the translated default of the language, else the English entry, else the English default. Do not reimplement this fallback.
 4. The engine messages (placeholder, confirmations) come from `#ccm-messages`, emitted with the `layout.body.top` hook. A theme that keeps that hook receives them. Without the element the engine falls back to English.
-5. A new template label is declared in `Front/FrontTexts.php` (`LABELS`) and in the five translation files. `TranslationCatalogueTest` checks that keys and `%parameters%` are identical in the five.
+5. A new template label is declared in `Front/FrontTexts.php` (`LABELS`) and in the six translation files. `TranslationCatalogueTest` checks that keys and `%parameters%` are identical in the six.
 
-The module provides three Thelia translation domains, each with five files: `cookieconsentmanager` (validation messages, `I18n/<locale>.php`), `cookieconsentmanager.bo.default-twig` (back-office) and `cookieconsentmanager.fo.flexy` (front). The German, Dutch and Spanish translations were not reviewed by a native speaker.
+The module provides three Thelia translation domains, each with six files: `cookieconsentmanager` (validation messages, `I18n/<locale>.php`), `cookieconsentmanager.bo.default-twig` (back-office) and `cookieconsentmanager.fo.flexy` (front). The German, Dutch, Spanish and Italian translations were not reviewed by a native speaker.
 
 ## Making code depend on consent
 
