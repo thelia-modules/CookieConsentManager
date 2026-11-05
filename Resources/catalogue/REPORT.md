@@ -119,6 +119,38 @@ Verified keys whose upstream `kind` differs from the derived one (engage in fall
 ## Parameters
 
 - Callbacks (`typeof tarteaucitron.user.X === 'function'`) are not exposed as parameters: skaze: skazeMore; snapchat: snapchatMore; clicky: clickyMore; criteoonetag: criteoonetagMore; gajs: gajsMore; analytics: analyticsMore/analyticsPrepare; googleads: googleadsMore; gtag: gtagMore; xiti: xitiMore; atinternet: atMore; atinternethightrack: atMore; facebookpixel: facebookpixelMore; matomo: matomoMore; matomocloud: matomocloudMore; bingads: bingadsMore; tiktok: tiktokMore
+- Executable parameters (`executable: true` in `catalogue.json`, derived by `tools/catalogue/executable.mjs`; changing one needs the publish right): 31 on 31 services, 233 parameters in all.
+  - `statable`: statableHost
+  - `teambrain`: teambrainUrl
+  - `usercom`: userId
+  - `dynatrace`: dynatraceJSPath
+  - `eulerian`: eulerianHost
+  - `posthog`: posthogHost
+  - `ubib`: ubibId
+  - `plausible`: plausibleEndpoint
+  - `piwikpro`: piwikProContainer
+  - `sharpspring`: ssId
+  - `openwebanalytics`: openwebanalyticsHost
+  - `disqus`: disqusShortname
+  - `googleads`: googleadsCustomDomain
+  - `gtag`: gtagCustomDomain
+  - `googletagmanager`: googletagmanagerCustomDomain
+  - `multiplegoogletagmanager`: multiplegoogletagmanagerCustomDomain
+  - `mautic`: mauticurl
+  - `twenga`: twengaLocale
+  - `xiti`: xitiId
+  - `atinternet`: atLibUrl
+  - `atinternethightrack`: atLibUrl
+  - `kameleoon`: kameleoon
+  - `xiti_smarttag`: xiti_smarttagLocalPath
+  - `webmecanik`: webmecanikurl
+  - `multiplegtag`: multiplegtagCustomDomain
+  - `koban`: kobanurl
+  - `matomo`: matomoHost
+  - `matomohightrack`: matomoHost
+  - `matomocloud`: matomoCustomJSPath
+  - `matomotm`: matomotmUrl
+  - `emolytics`: emolyticsID
 - `required` for imported services is a heuristic (early `return` when undefined).
 - Cross-check against the optional services listing (loaded): 16 service(s) differ (the code is authoritative).
   - statable: listing=[statableSiteId] code=[statableHost,statableSiteId]
