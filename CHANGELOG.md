@@ -2,6 +2,12 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.5] - 2026-11-05
+
+### Fixed
+
+- The proof sheet of a registry entry tells three cases apart for the served hash: the hash stored at publication, the hash the version is served with now (the module or the theme files were updated since), and a hash that matches no known rendering of this version. The last one used to be reported as a rendering changed after publication.
+
 ## [1.0.4] - 2026-11-05
 
 ### Security
