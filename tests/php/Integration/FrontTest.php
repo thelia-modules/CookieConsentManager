@@ -421,6 +421,46 @@ final class FrontTest extends CcmTestCase
         }
     }
 
+    public function testAPanelRequestForAVersionThatDoesNotExistLeavesNothingInTheCache(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $version = $this->publisher->publish('alice')->getVersion();
+        $config = $this->configs->forRequest(Request::create('/'))->config;
+        $controller = $this->panelController();
+        $controller($version, $config['hash'], 'en_US');
+        $before = array_keys($this->ccm->pool->getValues());
+        self::assertNotSame([], $before, 'the cache of the real version is warm');
+
+        foreach ([0, $version + 1, 987654321] as $number) {
+            foreach ([$config['hash'], str_repeat('a', 12)] as $hash) {
+                try {
+                    $controller($number, $hash, 'en_US');
+                    self::fail('404 expected for version '.$number);
+                } catch (NotFoundHttpException) {
+                    self::addToAssertionCount(1);
+                }
+            }
+        }
+
+        self::assertSame($before, array_keys($this->ccm->pool->getValues()), 'a version that was never published creates no cache entry');
+    }
+
+    public function testAPanelRequestUnderAWrongHashOfARealVersionCreatesNoCacheEntryEither(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $version = $this->publisher->publish('alice')->getVersion();
+        $config = $this->configs->forRequest(Request::create('/'))->config;
+        $controller = $this->panelController();
+        $controller($version, $config['hash'], 'en_US');
+        $before = array_keys($this->ccm->pool->getValues());
+
+        foreach (['000000000000', 'ffffffffffff', 'abcabcabcabc'] as $hash) {
+            self::assertSame(302, $controller($version, $hash, 'en_US')->getStatusCode());
+        }
+
+        self::assertSame($before, array_keys($this->ccm->pool->getValues()), 'the hash typed in the URL is not part of any cache key');
+    }
+
     public function testTheStyleSheetIsServedUnderItsOwnHash(): void
     {
         $style = new StyleSheet($this->module.'/assets/css/ccm.css');
