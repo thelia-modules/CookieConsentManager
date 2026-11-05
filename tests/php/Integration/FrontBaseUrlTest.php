@@ -40,7 +40,7 @@ final class FrontBaseUrlTest extends CcmTestCase
 
         $this->module = \dirname(__DIR__, 3);
         $this->hashes = new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher(new ServedScriptAssembler($this->module)), new ModuleVersion($this->module.'/Config/module.xml'), new NoOverriddenTemplates(), $this->ccm->pool);
-        $this->tokens = new PreviewToken('test-secret');
+        $this->tokens = new PreviewToken(str_repeat('t', 32));
     }
 
     private function provider(string $baseUrl, bool $admin = false): FrontConfigProvider

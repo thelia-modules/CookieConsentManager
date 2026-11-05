@@ -117,6 +117,7 @@ Deux niveaux, à ne pas confondre :
 ## Aperçu
 
 « Aperçu du brouillon sur la boutique » ouvre votre vraie boutique avec le brouillon : la bannière s'affiche avec vos services. Rien n'est enregistré au registre. Un bandeau « Aperçu » signale le mode, et aucun service n'est réellement chargé : pour vérifier les cookies, utilisez la version publiée.
+L'aperçu et la Vérification sont signés avec le secret de la boutique (`APP_SECRET`). S'il est vide ou plus court que 32 caractères, les deux sont indisponibles : le tableau de bord affiche une alerte et le bouton d'aperçu en donne la raison. Définissez un secret plus long dans l'environnement de la boutique.
 
 ## Publication et « changement substantiel »
 

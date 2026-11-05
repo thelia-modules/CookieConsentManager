@@ -10,6 +10,7 @@ use CookieConsentManager\Admin\DraftWriter;
 use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\FrontLinks;
 use CookieConsentManager\Draft\DraftRepository;
+use CookieConsentManager\Front\PreviewToken;
 use CookieConsentManager\Publication\PublicationRefusedException;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\VersionRepository;
@@ -225,7 +226,14 @@ final class VersionsController extends AbstractScreenController
             $path = '/';
         }
 
-        return new RedirectResponse($this->links->preview($path));
+        $url = $this->links->preview($path);
+        if (null === $url) {
+            $this->flash($request, 'warning', $this->say('The preview and the verification are unavailable: the secret of the shop (APP_SECRET) is empty or shorter than %min% characters. Set a longer secret in the environment of the shop.', ['%min%' => (string) PreviewToken::MINIMUM_SECRET_BYTES]));
+
+            return $this->redirectTo('ccm_admin_versions');
+        }
+
+        return new RedirectResponse($url);
     }
 
     /**
