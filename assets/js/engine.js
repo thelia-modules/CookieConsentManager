@@ -81,8 +81,8 @@
     return !(s && s.googleTag && cfg.gcm.enabled && cfg.gcm.mode !== 'advanced');
   };
   const necessary = (k) => { const s = svc(k); return !!s && s.purpose === 'essential'; };
-  // An expired choice or one older than the last substantial version is no consent at all: nothing optional runs until the visitor answers again.
-  const stale = (st) => !!st && (st.t + cfg.repromptDays * 86400 <= now() || (cfg.substantialVersion > 0 && (st.ver || 0) < cfg.substantialVersion));
+  // An expired choice, one without a whole-number time or one older than the last substantial version is no consent at all: nothing optional runs until the visitor answers again.
+  const stale = (st) => !!st && (!Number.isInteger(st.t) || st.t + cfg.repromptDays * 86400 <= now() || (cfg.substantialVersion > 0 && (st.ver || 0) < cfg.substantialVersion));
   const fresh = (st) => (st && !stale(st) ? st : null);
   const on = (st, k) => necessary(k) || (!stale(st) && granted(st, k) && (gcmFree(k) || gcmOpen(st)));
   const needsBanner = (st) => {
