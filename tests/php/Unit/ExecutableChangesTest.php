@@ -77,7 +77,7 @@ final class ExecutableChangesTest extends TestCase
     {
         $changes = new ExecutableChanges(new CatalogueReader(__DIR__.'/../../../Resources/catalogue/catalogue.json'));
 
-        foreach (['matomotm.matomotmUrl', 'matomo.matomoHost', 'atinternet.atLibUrl', 'dynatrace.dynatraceJSPath', 'posthog.posthogHost', 'gtag.gtagCustomDomain'] as $path) {
+        foreach (['matomotm.matomotmUrl', 'matomo.matomoHost', 'atinternet.atLibUrl', 'dynatrace.dynatraceJSPath', 'posthog.posthogHost', 'gtag.gtagCustomDomain', 'googletagmanager.googletagmanagerId', 'multiplegoogletagmanager.multiplegoogletagmanagerId', 'tagcommander.tagcommanderid'] as $path) {
             self::assertTrue($changes->isExecutablePath('services.'.preg_replace('/\./', '.parameters.', $path, 1)), $path);
         }
         foreach (['gtag.gtagUa', 'clarity.clarity', 'facebookpixel.facebookpixelId'] as $path) {

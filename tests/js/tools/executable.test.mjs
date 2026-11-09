@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deriveExecutable } from '../../../tools/catalogue/executable.mjs';
+import { deriveExecutable, TAG_MANAGER_CONTAINERS } from '../../../tools/catalogue/executable.mjs';
 import { readParams } from '../../../tools/catalogue/sandbox.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -90,6 +90,7 @@ test('the flags written in catalogue.json: the ones the audit named, and ones th
   for (const [key, name] of [
     ['matomotm', 'matomotmUrl'], ['matomo', 'matomoHost'], ['atinternet', 'atLibUrl'], ['dynatrace', 'dynatraceJSPath'],
     ['posthog', 'posthogHost'], ['gtag', 'gtagCustomDomain'], ['googletagmanager', 'googletagmanagerCustomDomain'], ['piwikpro', 'piwikProContainer'],
+    ['googletagmanager', 'googletagmanagerId'], ['multiplegoogletagmanager', 'multiplegoogletagmanagerId'], ['tagcommander', 'tagcommanderid'],
   ]) {
     assert.equal(flagged(key, name), true, `${key}.${name}`);
   }
@@ -135,4 +136,21 @@ test('each read stands on its own: the probe finds a minified address, the sourc
 test('a parameter whose fragment appends a literal-host address after a literal prefix variable stays plain', () => {
   const body = "var url = 'https://www.example.test/api.js?onload=x'; if (tarteaucitron.user.key !== undefined) { url += '&render=' + tarteaucitron.user.key; } tarteaucitron.addScript(url);";
   assert.deepEqual(derive(body, ['key']), []);
+});
+
+test('a tag manager container ID is executable although it follows a literal host: the container runs code its owner writes', () => {
+  const body = "tarteaucitron.addScript('https://tags.example.test/gtm.js?id=' + tarteaucitron.user.containerId);";
+  assert.deepEqual(derive(body, ['containerId']), [], 'the generic rule leaves it plain');
+  assert.deepEqual([...deriveExecutable(fragmentOf('googletagmanager'), 'googletagmanager', ['googletagmanagerId']).executable], ['googletagmanagerId']);
+});
+
+test('every listed tag manager container is a parameter its fragment reads', () => {
+  const missing = [];
+  for (const [key, names] of Object.entries(TAG_MANAGER_CONTAINERS)) {
+    const entry = catalogue.find((e) => e.key === key);
+    for (const name of names) {
+      if (!entry || !entry.params.some((p) => p.name === name)) missing.push(`${key}.${name}`);
+    }
+  }
+  assert.deepEqual(missing, [], 'a renamed upstream parameter would silently drop the flag');
 });

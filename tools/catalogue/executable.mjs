@@ -8,6 +8,8 @@
 //   - the body of an inline script, or an event handler attribute of a script;
 //   - markup written into the page (a quote or an angle bracket typed in it creates an element).
 // A value placed after a literal host (https://cdn.example/lib.js?id=<value>) only picks a resource of that publisher: not executable.
+// Except for a tag manager: the resource its container ID picks is code written by whoever owns that container (Custom HTML
+// tags), so the ID decides what runs. TAG_MANAGER_CONTAINERS lists those parameters; a new tag manager upstream is added there.
 //
 // Two reads, joined (a parameter found by either one is flagged):
 //   - dynamic: the fragment runs in jsdom, on the real compatibility layer, with a unique marker as the value of every parameter,
@@ -25,6 +27,15 @@ import { FROZEN_PARAMETERS, stripComments } from './sandbox.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const compatSource = readFileSync(join(ROOT, 'assets/js/compat.js'), 'utf8');
+
+export const TAG_MANAGER_CONTAINERS = Object.freeze({
+  googletagmanager: ['googletagmanagerId'],
+  multiplegoogletagmanager: ['multiplegoogletagmanagerId'],
+  tagcommander: ['tagcommanderid'],
+  adobeanalytics: ['adobeanalyticskey'],
+  adobeworkspace: ['adobeworkspaceId1', 'adobeworkspaceId2', 'adobeworkspaceId3'],
+  piwikpro: ['piwikProId'],
+});
 
 const HOST_DONE = /^(?:[a-z][a-z0-9+.-]*:)?\/\/[^/?#]*[/?#]/i;
 const SCRIPT_TAGS = new Set(['script']);
@@ -322,6 +333,7 @@ export function deriveExecutable(fragment, key, params, { reads = ['dynamic', 's
     }
     if (reads.includes('static')) merge(staticExecutable(fragment));
   }
+  merge(new Map((TAG_MANAGER_CONTAINERS[key] || []).map((name) => [name, ['tag manager container']])));
   const names = new Set(params);
   return {
     executable: new Set([...evidence.keys()].filter((name) => names.has(name))),

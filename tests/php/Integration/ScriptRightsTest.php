@@ -119,6 +119,23 @@ final class ScriptRightsTest extends CcmTestCase
         self::assertSame('https://evil.example.test/x.js', $this->parametersOf('matomotm')['matomotmUrl']);
     }
 
+    public function testChangingATagManagerContainerNeedsThePublishRight(): void
+    {
+        $draft = $this->publishableDraft();
+        $draft['services'][] = ['key' => 'googletagmanager', 'purpose' => 'ads', 'enabled' => true, 'parameters' => ['googletagmanagerId' => 'GTM-SHOP1']];
+        $this->ccm->drafts->replace($draft, 'test');
+        $controller = $this->getService(ServicesController::class);
+        $fields = ['enabled' => '1', 'parameters' => ['googletagmanagerId' => 'GTM-OTHER2']];
+
+        $denied = $this->post(self::VIEW_UPDATE, $fields, static fn (Request $request): Response => $controller->saveCatalogueService($request, 'googletagmanager'));
+        self::assertSame(403, $denied->getStatusCode(), 'the container runs whatever its owner puts in it');
+        self::assertSame('GTM-SHOP1', $this->parametersOf('googletagmanager')['googletagmanagerId']);
+
+        $allowed = $this->post(self::WITH_CREATE, $fields, static fn (Request $request): Response => $controller->saveCatalogueService($request, 'googletagmanager'));
+        self::assertSame(302, $allowed->getStatusCode());
+        self::assertSame('GTM-OTHER2', $this->parametersOf('googletagmanager')['googletagmanagerId']);
+    }
+
     public function testASetOfAScriptParameterFromNothingNeedsThePublishRightToo(): void
     {
         $this->ccm->drafts->replace($this->draftWithExecutableParameter(), 'test');

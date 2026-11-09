@@ -316,7 +316,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       }
     ],
     "cookies": [
@@ -354,7 +354,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       },
       {
         "name": "adobeworkspaceId2",
@@ -368,7 +368,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       },
       {
         "name": "adobeworkspaceId3",
@@ -382,7 +382,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       }
     ],
     "cookies": [
@@ -3314,7 +3314,7 @@
           "en": "ID in the form GTM-XXXXXXX, shown in the Google Tag Manager interface."
         },
         "pattern": "^GTM-[A-Z0-9]+$",
-        "executable": false
+        "executable": true
       },
       {
         "name": "googletagmanagerCustomDomain",
@@ -4915,7 +4915,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       }
     ],
     "cookies": [
@@ -5514,7 +5514,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       }
     ],
     "cookies": [
@@ -6741,7 +6741,7 @@
           "en": ""
         },
         "pattern": null,
-        "executable": false
+        "executable": true
       }
     ],
     "cookies": [],
