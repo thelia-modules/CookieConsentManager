@@ -162,3 +162,39 @@ test('le choix qui suit une relance est tracé renew, même UUID, états réels 
   await d.settle();
   assert.equal(d.calls[0].body.action, 'accept_all', 'sans relance, pas de renew');
 });
+
+test('a device clock two days behind the server keeps the choice dated by the registry', async () => {
+  const a = boot({ fetchOpts: { serverAhead: 2 * 86400 } });
+  a.click('[data-ccm-action="accept_all"]');
+  await a.settle();
+  const raw = getRaw(a.doc);
+  assert.equal(decodeCookie(raw).sd, 1, 'the registry marks the time it wrote');
+  const b = boot({ cookie: raw, fetchOpts: { serverAhead: 2 * 86400 } });
+  await b.settle();
+  assert.equal(b.doc.documentElement.classList.contains('ccm-show'), false, 'head.js: no banner');
+  assert.equal(b.cmp.hasConsent('gtag'), true, 'engine.js: the choice still grants');
+  assert.equal(b.calls.length, 0, 'nothing posted again');
+});
+
+test('a time written by the device stays limited to one day ahead', () => {
+  const t = Math.floor(Date.now() / 1000) + 2 * 86400;
+  const a = boot({ cookie: state({ t, s: { ...state().s, gtag: 1 }, p: { ...state().p, analytics: 1 } }) });
+  assert.equal(a.doc.documentElement.classList.contains('ccm-show'), true);
+  assert.equal(a.cmp.hasConsent('gtag'), false);
+});
+
+test('a time written by the registry may not run ahead by more than the renewal delay', () => {
+  const config = baseConfig();
+  const t = Math.floor(Date.now() / 1000) + (config.repromptDays + 1) * 86400;
+  const a = boot({ config, cookie: state({ t, sd: 1, s: { ...state().s, gtag: 1 }, p: { ...state().p, analytics: 1 } }) });
+  assert.equal(a.doc.documentElement.classList.contains('ccm-show'), true);
+  assert.equal(a.cmp.hasConsent('gtag'), false);
+});
+
+test('a whole-number time written as a float is read as a time', () => {
+  const t = Math.floor(Date.now() / 1000) - 86400;
+  const json = JSON.stringify(state({ s: { ...state().s, gtag: 1 }, p: { ...state().p, analytics: 1 } })).replace(/"t":\d+/, `"t":${t}.0`);
+  const a = boot({ cookie: Buffer.from(json).toString('base64url') });
+  assert.equal(a.doc.documentElement.classList.contains('ccm-show'), false);
+  assert.equal(a.cmp.hasConsent('gtag'), true);
+});

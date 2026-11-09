@@ -62,6 +62,7 @@ final class ConsentEndpointTest extends CcmTestCase
         self::assertSame($body['consent_id'], $decoded['id']);
         self::assertSame($this->version, $decoded['ver']);
         self::assertSame(0, $decoded['pd']);
+        self::assertSame(1, $decoded['sd'], 'the time comes from the server clock');
         self::assertSame(['analytics' => 1, 'media' => 2], $decoded['p']);
         self::assertSame(['gtag' => 1, 'youtube' => 0], $decoded['s']);
 

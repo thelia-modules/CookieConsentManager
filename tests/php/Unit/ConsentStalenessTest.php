@@ -35,7 +35,7 @@ final class ConsentStalenessTest extends TestCase
             'pd' => 0,
         ];
         if (!\array_key_exists('rawTime', $case)) {
-            $payload['t'] = time() - $case['ageSeconds'];
+            $payload['t'] = ($case['timeAsFloat'] ?? false) ? (float) (time() - $case['ageSeconds']) : time() - $case['ageSeconds'];
         } elseif (null !== $case['rawTime']) {
             $payload['t'] = $case['rawTime'];
         }
@@ -43,7 +43,11 @@ final class ConsentStalenessTest extends TestCase
             $payload['ver'] = $case['choiceVersion'];
         }
         $request = Request::create('/');
-        $request->cookies->set(ConsentCookie::NAME, ConsentCookie::encode($payload));
+        // ConsentCookie::encode() writes a whole float without its fraction: the float form needs JSON_PRESERVE_ZERO_FRACTION.
+        $encoded = ($case['timeAsFloat'] ?? false)
+            ? rtrim(strtr(base64_encode(json_encode($payload, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION)), '+/', '-_'), '=')
+            : ConsentCookie::encode($payload);
+        $request->cookies->set(ConsentCookie::NAME, $encoded);
 
         $reader = new RequestConsentReader();
         self::assertSame(!$case['stale'], $reader->hasConsent($request, 'gtag', $case['repromptDays'], $case['substantialVersion']));

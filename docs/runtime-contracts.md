@@ -22,7 +22,8 @@ Decoded:
   "p": { "analytics": 1, "ads": 0, "social": 0, "media": 2, "support": 0, "personalization": 0 },
   "s": { "gtag": 1, "googletagmanager": 1, "facebookpixel": 0, "youtube": 1, "vimeo": 0, "crisp": 0 },
   "x": { "matomo": 1 },
-  "pd": 0
+  "pd": 0,
+  "sd": 1
 }
 ```
 
@@ -37,13 +38,14 @@ Decoded:
 | `x` | exempt measurement: `1` active, `0` the visitor objected |
 | `pd` | `1` while the choice written by the script has not been confirmed by the registry; the engine posts it again on the next page load |
 | `pa`, `ps` | action and source of the choice that waits to be posted. Present only while `pd` is `1` |
+| `sd` | `1` when the registry wrote the cookie: `t` comes from the server clock, not from the visitor's device |
 
 Resolution rules:
 
 - `hasConsent(service)` is `s[service] === 1`. `hasPurposeConsent(purpose)` is `p[purpose] === 1`: a partial purpose is not granted.
 - The banner is shown again when an active published service is missing from `s` and its purpose is `1`. A purpose at `0` or `2` never triggers it.
 - "Accept all" sets every purpose and active service to `1`. "Reject all" and "continue without accepting" set everything to `0`.
-- A choice is stale when `t` plus the renewal delay has passed, when `t` is more than one day ahead of the clock (a day of drift is tolerated), when `t` is missing or not a whole number, or when `ver` is lower than the last substantial version. Until the visitor answers again, no non-exempt service runs and no Consent Mode `granted` update is sent (see [decision 005](decisions/005-stale-consent-suspension.md)).
+- A choice is stale when `t` plus the renewal delay has passed, when `t` is ahead of the clock (one day of drift is tolerated; in the browser, a time written by the registry, `sd: 1`, may be ahead by up to the renewal delay, since the visitor's device can trail the server clock), when `t` is missing or not a whole number, or when `ver` is lower than the last substantial version. Until the visitor answers again, no non-exempt service runs and no Consent Mode `granted` update is sent (see [decision 005](decisions/005-stale-consent-suspension.md)).
 - In live mode the script writes a new choice at once with `pd: 1`, then posts it. The cookie that the server sets in its answer replaces it. The script writes the cookie only for a new choice.
 - In preview mode the cookie is named `ccm_preview` and nothing is posted.
 
