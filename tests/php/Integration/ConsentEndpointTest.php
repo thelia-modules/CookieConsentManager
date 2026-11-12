@@ -62,6 +62,7 @@ final class ConsentEndpointTest extends CcmTestCase
         self::assertSame($body['consent_id'], $decoded['id']);
         self::assertSame($this->version, $decoded['ver']);
         self::assertSame(0, $decoded['pd']);
+        self::assertSame(1, $decoded['sd'], 'the time comes from the server clock');
         self::assertSame(['analytics' => 1, 'media' => 2], $decoded['p']);
         self::assertSame(['gtag' => 1, 'youtube' => 0], $decoded['s']);
 
@@ -73,6 +74,23 @@ final class ConsentEndpointTest extends CcmTestCase
         self::assertNull($entry->getIpTruncated(), 'IP not stored by default');
         self::assertCount(1, $recorded);
         self::assertTrue($recorded[0]->firstChoice);
+    }
+
+    public function testTheCookieIsSecureBehindAnUndeclaredTlsProxyWhenTheOriginIsHttps(): void
+    {
+        $plain = static function (string $origin, string $body): Request {
+            $server = ['CONTENT_TYPE' => 'application/json', 'HTTP_USER_AGENT' => 'Mozilla/5.0 (X11) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36', 'REMOTE_ADDR' => '203.0.113.78', 'HTTP_ORIGIN' => $origin];
+
+            return Request::create('http://'.self::HOST.'/ccm/consent', 'POST', [], [], [], $server, $body);
+        };
+
+        $secure = ($this->controller)($plain('https://'.self::HOST, $this->payload()));
+        self::assertSame(200, $secure->getStatusCode());
+        self::assertStringEndsWith('; Secure', (string) $secure->headers->getCookies()[0]);
+
+        $insecure = ($this->controller)($plain('http://'.self::HOST, $this->payload()));
+        self::assertSame(200, $insecure->getStatusCode());
+        self::assertStringEndsNotWith('; Secure', (string) $insecure->headers->getCookies()[0]);
     }
 
     public function testTheRegistryKeepsNoSecretSegmentOfThePath(): void

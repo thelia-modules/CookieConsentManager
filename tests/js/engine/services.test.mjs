@@ -46,6 +46,13 @@ test('scripts balisés text/plain réactivés au consentement du service', async
   assert.equal(a.doc.querySelector('script[data-ccm-active="acme-widget"]').type, '');
 });
 
+test('script balisé réactivé : le nonce masqué par la CSP est recopié depuis la propriété', async () => {
+  const a = boot({ fragments: mkFrags([]), extraBody: '<script type="text/plain" data-ccm-service="acme-widget" id="noncy" nonce="">window.__noncy = 1;</script>', beforeHead: (win) => { Object.defineProperty(win.document.getElementById('noncy'), 'nonce', { value: 'r4nd0m' }); } });
+  a.click('[data-ccm-action="accept_all"]');
+  await a.settle();
+  assert.equal(a.doc.getElementById('noncy').nonce, 'r4nd0m');
+});
+
 test('API : onConsent immédiat si accordé, file avant ready, onChange', async () => {
   const a = boot({ cookie: state({ p: { analytics: 1, ads: 0, media: 0, support: 0, personalization: 0 }, s: { gtag: 1, googletagmanager: 0, youtube: 0, 'acme-widget': 0, 'tiktok-via-gtm': 0 } }), fragments: mkFrags([]), start: false });
   const seen = [];

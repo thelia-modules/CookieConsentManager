@@ -128,7 +128,7 @@ return [
     'Too low' => 'Trop faible',
     'Compliant color' => 'Couleur conforme',
     'Texts by language' => 'Textes par langue',
-    'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch and Spanish are provided, any other language shows English.' => 'Un jeu de textes par langue active. Une langue sans texte affiche le texte par défaut de cette langue : le français, l\'anglais, l\'allemand, le néerlandais et l\'espagnol sont fournis, toute autre langue affiche l\'anglais.',
+    'One text set per active language. A language without text shows the default text of that language: French, English, German, Dutch, Spanish and Italian are provided, any other language shows English.' => 'Un jeu de textes par langue active. Une langue sans texte affiche le texte par défaut de cette langue : le français, l\'anglais, l\'allemand, le néerlandais, l\'espagnol et l\'italien sont fournis, toute autre langue affiche l\'anglais.',
     'language not active' => 'langue non active',
     'no text yet (English shown)' => 'pas encore de texte (anglais affiché)',
     'Restore default texts' => 'Rétablir les textes par défaut',

@@ -57,7 +57,8 @@ export const BODY = `
 <div id="vid" data-ccm-placeholder="youtube" data-ccm-src="https://www.youtube-nocookie.com/embed/abc" data-ccm-attr-width="560" data-ccm-attr-title="Vid"></div>
 <script type="text/plain" data-ccm-service="acme-widget">window.__acme = (window.__acme||0)+1;</script>`;
 
-export const fetchLog = (win, { status = 200, fail = false } = {}) => {
+// serverAhead: seconds by which the server clock leads the device clock (the registry dates the cookie it sets).
+export const fetchLog = (win, { status = 200, fail = false, serverAhead = 0 } = {}) => {
   const calls = [];
   win.fetch = (url, init) => {
     const body = JSON.parse(init.body);
@@ -65,7 +66,7 @@ export const fetchLog = (win, { status = 200, fail = false } = {}) => {
     if (fail) return Promise.reject(new Error('net'));
     if (status !== 200) return Promise.resolve({ ok: false, status, json: async () => ({}) });
     const id = body.consent_id || '11111111-2222-4333-8444-555555555555';
-    const st = { f: 1, id, ver: body.config_version, t: Math.floor(Date.now() / 1000), p: body.purposes, s: body.services, x: body.exempt, pd: 0 };
+    const st = { f: 1, id, ver: body.config_version, t: Math.floor(Date.now() / 1000) + serverAhead, p: body.purposes, s: body.services, x: body.exempt, pd: 0, sd: 1 };
     win.document.cookie = 'ccm_consent=' + cookieValue(st) + '; Path=/';
     return Promise.resolve({ ok: true, status: 200, json: async () => ({ consent_id: id }) });
   };

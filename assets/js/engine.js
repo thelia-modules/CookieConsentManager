@@ -81,8 +81,10 @@
     return !(s && s.googleTag && cfg.gcm.enabled && cfg.gcm.mode !== 'advanced');
   };
   const necessary = (k) => { const s = svc(k); return !!s && s.purpose === 'essential'; };
-  // An expired choice, one without a whole-number time or one older than the last substantial version is no consent at all: nothing optional runs until the visitor answers again.
-  const stale = (st) => !!st && (!Number.isInteger(st.t) || st.t + cfg.repromptDays * 86400 <= now() || (cfg.substantialVersion > 0 && (st.ver || 0) < cfg.substantialVersion));
+  // An expired choice, one without a whole-number time, one dated ahead of the clock or one older than the last substantial version is no consent at all: nothing optional runs until the visitor answers again.
+  // A time written by this device may be one day ahead (clock drift). A time written by the registry (`sd`) comes from the server clock, which the device may trail by more than a day: it may be ahead by up to the renewal delay.
+  const ahead = (st) => st.t > now() + (st.sd === 1 ? cfg.repromptDays : 1) * 86400;
+  const stale = (st) => !!st && (!Number.isInteger(st.t) || st.t + cfg.repromptDays * 86400 <= now() || ahead(st) || (cfg.substantialVersion > 0 && (st.ver || 0) < cfg.substantialVersion));
   const fresh = (st) => (st && !stale(st) ? st : null);
   const on = (st, k) => necessary(k) || (!stale(st) && granted(st, k) && (gcmFree(k) || gcmOpen(st)));
   const needsBanner = (st) => {
@@ -258,6 +260,8 @@
       Array.from(old.attributes).forEach((a) => {
         if (a.name !== 'type' && a.name.indexOf('data-ccm-') !== 0) s.setAttribute(a.name, a.value);
       });
+      // Under a CSP the browser hides the nonce attribute (it reads empty): only the property carries it.
+      if (old.nonce) s.nonce = old.nonce;
       s.setAttribute('data-ccm-active', key);
       if (old.src) s.async = false; else s.text = old.text;
       scripts.push({ kind, key });

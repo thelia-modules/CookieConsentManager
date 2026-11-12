@@ -451,6 +451,37 @@ final class FrontTest extends CcmTestCase
         };
     }
 
+    public function testAnHtmlRouteOutsideTheThemeIsRewrittenOnceTheThemeIsActivated(): void
+    {
+        $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
+        $this->publisher->publish('alice');
+        $page = '<html><body><iframe src="https://www.youtube.com/embed/abc" title="v"></iframe></body></html>';
+
+        $loader = new FilesystemLoader();
+        $activations = 0;
+        $activator = new class($loader, $this->module.'/templates/frontOffice/flexy', $activations) extends FrontThemeActivator {
+            public function __construct(private readonly FilesystemLoader $loader, private readonly string $path, private int &$count)
+            {
+            }
+
+            public function activate(): void
+            {
+                ++$this->count;
+                $this->loader->addPath($this->path);
+            }
+        };
+        $context = new TemplateContext(new FrontTexts(new CatalogueTranslator()));
+        $listener = new IframeRewriteListener($this->configs, new IframeRewriter(), new PlaceholderRenderer($context, new Environment($loader, ['strict_variables' => true])), $activator);
+
+        $response = new Response($page, 200, ['Content-Type' => 'text/html']);
+        $listener->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), Request::create('/_fragment'), HttpKernelInterface::MAIN_REQUEST, $response));
+        self::assertStringContainsString('data-ccm-placeholder="youtube"', (string) $response->getContent());
+        self::assertSame(1, $activations);
+
+        $listener->onResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), Request::create('/produit'), HttpKernelInterface::MAIN_REQUEST, new Response($page, 200, ['Content-Type' => 'text/html'])));
+        self::assertSame(1, $activations, 'a theme that is already known is not activated again');
+    }
+
     public function testTheListenerRewritesTheAnswersOfALiveComponentAndNoOtherAjaxResponse(): void
     {
         $this->ccm->drafts->replace($this->publishableDraft(), 'alice');
