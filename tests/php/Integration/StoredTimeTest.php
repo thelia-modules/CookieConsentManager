@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace CookieConsentManager\Tests\Integration;
 
 use CookieConsentManager\Admin\RegistryProof;
+use CookieConsentManager\Front\AssembledScriptHasher;
+use CookieConsentManager\Front\ServedHashResolver;
+use CookieConsentManager\Front\ServedScriptAssembler;
 use CookieConsentManager\Model\ConsentEntry;
+use CookieConsentManager\Publication\ModuleVersion;
 use CookieConsentManager\Tests\Support\CcmTestCase;
+use CookieConsentManager\Tests\Support\NoOverriddenTemplates;
 
 final class StoredTimeTest extends CcmTestCase
 {
@@ -46,7 +51,8 @@ final class StoredTimeTest extends CcmTestCase
             ->setAction('accept_all')->setSource('banner')->setVersion($version->getVersion())->setVersionHash('abc')
             ->setLocale('fr_FR')->setPath('/')->setBrowser('Chrome 130')->setPurposesJson('{}')->setServicesJson('{}')->setExemptJson('{}');
 
-        $proof = (new RegistryProof($this->ccm->versions))->build($entry);
+        $module = \dirname(__DIR__, 3);
+        $proof = (new RegistryProof($this->ccm->versions, new ServedHashResolver($this->ccm->versions, new AssembledScriptHasher(new ServedScriptAssembler($module)), new ModuleVersion($module.'/Config/module.xml'), new NoOverriddenTemplates(), $this->ccm->pool)))->build($entry);
 
         self::assertSame('2026-10-31 23:03:27 UTC', $proof['entry']['recorded_at']['utc']);
         self::assertSame('2026-11-01 08:03:27', $proof['entry']['recorded_at']['local']);
