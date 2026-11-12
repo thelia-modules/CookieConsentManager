@@ -13,7 +13,7 @@ Où le trouver : back-office Thelia, menu du haut, **Consentement aux cookies**.
 - Tout ce que vous modifiez va dans le **brouillon**. Le brouillon n'est jamais montré aux visiteurs.
 - **Publier** crée une version numérotée qui n'est plus modifiable et la met en ligne. Tant qu'aucune version n'est publiée, **la bannière n'apparaît pas**.
 - Chaque consentement est enregistré avec le numéro de version que le visiteur a vue : c'est ce qui permet de le prouver.
-- Vous pouvez toujours revenir en arrière : « Restaurer comme brouillon » reprend une ancienne version dans le brouillon, qu'il faut ensuite publier.
+- Vous pouvez toujours revenir en arrière : « Restaurer comme brouillon » reprend une ancienne version dans le brouillon, qu'il faut ensuite publier. Le brouillon entier est remplacé, y compris ce qui n'est pas encore publié : la page vous en avertit et le serveur refuse l'action tant que la confirmation n'est pas cochée.
 
 ## Tableau de bord
 
@@ -37,6 +37,7 @@ Quatre étapes, à faire dans l'ordre pour une première mise en place :
 - **Catalogue** : les services « vérifiés » sont testés et documentés ; les services « importés » sont expérimentaux et masqués tant que « Services expérimentaux » est éteint au tableau de bord. Utilisez le filtre par niveau, catégorie ou recherche.
 - Pour une vidéo, la fiche du service propose le **code HTML à coller** dans la page (bouton Copier). Les iframes de YouTube, Vimeo, Dailymotion, des cartes Google et de la plupart des autres services média déjà présentes dans vos pages sont remplacées automatiquement par un encart « Autoriser » tant que le service est actif et publié (la liste des services qui ne le sont pas est dans le guide intégrateur).
 - **Services proposés par d'autres modules** : un module (paiement, par exemple) peut déclarer ses propres cookies. Ils restent **inactifs** tant que vous ne les activez pas et ne publiez pas. Un service « strictement nécessaire » reste signalé en permanence avec sa justification.
+- **Paramètres qui sont des adresses** : certains paramètres d'un service du catalogue sont des adresses ou des hôtes que le service charge comme script, ou l'identifiant du conteneur d'un gestionnaire de balises (le conteneur exécute ce que son propriétaire y place). Les changer exige le droit CREATE, comme le code d'un service personnalisé ; les autres identifiants de compte restent en UPDATE. Les listes de modifications signalent ces lignes « Exécuté sur la boutique ».
 - **Services personnalisés** : un service qui n'est pas au catalogue, avec une adresse de script, votre propre code (droit CREATE requis pour écrire ou changer le code ou l'adresse du script, conservé dans la version) ou une simple déclaration (service chargé par Google Tag Manager).
 - **Finalité d'un service du catalogue** : elle est en lecture seule. Un service du catalogue reste dans la finalité prévue pour lui ; seul un service personnalisé choisit la sienne.
 - **Mesure d'audience exemptée** : l'exemption de consentement est limitée à une liste d'outils, affichée avec une description : Matomo auto-hébergé, Wysistat en mode exempté, Plausible, Simple Analytics. Aucun des quatre outils n'a été testé sur un compte réel : la liste repose sur une lecture du code que chacun exécute. La page de la CNIL sur la mesure d'audience (<https://www.cnil.fr/fr/cookies-solutions-pour-les-outils-de-mesure-daudience>, lue le 2026-11-04) ne nomme aucun produit : elle pose des conditions (mesure de sa seule audience, statistiques anonymes, pas de recoupement) et recommande un traceur de 13 mois au plus et une conservation de 25 mois au plus. Pour chacun, cochez les conditions que vous confirmez (elles se règlent dans l'outil lui-même, le module ne les voit pas) : la condition manquante est nommée avec une aide. Google Analytics, les services personnalisés et ceux des autres modules ne sont jamais éligibles. Un outil déjà exempté qui sort de la liste reste affiché pour que vous puissiez le retirer. Si l'un d'eux est actif, la bannière l'annonce au premier niveau, avec un lien pour s'y opposer.
@@ -116,6 +117,7 @@ Deux niveaux, à ne pas confondre :
 ## Aperçu
 
 « Aperçu du brouillon sur la boutique » ouvre votre vraie boutique avec le brouillon : la bannière s'affiche avec vos services. Rien n'est enregistré au registre. Un bandeau « Aperçu » signale le mode, et aucun service n'est réellement chargé : pour vérifier les cookies, utilisez la version publiée.
+L'aperçu et la Vérification sont signés avec le secret de la boutique (`APP_SECRET`). S'il est vide ou plus court que 32 caractères, les deux sont indisponibles : le tableau de bord affiche une alerte et le bouton d'aperçu en donne la raison. Définissez un secret plus long dans l'environnement de la boutique.
 
 ## Publication et « changement substantiel »
 
@@ -158,7 +160,7 @@ Le thème Flexy charge ses polices depuis Google (`fonts.googleapis.com`, `fonts
 ## Passage recette vers production
 
 1. Sur la recette : onglet « Versions et vérification », **Exporter le brouillon (JSON)**. L'export contient le **brouillon**, pas la version publiée : publiez d'abord si besoin.
-2. Sur la production : **Importer une configuration (JSON)** (droit CREATE, celui qui publie, car un fichier peut porter du code). L'import remplace le brouillon, jamais la version en ligne. Un fichier de plus de 1 Mo est refusé, de même qu'un service présenté comme venant d'un module qui ne le déclare pas.
+2. Sur la production : **Importer une configuration (JSON)** (droit CREATE, celui qui publie, car un fichier peut porter du code). L'import remplace le brouillon entier, y compris ce qui n'est pas encore publié (l'écran compte les modifications non publiées et le serveur refuse l'import tant que la confirmation n'est pas cochée), jamais la version en ligne. Un fichier de plus de 1 Mo est refusé, de même qu'un code de finalité invalide et qu'un service présenté comme venant d'un module qui ne le déclare pas.
 3. L'écran liste les **champs d'environnement** : identifiants de services (Google Analytics, Meta, Crisp...), adresse de la politique, régions. Ils viennent du site de recette : **ressaisissez ou confirmez les valeurs de la production** une à une avant de publier. La publication est refusée tant qu'ils ne sont pas confirmés. Pour chaque champ, la valeur de recette est affichée à côté de la zone de saisie ; aucune case n'est précochée.
 4. Vérifier que la page de politique existe sur le site de production, puis publier.
 
@@ -168,14 +170,14 @@ Les droits se règlent par profil dans Configuration, Profils d'administrateurs,
 
 | Action | VIEW | UPDATE | CREATE | DELETE |
 |--------|:----:|:------:|:------:|:------:|
-| Consulter tous les écrans, la liste du registre, les versions | oui | oui | oui | oui |
+| Consulter tous les écrans (le registre n'y montre que ses réglages et ses statistiques agrégées, pas ses entrées), les versions | oui | oui | oui | oui |
 | Exporter (JSON du brouillon ou d'une version) | oui | oui | oui | oui |
-| Exporter le registre (CSV), ouvrir une fiche de preuve | non | oui | non | non |
+| Lister, rechercher et ouvrir les entrées du registre (données personnelles), exporter le registre (CSV), ouvrir une fiche de preuve | non | oui | non | non |
 | Aperçu du brouillon | oui | oui | oui | oui |
 | Lancer la Vérification et télécharger le rapport | oui | oui | oui | oui |
 | Modifier le brouillon (services, finalités, textes, couleurs, Consent Mode, réglages) | non | oui | non | non |
 | Importer un préréglage | non | oui | non | non |
-| Écrire ou changer le code ou l'adresse du script d'un service personnalisé, activer les services expérimentaux | non | non | oui | non |
+| Écrire ou changer le code ou l'adresse du script d'un service personnalisé, saisir ou changer un paramètre de service qui est une adresse ou un conteneur de gestionnaire de balises (signalé « Exécuté sur la boutique »), activer les services expérimentaux | non | non | oui | non |
 | Importer une configuration | non | non | oui | non |
 | Confirmer les champs d'environnement | non | oui | non | non |
 | Restaurer une version comme brouillon | non | non | oui | non |
@@ -185,9 +187,9 @@ Les droits se règlent par profil dans Configuration, Profils d'administrateurs,
 
 Chaque colonne s'ajoute aux autres : un profil qui publie a typiquement VIEW, UPDATE et CREATE. Le tableau de bord affiche aussi, par profil, les droits réellement accordés.
 
-**La publication est un droit sensible.** Elle envoie la configuration à tous les visiteurs, JavaScript compris : un service personnalisé avec un champ `code`, ou un service à adresse de script, sert du code à tous les visiteurs. Tout ce qui peut amener un tel code au brouillon exige donc aussi CREATE : écrire ou changer le code ou l'adresse de script d'un service, importer une configuration, restaurer une version, activer les services expérimentaux. UPDATE seul modifie le reste du brouillon et ne peut pas publier. DELETE ne couvre que la purge du registre.
+**La publication est un droit sensible.** Elle envoie la configuration à tous les visiteurs, JavaScript compris : un service personnalisé avec un champ `code`, ou un service à adresse de script, sert du code à tous les visiteurs. Tout ce qui peut amener un tel code au brouillon exige donc aussi CREATE : écrire ou changer le code ou l'adresse de script d'un service, saisir ou changer un paramètre du catalogue qui est lui-même une adresse ou un hôte chargé comme script (l'adresse de Matomo, le domaine personnalisé d'une balise Google, l'adresse de la bibliothèque AT Internet, l'identifiant du conteneur Google Tag Manager... 39 paramètres, marqués `executable` dans le catalogue et « Exécuté sur la boutique » dans les listes de modifications), importer une configuration, restaurer une version, activer les services expérimentaux. UPDATE seul modifie le reste du brouillon et ne peut pas publier. DELETE ne couvre que la purge du registre.
 
-**Profil en lecture seule** (VIEW sans UPDATE) : tous les écrans se consultent, les champs sont désactivés, les boutons d'écriture sont masqués et un bandeau « Accès en lecture seule » le rappelle. Sans le droit VIEW, l'entrée de menu « Consentement aux cookies » n'apparaît pas.
+**Profil en lecture seule** (VIEW sans UPDATE) : tous les écrans se consultent, sauf les entrées du registre qui demandent UPDATE ; les champs sont désactivés, les boutons d'écriture sont masqués et un bandeau « Accès en lecture seule » le rappelle. Sans le droit VIEW, l'entrée de menu « Consentement aux cookies » n'apparaît pas.
 
 ## Texte type pour la politique de confidentialité
 

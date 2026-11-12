@@ -2,14 +2,14 @@
   {
     "key": "gtag", "name": "Google Analytics 4", "upstreamType": "analytic", "purpose": "analytics", "verified": true,
     "kind": "script", "googleTag": true, "uri": "https://analytics.google.com/",
-    "params": [{"name": "gtagUa", "required": true, "label": {"fr": "Identifiant de mesure", "en": "Measurement ID"}, "help": {"fr": "G-XXXXXXXXXX", "en": "G-XXXXXXXXXX"}, "pattern": "^G-[A-Z0-9]{4,}$"}],
+    "params": [{"name": "gtagUa", "required": true, "label": {"fr": "Identifiant de mesure", "en": "Measurement ID"}, "help": {"fr": "G-XXXXXXXXXX", "en": "G-XXXXXXXXXX"}, "pattern": "^G-[A-Z0-9]{4,}$", "executable": false}],
     "cookies": ["_ga", "_ga_*"], "storage": [], "domains": ["www.googletagmanager.com", "www.google-analytics.com"],
     "needsMarkup": false, "markup": null, "excluded": null
   },
   {
     "key": "googletagmanager", "name": "Google Tag Manager", "upstreamType": "api", "purpose": "ads", "verified": true,
     "kind": "script", "googleTag": true, "uri": "https://tagmanager.google.com/",
-    "params": [{"name": "googletagmanagerId", "required": true, "label": {"fr": "Identifiant du conteneur", "en": "Container ID"}, "help": {"fr": "GTM-XXXXXX", "en": "GTM-XXXXXX"}, "pattern": "^GTM-[A-Z0-9]{4,}$"}],
+    "params": [{"name": "googletagmanagerId", "required": true, "label": {"fr": "Identifiant du conteneur", "en": "Container ID"}, "help": {"fr": "GTM-XXXXXX", "en": "GTM-XXXXXX"}, "pattern": "^GTM-[A-Z0-9]{4,}$", "executable": false}],
     "cookies": [], "storage": [], "domains": ["www.googletagmanager.com"],
     "needsMarkup": false, "markup": null, "excluded": null
   },
@@ -22,7 +22,7 @@
   {
     "key": "matomo", "name": "Matomo", "upstreamType": "analytic", "purpose": "analytics", "verified": true,
     "kind": "script", "googleTag": false, "uri": "https://matomo.org/privacy-policy/",
-    "params": [{"name": "matomoId", "required": true, "label": {"fr": "Identifiant du site", "en": "Site ID"}, "help": {"fr": "", "en": ""}, "pattern": "^[0-9]+$"}, {"name": "matomoHost", "required": true, "label": {"fr": "URL", "en": "URL"}, "help": {"fr": "", "en": ""}, "pattern": "^https://"}],
+    "params": [{"name": "matomoId", "required": true, "label": {"fr": "Identifiant du site", "en": "Site ID"}, "help": {"fr": "", "en": ""}, "pattern": "^[0-9]+$", "executable": false}, {"name": "matomoHost", "required": true, "label": {"fr": "URL", "en": "URL"}, "help": {"fr": "", "en": ""}, "pattern": "^https://", "executable": true}],
     "cookies": ["_pk_id.*", "_pk_ses.*"], "storage": [], "domains": [],
     "needsMarkup": false, "markup": null, "excluded": null
   },

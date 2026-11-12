@@ -6,7 +6,7 @@ namespace CookieConsentManager\Registry;
 
 final class Uuid4
 {
-    private const PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
+    private const PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iD';
 
     public static function isValid(mixed $value): bool
     {

@@ -7,6 +7,7 @@ namespace CookieConsentManager\Controller\Admin;
 use CookieConsentManager\Admin\ActiveLanguages;
 use CookieConsentManager\Admin\DraftSectionEditor;
 use CookieConsentManager\Admin\DraftWriter;
+use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\MarkupSnippets;
 use CookieConsentManager\Catalogue\CatalogueEntry;
 use CookieConsentManager\Catalogue\CatalogueReader;
@@ -42,6 +43,7 @@ final class ServicesController extends AbstractScreenController
         private readonly ActiveLanguages $languages,
         private readonly FrontTexts $frontTexts,
         private readonly CookieDurations $durations,
+        private readonly ExecutableChanges $executable,
     ) {
         parent::__construct($urls, $drafts, $writer, $editor, $versions);
     }
@@ -109,8 +111,8 @@ final class ServicesController extends AbstractScreenController
 
         $before = $this->drafts->load();
         $after = $apply($before);
-        // Script that reaches the storefront: only the right that publishes may add or change it.
-        if ($this->changesExecutable($before, $after) && null !== $denied = $this->guardWrite($request, AccessManager::CREATE)) {
+        // Script that reaches the storefront (code, address, parameter that is an address): only the right that publishes may add or change it.
+        if (null !== $denied = $this->guardExecutable($this->executable, $before, $after)) {
             return $denied;
         }
 
@@ -122,24 +124,6 @@ final class ServicesController extends AbstractScreenController
         $this->flash($request, 'success', $this->say($success, $parameters));
 
         return new \Symfony\Component\HttpFoundation\RedirectResponse($this->urls->generate('ccm_admin_services').'#'.$anchor);
-    }
-
-    /**
-     * @param array<string, mixed> $before
-     * @param array<string, mixed> $after
-     */
-    private function changesExecutable(array $before, array $after): bool
-    {
-        $known = array_column($before['services'], null, 'key');
-        foreach ($after['services'] as $service) {
-            foreach (['code', 'script_url'] as $field) {
-                if ((string) ($service[$field] ?? '') !== (string) ($known[$service['key']][$field] ?? '')) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

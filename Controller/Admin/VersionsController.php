@@ -7,8 +7,10 @@ namespace CookieConsentManager\Controller\Admin;
 use CookieConsentManager\Admin\ChangePresenter;
 use CookieConsentManager\Admin\DraftSectionEditor;
 use CookieConsentManager\Admin\DraftWriter;
+use CookieConsentManager\Admin\ExecutableChanges;
 use CookieConsentManager\Admin\FrontLinks;
 use CookieConsentManager\Draft\DraftRepository;
+use CookieConsentManager\Front\PreviewToken;
 use CookieConsentManager\Publication\PublicationRefusedException;
 use CookieConsentManager\Publication\Publisher;
 use CookieConsentManager\Publication\VersionRepository;
@@ -30,6 +32,7 @@ final class VersionsController extends AbstractScreenController
 {
     private const PAGE_SIZE = 25;
     private const IMPORT_MAX_BYTES = 1048576;
+    private const CONFIRM_REPLACE = 'confirm_replace';
 
     public function __construct(
         UrlGeneratorInterface $urls,
@@ -45,6 +48,7 @@ final class VersionsController extends AbstractScreenController
         private readonly FrontLinks $links,
         private readonly EnvironmentFields $environmentFields,
         private readonly ChangePresenter $changes,
+        private readonly ExecutableChanges $executable,
     ) {
         parent::__construct($urls, $drafts, $writer, $editor, $versions);
     }
@@ -106,6 +110,9 @@ final class VersionsController extends AbstractScreenController
         if (null !== $denied = $this->guardWrite($request, AccessManager::CREATE)) {
             return $denied;
         }
+        if (null !== $unconfirmed = $this->refuseUnconfirmedReplacement($request, 'ccm_admin_versions')) {
+            return $unconfirmed;
+        }
 
         $file = $request->files->get('config_file');
         if ($file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
@@ -146,7 +153,12 @@ final class VersionsController extends AbstractScreenController
         $confirmed = array_values(array_filter((array) ($input['confirmed'] ?? []), 'is_string'));
         $values = array_filter((array) ($input['values'] ?? []), 'is_string');
 
-        $outcome = $this->environmentFields->resolve($this->drafts->load(), $confirmed, $values);
+        $draft = $this->drafts->load();
+        $outcome = $this->environmentFields->resolve($draft, $confirmed, $values);
+        // A value typed for a parameter that is the address of a script is a change of what the storefront runs.
+        if (null !== $denied = $this->guardExecutable($this->executable, $draft, $outcome['draft'])) {
+            return $denied;
+        }
         if ([] === $outcome['resolved']) {
             $this->flash($request, 'warning', $this->say('Nothing was confirmed: tick a field to keep its imported value, or type the value of this shop.'));
 
@@ -198,6 +210,9 @@ final class VersionsController extends AbstractScreenController
         if (null === $this->versions->find($number)) {
             return $this->pageNotFound();
         }
+        if (null !== $unconfirmed = $this->refuseUnconfirmedReplacement($request, 'ccm_admin_version_show', ['number' => $number])) {
+            return $unconfirmed;
+        }
 
         $this->restorer->restore($number, $this->author());
         $this->flash($request, 'success', $this->say('Version %version% restored in the draft. Publish to make it live.', ['%version%' => (string) $number]));
@@ -214,11 +229,18 @@ final class VersionsController extends AbstractScreenController
 
         $path = (string) $request->query->get('path', '/');
         // A path of this site only: never a host, never a scheme-relative URL.
-        if (1 !== preg_match('~^/(?!/)[^\s\\\\]*$~', $path)) {
+        if (1 !== preg_match('~^/(?!/)[^\s\\\\]*$~D', $path)) {
             $path = '/';
         }
 
-        return new RedirectResponse($this->links->preview($path));
+        $url = $this->links->preview($path);
+        if (null === $url) {
+            $this->flash($request, 'warning', $this->say('The preview and the verification are unavailable: the secret of the shop (APP_SECRET) is empty or shorter than %min% characters. Set a longer secret in the environment of the shop.', ['%min%' => (string) PreviewToken::MINIMUM_SECRET_BYTES]));
+
+            return $this->redirectTo('ccm_admin_versions');
+        }
+
+        return new RedirectResponse($url);
     }
 
     /**
@@ -245,6 +267,20 @@ final class VersionsController extends AbstractScreenController
             'environment_pending' => (array) ($draft['_meta']['environment_pending'] ?? []),
             'env_fields' => $this->environmentFields->pending($draft),
         ], $status);
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    private function refuseUnconfirmedReplacement(Request $request, string $route, array $parameters = []): ?Response
+    {
+        if ($request->request->getBoolean(self::CONFIRM_REPLACE)) {
+            return null;
+        }
+
+        $this->flash($request, 'warning', $this->say('Nothing was changed: tick the confirmation that the current draft will be replaced.'));
+
+        return $this->redirectTo($route, $parameters);
     }
 
     private function uiLocale(): string

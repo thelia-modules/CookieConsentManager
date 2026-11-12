@@ -23,7 +23,7 @@ Below, "the first CNIL page", "the second CNIL page" and "the third CNIL page" m
 - Everything you change goes into the draft. Visitors never see the draft.
 - Publishing creates a numbered version that can no longer be edited, and puts it online. Until a version is published, the banner does not appear.
 - Each consent is recorded with the number of the version the visitor saw. That is what lets you show what was displayed.
-- You can go back: on a version's page, "Restore as the draft" copies an old version into the draft, which you then publish.
+- You can go back: on a version's page, "Restore as the draft" copies an old version into the draft, which you then publish. The whole draft is replaced, including what is not published yet: the page warns you and the server refuses the action unless you tick the confirmation.
 
 ## Dashboard
 
@@ -49,6 +49,7 @@ The assistant has four steps, in order, for a first setup:
 - Catalogue: "verified" services are tested and documented. "Imported" services are experimental and hidden while "Experimental services" is off on the dashboard. Filter by level, category or search.
 - For a video, the service sheet gives the HTML to paste into the page ("HTML to paste in your page", with a Copy button). The embedded iframes of YouTube, Vimeo, Dailymotion, Google Maps and most other media services already in your pages are replaced by an "Allow" box while the service is active and published. The list of services that are not is in the [integrator guide](integrator-guide.md#hard-coded-scripts).
 - Services proposed by other modules: a module (payment, for example) can declare its own cookies. They stay inactive until you enable them and publish. A "strictly necessary" service stays flagged with its justification.
+- Some parameters of a catalogue service are addresses or hosts that the service loads as a script, or the container ID of a tag manager (the container runs whatever its owner puts in it). Changing one needs the CREATE right, like the code of a custom service; the other account identifiers stay with UPDATE. The lists of changes mark these rows "Runs on the storefront".
 - Custom services: a service that is not in the catalogue. It has a script address, your own code (CREATE right required to write or change the code or the script address, kept in the version) or a plain declaration (a service loaded by Google Tag Manager).
 - Purpose of a catalogue service: read-only. Only a custom service chooses its own.
 - Exempt audience measurement: the exemption from consent is limited to a list of tools, displayed with a description: self-hosted Matomo, Wysistat in exempt mode, Plausible, Simple Analytics. For each, tick the conditions you confirm (they are set in the tool itself, and the module cannot see them). The missing condition is named with a help text. Google Analytics, custom services and services of other modules are never eligible. A tool that is already exempt and leaves the list stays visible so that you can remove it. When one of them is active, the banner announces it at the first level, with a link to object.
@@ -142,6 +143,7 @@ There are two levels:
 
 "Preview the draft on the shop" opens your real shop with the draft: the banner shows with your services. Nothing is written to the registry.
 A "Preview" strip marks the mode, and no service is actually loaded. To check cookies, use the published version.
+The preview and the Verification are signed with the secret of the shop (`APP_SECRET`). If it is empty or shorter than 32 characters, both are unavailable: the dashboard shows a warning and the preview button explains why. Set a longer secret in the environment of the shop.
 
 ## Publishing and "substantial change"
 
@@ -189,7 +191,7 @@ Ask your developer to host the fonts on the site (font files copied into the the
 ## From test to production
 
 1. On the test site: tab "Versions and verification", "Export the draft (JSON)". The export holds the draft, not the published version, so publish first if needed.
-2. On production: "Import a configuration (JSON)" (CREATE right, the one that publishes, because a file can carry code). The import replaces the draft, never the live version. A file over 1 MB is refused. Invalid addresses, and services presented as coming from a module that does not declare them, block the write. Other errors are imported so that you can correct them in the back-office. Experimental services of the file are skipped while "Experimental services" is off.
+2. On production: "Import a configuration (JSON)" (CREATE right, the one that publishes, because a file can carry code). The import replaces the whole draft, including what is not published yet (the screen counts the unpublished changes and the server refuses the import unless you tick the confirmation), never the live version. A file over 1 MB is refused. Invalid addresses, invalid purpose codes, and services presented as coming from a module that does not declare them, block the write. Other errors are imported so that you can correct them in the back-office. Experimental services of the file are skipped while "Experimental services" is off.
 3. The screen lists the environment fields: service identifiers (Google Analytics, Meta, Crisp...), policy address, regions. They come from the test site, so re-enter or confirm the production values one by one before publishing. Publication is refused until they are confirmed. For each field the test value is shown next to the input, and no box is pre-ticked.
 4. Check that the policy page exists on the production site, then publish.
 
@@ -202,11 +204,11 @@ Each action needs one right. Rights do not include each other: to open the scree
 
 | Action | Right needed |
 |--------|:------------:|
-| Browse all screens and the registry list, preview the draft, run the Verification and download its report, export (JSON of the draft or of a version) | VIEW |
-| Export the registry (CSV), open a proof sheet | UPDATE |
+| Browse all screens (the registry shows its settings and aggregated statistics, not its entries), preview the draft, run the Verification and download its report, export (JSON of the draft or of a version) | VIEW |
+| List, search and open the registry entries (they hold personal data), export the registry (CSV), open a proof sheet | UPDATE |
 | Edit the draft (services, purposes, texts, colours, Consent Mode, settings) | UPDATE |
 | Import a preset | UPDATE |
-| Write or change the code or the script address of a custom service, switch on experimental services | CREATE |
+| Write or change the code or the script address of a custom service, set or change a service parameter that is an address or a tag manager container (flagged "Runs on the storefront"), switch on experimental services | CREATE |
 | Import a configuration | CREATE |
 | Confirm environment fields | UPDATE |
 | Restore a version as the draft | CREATE |
@@ -214,9 +216,9 @@ Each action needs one right. Rights do not include each other: to open the scree
 | Publish a version (setup assistant included, last step) | CREATE |
 | Purge the registry | DELETE |
 
-Publishing is a sensitive right. It sends the configuration to every visitor, and that includes JavaScript: custom services with a `code` field and script services with a `script_url` serve code to all visitors of the shop. Whatever can bring such code into the draft therefore needs CREATE too: writing or changing the code or script address of a service, importing a configuration, restoring a version, switching on experimental services. UPDATE alone edits everything else in the draft and cannot publish. Give CREATE only to people who may put code on every page. DELETE covers the registry purge only.
+Publishing is a sensitive right. It sends the configuration to every visitor, and that includes JavaScript: custom services with a `code` field and script services with a `script_url` serve code to all visitors of the shop. Whatever can bring such code into the draft therefore needs CREATE too: writing or changing the code or script address of a service, setting or changing a catalogue parameter that is itself an address or a host loaded as a script (the Matomo address, the custom domain of a Google tag, the library address of AT Internet, the container ID of Google Tag Manager... 39 parameters, flagged `executable` in the catalogue and "Runs on the storefront" in the lists of changes), importing a configuration, restoring a version, switching on experimental services. UPDATE alone edits everything else in the draft and cannot publish. Give CREATE only to people who may put code on every page. DELETE covers the registry purge only.
 
-Read-only profile (VIEW without UPDATE): every screen can be browsed, fields are disabled, write buttons are hidden, and a strip "Read-only access" says so. Without VIEW, the menu entry "Cookie consent" does not appear.
+Read-only profile (VIEW without UPDATE): every screen can be browsed except the registry entries, which need UPDATE; fields are disabled, write buttons are hidden, and a strip "Read-only access" says so. Without VIEW, the menu entry "Cookie consent" does not appear.
 
 ## Sample text for the privacy policy
 

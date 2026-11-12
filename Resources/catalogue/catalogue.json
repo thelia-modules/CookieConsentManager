@@ -20,7 +20,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -74,7 +75,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -105,7 +107,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -136,7 +139,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -167,7 +171,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -201,7 +206,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "addtoanyfeedUri",
@@ -214,7 +220,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -262,7 +269,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adformpm",
@@ -275,7 +283,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -306,7 +315,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -343,7 +353,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "adobeworkspaceId2",
@@ -356,7 +367,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "adobeworkspaceId3",
@@ -369,7 +381,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -425,7 +438,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -494,7 +508,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -576,7 +591,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -624,7 +640,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -655,7 +672,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "analyticsPageView",
@@ -668,7 +686,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "analyticsUa",
@@ -681,7 +700,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "analyticsUaCreate",
@@ -694,7 +714,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -737,7 +758,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -790,7 +812,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -838,7 +861,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "atNoFallback",
@@ -851,7 +875,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "atinternetAlreadyLoaded",
@@ -864,7 +889,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "atinternetSendData",
@@ -877,7 +903,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -913,7 +940,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -987,7 +1015,8 @@
           "fr": "Identifiant numérique de la balise UET, visible dans Microsoft Advertising > Suivi des conversions.",
           "en": "Numeric UET tag ID, shown in Microsoft Advertising > Conversion tracking."
         },
-        "pattern": "^[0-9]{5,12}$"
+        "pattern": "^[0-9]{5,12}$",
+        "executable": false
       },
       {
         "name": "bingadsStoreCookies",
@@ -1000,7 +1029,8 @@
           "fr": "Valeur transmise à storeConvTrackCookies : true ou false. Laisser vide pour le comportement par défaut.",
           "en": "Value passed to storeConvTrackCookies: true or false. Leave empty for the default."
         },
-        "pattern": "^(true|false)?$"
+        "pattern": "^(true|false)?$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -1038,7 +1068,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1137,7 +1168,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1168,7 +1200,8 @@
           "fr": "Identifiant du projet Clarity (lettres minuscules et chiffres).",
           "en": "Clarity project ID (lowercase letters and digits)."
         },
-        "pattern": "^[a-z0-9]{6,16}$"
+        "pattern": "^[a-z0-9]{6,16}$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -1210,7 +1243,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "clickdimensionsDomain",
@@ -1223,7 +1257,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1254,7 +1289,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -1312,7 +1348,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1343,7 +1380,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1374,7 +1412,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -1412,7 +1451,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1443,7 +1483,8 @@
           "fr": "Identifiant de la forme xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, visible dans Crisp > Paramètres > Installation.",
           "en": "ID in the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, shown in Crisp > Settings > Setup."
         },
-        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -1496,7 +1537,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -1619,7 +1661,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1675,7 +1718,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -1723,7 +1767,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "dynatraceJSPath",
@@ -1736,7 +1781,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -1767,7 +1813,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1819,7 +1866,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -1861,7 +1909,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1892,7 +1941,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1923,7 +1973,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -1954,7 +2005,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -2026,7 +2078,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2084,7 +2137,8 @@
           "fr": "Numéro du pixel, visible dans le Gestionnaire d'événements Meta.",
           "en": "Pixel number, shown in Meta Events Manager."
         },
-        "pattern": "^[0-9]{6,20}$"
+        "pattern": "^[0-9]{6,20}$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -2146,7 +2200,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2232,7 +2287,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "firebaseAppId",
@@ -2245,7 +2301,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "firebaseAuthDomain",
@@ -2258,7 +2315,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "firebaseDatabaseUrl",
@@ -2271,7 +2329,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "firebaseMeasurementId",
@@ -2284,7 +2343,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "firebaseProjectId",
@@ -2297,7 +2357,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "firebaseStorageBucket",
@@ -2310,7 +2371,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2344,7 +2406,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "force24trackingId",
@@ -2357,7 +2420,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2391,7 +2455,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -2442,7 +2507,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "gajsPageView",
@@ -2455,7 +2521,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "gajsUa",
@@ -2468,7 +2535,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2705,7 +2773,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2741,7 +2810,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "getquantyAlreadyLoaded",
@@ -2754,7 +2824,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -2814,7 +2885,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -2845,7 +2917,8 @@
           "fr": "Identifiant de la forme AW-1234567890, visible dans Google Ads > Outils > Balise Google.",
           "en": "ID in the form AW-1234567890, shown in Google Ads > Tools > Google tag."
         },
-        "pattern": "^AW-[0-9]+$"
+        "pattern": "^AW-[0-9]+$",
+        "executable": false
       },
       {
         "name": "googleadsCustomDomain",
@@ -2858,7 +2931,8 @@
           "fr": "Laisser vide pour www.googletagmanager.com.",
           "en": "Leave empty for www.googletagmanager.com."
         },
-        "pattern": "^[A-Za-z0-9.-]+$"
+        "pattern": "^[A-Za-z0-9.-]+$",
+        "executable": true
       }
     ],
     "cookies": [
@@ -2897,7 +2971,8 @@
           "fr": "Numéro de conversion Google Ads (chiffres seuls, sans AW-).",
           "en": "Google Ads conversion number (digits only, without AW-)."
         },
-        "pattern": "^[0-9]+$"
+        "pattern": "^[0-9]+$",
+        "executable": false
       },
       {
         "name": "adwordsconversionLabel",
@@ -2910,7 +2985,8 @@
           "fr": "Libellé de l'action de conversion.",
           "en": "Label of the conversion action."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adwordsconversionLanguage",
@@ -2923,7 +2999,8 @@
           "fr": "Code langue (ex. fr).",
           "en": "Language code (e.g. fr)."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adwordsconversionFormat",
@@ -2936,7 +3013,8 @@
           "fr": "Format de la balise (ex. 3).",
           "en": "Tag format (e.g. 3)."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adwordsconversionColor",
@@ -2949,7 +3027,8 @@
           "fr": "Couleur de fond du badge (ex. ffffff).",
           "en": "Badge background color (e.g. ffffff)."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adwordsconversionValue",
@@ -2962,7 +3041,8 @@
           "fr": "Valeur de la conversion.",
           "en": "Conversion value."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adwordsconversionCurrency",
@@ -2975,7 +3055,8 @@
           "fr": "Code devise ISO (ex. EUR).",
           "en": "ISO currency code (e.g. EUR)."
         },
-        "pattern": "^[A-Z]{3}$"
+        "pattern": "^[A-Z]{3}$",
+        "executable": false
       },
       {
         "name": "adwordsconversionCustom1",
@@ -2988,7 +3069,8 @@
           "fr": "Valeur transmise telle quelle.",
           "en": "Value passed as is."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "adwordsconversionCustom2",
@@ -3001,7 +3083,8 @@
           "fr": "Valeur transmise telle quelle.",
           "en": "Value passed as is."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -3035,7 +3118,8 @@
           "fr": "Numéro de conversion Google Ads (chiffres seuls, sans AW-).",
           "en": "Google Ads conversion number (digits only, without AW-)."
         },
-        "pattern": "^[0-9]+$"
+        "pattern": "^[0-9]+$",
+        "executable": false
       }
     ],
     "cookies": [],
@@ -3069,7 +3153,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -3100,7 +3185,8 @@
           "fr": "Clé d'API de la console Google Cloud, restreinte à votre domaine.",
           "en": "API key from Google Cloud console, restricted to your domain."
         },
-        "pattern": "^AIza[0-9A-Za-z_-]{35}$"
+        "pattern": "^AIza[0-9A-Za-z_-]{35}$",
+        "executable": false
       },
       {
         "name": "googlemapsLibraries",
@@ -3113,7 +3199,8 @@
           "fr": "Liste séparée par des virgules (ex. places,geometry). Laisser vide si inutile.",
           "en": "Comma-separated list (e.g. places,geometry). Leave empty if unused."
         },
-        "pattern": "^[a-z,]*$"
+        "pattern": "^[a-z,]*$",
+        "executable": false
       }
     ],
     "cookies": [],
@@ -3226,7 +3313,8 @@
           "fr": "Identifiant de la forme GTM-XXXXXXX, visible dans l'interface Google Tag Manager.",
           "en": "ID in the form GTM-XXXXXXX, shown in the Google Tag Manager interface."
         },
-        "pattern": "^GTM-[A-Z0-9]+$"
+        "pattern": "^GTM-[A-Z0-9]+$",
+        "executable": true
       },
       {
         "name": "googletagmanagerCustomDomain",
@@ -3239,7 +3327,8 @@
           "fr": "Laisser vide pour www.googletagmanager.com. Sinon, domaine d'un serveur de balisage (sans https://).",
           "en": "Leave empty for www.googletagmanager.com. Otherwise the domain of a tagging server (without https://)."
         },
-        "pattern": "^[A-Za-z0-9.-]+$"
+        "pattern": "^[A-Za-z0-9.-]+$",
+        "executable": true
       }
     ],
     "cookies": [
@@ -3276,7 +3365,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3384,7 +3474,8 @@
           "fr": "Identifiant de la forme G-XXXXXXXXXX, visible dans Google Analytics > Administration > Flux de données.",
           "en": "ID in the form G-XXXXXXXXXX, shown in Google Analytics > Admin > Data streams."
         },
-        "pattern": "^(G|GT)-[A-Z0-9]+$"
+        "pattern": "^(G|GT)-[A-Z0-9]+$",
+        "executable": false
       },
       {
         "name": "gtagCustomDomain",
@@ -3397,7 +3488,8 @@
           "fr": "Laisser vide pour www.googletagmanager.com. Sinon, domaine d'un serveur de balisage (sans https://).",
           "en": "Leave empty for www.googletagmanager.com. Otherwise the domain of a tagging server (without https://)."
         },
-        "pattern": "^[A-Za-z0-9.-]+$"
+        "pattern": "^[A-Za-z0-9.-]+$",
+        "executable": true
       },
       {
         "name": "gtagCrossdomain",
@@ -3410,7 +3502,8 @@
           "fr": "Domaines à relier au suivi (laisser vide si un seul domaine).",
           "en": "Domains to link in tracking (leave empty for a single domain)."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3482,7 +3575,8 @@
           "fr": "Numéro du site Hotjar.",
           "en": "Hotjar site number."
         },
-        "pattern": "^[0-9]+$"
+        "pattern": "^[0-9]+$",
+        "executable": false
       },
       {
         "name": "HotjarSv",
@@ -3495,7 +3589,8 @@
           "fr": "Numéro de version du code de suivi (en général 6).",
           "en": "Tracking code version number (usually 6)."
         },
-        "pattern": "^[0-9]+$"
+        "pattern": "^[0-9]+$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -3533,7 +3628,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "hubspotId",
@@ -3546,7 +3642,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3629,7 +3726,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3701,7 +3799,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -3732,7 +3831,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3765,7 +3865,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "kobanurl",
@@ -3778,7 +3879,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -3811,7 +3913,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3869,7 +3972,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3902,7 +4006,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "leadforensicsSf14gv",
@@ -3915,7 +4020,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3948,7 +4054,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -3999,7 +4106,8 @@
           "fr": "Identifiant numérique, visible dans LinkedIn Campaign Manager > Insight Tag.",
           "en": "Numeric ID, shown in LinkedIn Campaign Manager > Insight Tag."
         },
-        "pattern": "^[0-9]{4,12}$"
+        "pattern": "^[0-9]{4,12}$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -4055,7 +4163,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "madmetricsDirectId",
@@ -4068,7 +4177,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "madmetricsHostname",
@@ -4081,7 +4191,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "madmetricsLlmId",
@@ -4094,7 +4205,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "madmetricsReferalId",
@@ -4107,7 +4219,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "madmetricsSiteId",
@@ -4120,7 +4233,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -4176,7 +4290,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -4207,7 +4322,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -4241,7 +4357,8 @@
           "fr": "Adresse complète avec https:// et la barre finale, ex. https://stats.example.com/.",
           "en": "Full address with https:// and the trailing slash, e.g. https://stats.example.com/."
         },
-        "pattern": "^(https?:)?//[^\\s/]+(/[^\\s]*)?/$"
+        "pattern": "^(https?:)?//[^\\s/]+(/[^\\s]*)?/$",
+        "executable": true
       },
       {
         "name": "matomoId",
@@ -4254,7 +4371,8 @@
           "fr": "Numéro du site dans Matomo.",
           "en": "Site number in Matomo."
         },
-        "pattern": "^[0-9]+$"
+        "pattern": "^[0-9]+$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -4288,7 +4406,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "matomoDontTrackPageView",
@@ -4301,7 +4420,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "matomoFullTracking",
@@ -4314,7 +4434,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "matomoHost",
@@ -4327,7 +4448,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "matomoId",
@@ -4340,7 +4462,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -4397,7 +4520,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "matomoId",
@@ -4410,7 +4534,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -4449,7 +4574,8 @@
           "fr": "Adresse du fichier conteneur, ex. https://stats.example.com/js/container_XXXXXXXX.js.",
           "en": "Address of the container file, e.g. https://stats.example.com/js/container_XXXXXXXX.js."
         },
-        "pattern": "^https://[^\\s]+\\.js$"
+        "pattern": "^https://[^\\s]+\\.js$",
+        "executable": true
       }
     ],
     "cookies": [
@@ -4506,7 +4632,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -4557,7 +4684,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -4600,7 +4728,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -4631,7 +4760,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "microsoftcampaignanalyticsactionId",
@@ -4644,7 +4774,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "microsoftcampaignanalyticsdomainId",
@@ -4657,7 +4788,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -4732,7 +4864,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -4767,7 +4900,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "multiplegoogletagmanagerId",
@@ -4780,7 +4914,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -4834,7 +4969,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "multiplegtagUa",
@@ -4847,7 +4983,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -4890,7 +5027,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -4921,7 +5059,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -4952,7 +5091,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -5011,7 +5151,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "openwebanalyticsId",
@@ -5024,7 +5165,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5072,7 +5214,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5103,7 +5246,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "piCId",
@@ -5116,7 +5260,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -5149,7 +5294,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "pianoSendData",
@@ -5162,7 +5308,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "pianoSite",
@@ -5175,7 +5322,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -5212,7 +5360,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5260,7 +5409,8 @@
           "fr": "Identifiant numérique, visible dans Pinterest Ads > Conversions.",
           "en": "Numeric ID, shown in Pinterest Ads > Conversions."
         },
-        "pattern": "^[0-9]{8,20}$"
+        "pattern": "^[0-9]{8,20}$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -5303,7 +5453,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "pipedrivePlaybook",
@@ -5316,7 +5467,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5347,7 +5499,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "piwikProId",
@@ -5360,7 +5513,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -5399,7 +5553,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "piximediaName",
@@ -5412,7 +5567,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "piximediaTag",
@@ -5425,7 +5581,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "piximediaType",
@@ -5438,7 +5595,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5469,7 +5627,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "plausibleEndpoint",
@@ -5482,7 +5641,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -5530,7 +5690,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "pleziTw",
@@ -5543,7 +5704,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5591,7 +5753,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "posthogHost",
@@ -5604,7 +5767,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -5689,7 +5853,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5720,7 +5885,8 @@
           "fr": "À renseigner pour reCAPTCHA v3 (paramètre render). Laisser vide en v2.",
           "en": "Fill in for reCAPTCHA v3 (render parameter). Leave empty for v2."
         },
-        "pattern": "^6L[0-9A-Za-z_-]{38}$"
+        "pattern": "^6L[0-9A-Za-z_-]{38}$",
+        "executable": false
       },
       {
         "name": "recaptcha_hl",
@@ -5733,7 +5899,8 @@
           "fr": "Code langue du widget (ex. fr). Laisser vide pour la langue du navigateur.",
           "en": "Widget language code (e.g. fr). Leave empty for the browser language."
         },
-        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -5769,7 +5936,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "redditExternalId",
@@ -5782,7 +5950,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "redditIDFA",
@@ -5795,7 +5964,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "redditInit",
@@ -5808,7 +5978,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5839,7 +6010,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5870,7 +6042,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -5903,7 +6076,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "screebId",
@@ -5916,7 +6090,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5947,7 +6122,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -5978,7 +6154,8 @@
           "fr": "Clé du suivi Marketing Automation, visible dans Brevo > Automatisation > Paramètres.",
           "en": "Marketing Automation tracking key, shown in Brevo > Automation > Settings."
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -6013,7 +6190,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -6067,7 +6245,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -6100,7 +6279,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -6135,7 +6315,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "ssId",
@@ -6148,7 +6329,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -6184,7 +6366,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6232,7 +6415,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6297,7 +6481,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -6333,7 +6518,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "snapchatId",
@@ -6346,7 +6532,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6424,7 +6611,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "statableSiteId",
@@ -6437,7 +6625,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6487,7 +6676,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6518,7 +6708,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6549,7 +6740,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -6580,7 +6772,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "tawktoWidgetId",
@@ -6593,7 +6786,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6624,7 +6818,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6655,7 +6850,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "teambrainUrl",
@@ -6668,7 +6864,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -6699,7 +6896,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "thetradedeskUpixelId",
@@ -6712,7 +6910,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6760,7 +6959,8 @@
           "fr": "Identifiant alphanumérique, visible dans TikTok Ads Manager > Événements.",
           "en": "Alphanumeric ID, shown in TikTok Ads Manager > Events."
         },
-        "pattern": "^[A-Z0-9]{10,30}$"
+        "pattern": "^[A-Z0-9]{10,30}$",
+        "executable": false
       }
     ],
     "cookies": [
@@ -6830,7 +7030,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6861,7 +7062,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -6909,7 +7111,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "twengaLocale",
@@ -6922,7 +7125,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -7021,7 +7225,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7069,7 +7274,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7100,7 +7306,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "ubibId",
@@ -7113,7 +7320,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -7144,7 +7352,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "userId",
@@ -7157,7 +7366,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -7190,7 +7400,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7221,7 +7432,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7255,7 +7467,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7286,7 +7499,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7317,7 +7531,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7348,7 +7563,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "verizondottagProjectId",
@@ -7361,7 +7577,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -7440,7 +7657,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "visibleedomain",
@@ -7453,7 +7671,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7490,7 +7709,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7546,7 +7766,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [
@@ -7614,7 +7835,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7648,7 +7870,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7683,7 +7906,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7716,7 +7940,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7749,7 +7974,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7835,7 +8061,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       }
     ],
     "cookies": [],
@@ -7866,7 +8093,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": true
       },
       {
         "name": "xiti_smarttagSiteId",
@@ -7879,7 +8107,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -7987,7 +8216,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [],
@@ -8018,7 +8248,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       },
       {
         "name": "zohoPageSenseScriptHash",
@@ -8031,7 +8262,8 @@
           "fr": "",
           "en": ""
         },
-        "pattern": null
+        "pattern": null,
+        "executable": false
       }
     ],
     "cookies": [
@@ -8089,7 +8321,8 @@
           "fr": "Clé alphanumérique du widget Zendesk Chat.",
           "en": "Alphanumeric key of the Zendesk Chat widget."
         },
-        "pattern": "^[A-Za-z0-9]{20,40}$"
+        "pattern": "^[A-Za-z0-9]{20,40}$",
+        "executable": false
       }
     ],
     "cookies": [

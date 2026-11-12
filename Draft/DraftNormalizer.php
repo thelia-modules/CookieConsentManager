@@ -95,7 +95,7 @@ final class DraftNormalizer
     {
         $result = [];
         foreach ($urls as $language => $url) {
-            if (1 === preg_match('/^[a-z]{2}$/', (string) $language) && '' !== trim((string) $url)) {
+            if (1 === preg_match('/^[a-z]{2}$/D', (string) $language) && '' !== trim((string) $url)) {
                 $result[(string) $language] = trim((string) $url);
             }
         }
@@ -115,7 +115,7 @@ final class DraftNormalizer
     {
         $result = [];
         foreach ($presets as $language => $code) {
-            if (1 === preg_match('/^[a-z]{2}$/', (string) $language) && 1 === preg_match('/^[a-z]{2}-[A-Z]{2}$/', (string) $code)) {
+            if (1 === preg_match('/^[a-z]{2}$/D', (string) $language) && 1 === preg_match('/^[a-z]{2}-[A-Z]{2}$/D', (string) $code)) {
                 $result[(string) $language] = (string) $code;
             }
         }

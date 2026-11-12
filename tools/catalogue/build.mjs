@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { splitServices } from './split.mjs';
 import { detectExclusion, readFallbackClasses, readMetadata, readParams } from './sandbox.mjs';
 import { GOOGLE_TAG_KEYS, OTHER_PURPOSE, TYPE_TO_PURPOSE } from './purposes.mjs';
+import { deriveExecutable } from './executable.mjs';
 import { renderReport } from './report.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -87,7 +88,7 @@ if (fragments.length !== opts.expected) {
 const section3 = opts.section3 && existsSync(opts.section3) ? new Map(JSON.parse(readFileSync(opts.section3, 'utf8')).map((s) => [s.key, s])) : null;
 const verified = JSON.parse(readFileSync(join(ROOT, 'tools/catalogue/verified.json'), 'utf8'));
 
-const notes = { keyMismatch: [], needConsentFalse: [], otherMapped: [], dynamicCookies: [], iifeCookies: [], kindMismatch: [], callbacks: {}, section3Diff: [], noSection3: [], unmappedOtherStale: [] };
+const notes = { keyMismatch: [], needConsentFalse: [], otherMapped: [], dynamicCookies: [], iifeCookies: [], kindMismatch: [], callbacks: {}, executable: {}, section3Diff: [], noSection3: [], unmappedOtherStale: [] };
 const entries = [];
 
 for (const fragment of fragments) {
@@ -111,6 +112,8 @@ for (const fragment of fragments) {
   const excluded = detectExclusion(fragment.code, meta.type, fragment.key);
   const { params, callbacks, required } = readParams(fragment.code);
   if (callbacks.length) notes.callbacks[fragment.key] = callbacks;
+  const { executable } = deriveExecutable(fragment.code, fragment.key, params);
+  if (executable.size) notes.executable[fragment.key] = [...executable].sort();
   if (meta.cookiesIife) notes.iifeCookies.push(fragment.key);
   if (meta.cookiesDynamic) notes.dynamicCookies.push(fragment.key);
 
@@ -138,14 +141,14 @@ for (const fragment of fragments) {
     entry = {
       key: fragment.key, name: ver.name ?? meta.name, upstreamType: meta.type, purpose: ver.purpose, verified: true, kind: ver.kind,
       googleTag: ver.googleTag ?? GOOGLE_TAG_KEYS.has(fragment.key), uri: meta.uri,
-      params: declared.map((name) => ({ name, required: ver.params[name].required, label: ver.params[name].label, help: ver.params[name].help, pattern: ver.params[name].pattern })),
+      params: declared.map((name) => ({ name, required: ver.params[name].required, label: ver.params[name].label, help: ver.params[name].help, pattern: ver.params[name].pattern, executable: executable.has(name) })),
       cookies: ver.cookies, storage: ver.storage ?? [], domains: ver.domains,
     };
   } else {
     entry = {
       key: fragment.key, name: meta.name ?? fragment.key, upstreamType: meta.type, purpose, verified: false, kind: derivedKind,
       googleTag: GOOGLE_TAG_KEYS.has(fragment.key), uri: meta.uri,
-      params: params.map((name) => ({ name, required: required.has(name), label: { fr: name, en: name }, help: { fr: '', en: '' }, pattern: null })),
+      params: params.map((name) => ({ name, required: required.has(name), label: { fr: name, en: name }, help: { fr: '', en: '' }, pattern: null, executable: executable.has(name) })),
       cookies: meta.cookies, storage: [], domains: [],
     };
   }

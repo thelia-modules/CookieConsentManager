@@ -2,6 +2,20 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.0.4] - 2026-11-05
+
+### Security
+
+- Media iframes are read as a browser reads them before being blocked: an address written with an upper-case scheme, spaces, tabs or line feeds, a trailing dot on the host, backslashes or `..` segments is recognised, and an unreadable address that names an active service is blocked.
+- Only the iframes that are tags of the page are rewritten: an `<iframe` inside an attribute value, a comment, a script, a style, a textarea or a template is left as is. The placeholder used to be inserted into the attribute value, which could turn the rest of the value into markup.
+- When a page cannot be read, the iframes of the active media services are emptied instead of the page being served as is. Pathological pages are read in bounded time.
+- Changing a catalogue parameter whose value decides what script runs on the storefront (a script address, a host, or the container ID of a tag manager: Google Tag Manager, TagCommander, Adobe Launch, Piwik Pro; 39 parameters flagged by the catalogue build) needs the right that publishes (CREATE), on the Services screen, in the setup wizard and when confirming environment fields. The publication diff marks these lines.
+- A panel address for a version that was never published no longer creates a cache entry.
+- Every anchored validation pattern refuses a final line feed, and the purpose code of a draft is validated, also on import.
+- No preview or audit token is issued or accepted while the secret of the shop is empty or shorter than 32 bytes; the dashboard says why the preview is unavailable.
+- The registry entries, their list and the detail of a consent, need UPDATE, like the CSV export. With VIEW, the registry screen shows its settings and statistics only.
+- Importing a configuration and restoring a version ask for a confirmation checked by the server before the draft is replaced.
+
 ## [1.0.3] - 2026-11-05
 
 ### Added
